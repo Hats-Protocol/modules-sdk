@@ -5,7 +5,7 @@ import {
   stringToBytes,
   encodePacked,
   encodeAbiParameters,
-  //decodeEventLog,
+  decodeEventLog,
 } from "viem";
 import {
   MissingPublicClientError,
@@ -18,11 +18,11 @@ import {
   eligibilityModules,
   eligibilityFactory,
 } from "@hatsprotocol/modules-registry";
-import { Uint256Schema } from "../schemas";
+//import { verify } from "../schemas";
 import type {
   CreateInstanceResult,
   SupportedChain,
-  CreateInstanceArg,
+  //CreateInstanceArg,
 } from "../types";
 import type { EligibilityModule } from "@hatsprotocol/modules-registry";
 import type { Account, Address } from "viem";
@@ -62,13 +62,15 @@ export class EligibilityClient {
 
     eligibilityModules.forEach((module) => {
       if (this._chainId.toString() in module.moduleInfo.deployments) {
-        const moduleId = keccak256(stringToBytes(JSON.stringify(module)));
+        const moduleId: string = keccak256(
+          stringToBytes(JSON.stringify(module))
+        );
         this._modules[moduleId] = module;
       }
     });
   }
 
-  async deployModule({
+  async createNewInstance({
     account,
     moduleId,
     hatId,
@@ -76,7 +78,7 @@ export class EligibilityClient {
     mutableArgs,
   }: {
     account: Account | Address;
-    moduleId: `0x${string}`;
+    moduleId: string;
     hatId: bigint;
     immutableArgs: unknown[];
     mutableArgs: unknown[];
@@ -124,9 +126,17 @@ export class EligibilityClient {
         hash,
       });
 
+      const event = decodeEventLog({
+        abi: eligibilityFactory.factoryAbi,
+        eventName: "HatsModuleFactory_ModuleDeployed",
+        data: receipt.logs[0].data,
+        topics: receipt.logs[0].topics,
+      });
+
       return {
         status: receipt.status,
         transactionHash: receipt.transactionHash,
+        newInstance: event.args.instance,
       };
     } catch (err) {
       console.log(err);
@@ -134,11 +144,11 @@ export class EligibilityClient {
     }
   }
 
-  getModuleById(moduleId: `0x${string}`): EligibilityModule | undefined {
+  getModuleById(moduleId: string): EligibilityModule | undefined {
     return this._modules[moduleId];
   }
 
-  getAllModules(): { [id: `0x${string}`]: EligibilityModule } {
+  getAllModules(): { [id: string]: EligibilityModule } {
     return this._modules;
   }
 }

@@ -249,3 +249,24 @@ export const AddressSchema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
 export const BooleanSchema = z.boolean();
 
 export const StringSchema = z.string();
+
+export const verify = (val: unknown, type: string): boolean => {
+  switch (type) {
+    case "uint256": {
+      const res = Uint256Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "address": {
+      const res = AddressSchema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+  }
+
+  return true;
+};
