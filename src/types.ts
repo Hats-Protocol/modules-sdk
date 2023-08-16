@@ -14,3 +14,42 @@ export type CreateInstanceArg = {
   description: string;
   type: string;
 };
+
+export type Module = {
+  name: string;
+  description: string;
+  github: {
+    owner: string;
+    repo: string;
+  };
+  type: {
+    eligibility: boolean;
+    toggle: boolean;
+    hatter: boolean;
+  };
+  implementationAddress: string;
+  deployments: {
+    chainId: string;
+    block: string;
+  }[];
+  args: {
+    immutable: { name: string; description: string; type: string }[];
+    mutable: { name: string; description: string; type: string }[];
+  };
+  abi: any;
+};
+
+export type Factory = {
+  name: string;
+  description: string;
+  github: {
+    owner: string;
+    repo: string;
+  };
+  implementationAddress: string;
+  deployments: {
+    chainId: string;
+    block: string;
+  }[];
+  abi: any;
+};

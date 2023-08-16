@@ -14,23 +14,23 @@ import {
   ModuleNotAvailableError,
   TransactionRevertedError,
   InvalidParamError,
-} from "../errors";
+} from "./errors";
 //import {
 //  eligibilityModules,
 //  eligibilityFactory,
 //} from "@hatsprotocol/modules-registry";
-import { verify } from "../schemas";
+import { verify } from "./schemas";
 import type {
   CreateInstanceResult,
   SupportedChain,
   //CreateInstanceArg,
-} from "../types";
+} from "./types";
 import * as fs from "fs";
 //import type { EligibilityModule } from "@hatsprotocol/modules-registry";
 import type { Account, Address } from "viem";
-import type { Module, Factory } from "../types";
+import type { Module, Factory } from "./types";
 
-export class EligibilityClient {
+export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
   private readonly _walletClient: WalletClient;
   private readonly _chainId: SupportedChain;

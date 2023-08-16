@@ -1,3 +1,3 @@
-import { EligibilityClient } from "./client/index";
+import { HatsModulesClient } from "./client";
 
-export { EligibilityClient };
+export { HatsModulesClient };
