@@ -3,8 +3,14 @@ import { createPublicClient, createWalletClient, http } from "viem";
 import { goerli } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
-import type { PublicClient, WalletClient, PrivateKeyAccount } from "viem";
+import type {
+  PublicClient,
+  WalletClient,
+  PrivateKeyAccount,
+  Address,
+} from "viem";
 import type { Anvil } from "@viem/anvil";
+import type { Module } from "../src/types";
 import "dotenv/config";
 
 describe("Eligibility Client Tests", () => {
@@ -41,40 +47,63 @@ describe("Eligibility Client Tests", () => {
       walletClient,
       chainId: "5",
     });
-  }, 30000);
 
-  test("Test create new instance", async () => {
     await hatsModulesClient.prepare();
-    expect(1).toBe(1);
-  });
-
-  test("Test create new instance", async () => {
-    const modules = hatsModulesClient.getAllModules();
-    if (modules !== undefined) {
-      const moduleIds = Object.keys(modules);
-      console.log("moduleIds", moduleIds);
-
-      const res = await hatsModulesClient.createNewInstance({
-        account: deployerAccount,
-        moduleId: moduleIds[0],
-        hatId: BigInt(
-          "0x0000000100000000000000000000000000000000000000000000000000000000"
-        ),
-        immutableArgs: [],
-        mutableArgs: [
-          1690803340n,
-          1n,
-          BigInt(
-            "0x0000000100000000000000000000000000000000000000000000000000000000"
-          ),
-        ],
-      });
-      console.log("instance:", res.newInstance);
-      expect(1).toBe(1);
-    }
-  });
+  }, 30000);
 
   afterAll(async () => {
     await anvil.stop();
   }, 30000);
+
+  test("Test create new jokerace instance", async () => {
+    const jokeraceId =
+      "0x27ed8ea37bc9ab5183ee6b34a3ea9a0d48fd68cd2069f01925617060c467d51e";
+    const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
+    const adminHat = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
+    const underlyingContest = "0x0000000000000000000000000000000000000001";
+    const termEnd = 1690803340n;
+    const topK = 1n;
+
+    const res = await hatsModulesClient.createNewInstance({
+      account: deployerAccount,
+      moduleId: jokeraceId,
+      hatId: adminHat,
+      immutableArgs: [adminHat],
+      mutableArgs: [underlyingContest, termEnd, topK],
+    });
+
+    const adminHatResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "ADMIN_HAT",
+      args: [],
+    });
+
+    const underlyingContestResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "underlyingContest",
+      args: [],
+    });
+
+    const termEndResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "termEnd",
+      args: [],
+    });
+
+    const topKResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "topK",
+      args: [],
+    });
+    expect(adminHatResult).toBe(adminHat);
+    expect(underlyingContestResult).toBe(underlyingContest);
+    expect(termEndResult).toBe(termEnd);
+    expect(topKResult).toBe(topK);
+  });
 });

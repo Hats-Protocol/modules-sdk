@@ -250,6 +250,41 @@ export const BooleanSchema = z.boolean();
 
 export const StringSchema = z.string();
 
+export const Bytes1Schema = z.string().regex(/^0x[a-fA-F0-9]{2}$/);
+export const Bytes2Schema = z.string().regex(/^0x[a-fA-F0-9]{4}$/);
+export const Bytes3Schema = z.string().regex(/^0x[a-fA-F0-9]{6}$/);
+export const Bytes4Schema = z.string().regex(/^0x[a-fA-F0-9]{8}$/);
+export const Bytes5Schema = z.string().regex(/^0x[a-fA-F0-9]{10}$/);
+export const Bytes6Schema = z.string().regex(/^0x[a-fA-F0-9]{12}$/);
+export const Bytes7Schema = z.string().regex(/^0x[a-fA-F0-9]{14}$/);
+export const Bytes8Schema = z.string().regex(/^0x[a-fA-F0-9]{16}$/);
+export const Bytes9Schema = z.string().regex(/^0x[a-fA-F0-9]{18}$/);
+export const Bytes10Schema = z.string().regex(/^0x[a-fA-F0-9]{20}$/);
+export const Bytes11Schema = z.string().regex(/^0x[a-fA-F0-9]{22}$/);
+export const Bytes12Schema = z.string().regex(/^0x[a-fA-F0-9]{24}$/);
+export const Bytes13Schema = z.string().regex(/^0x[a-fA-F0-9]{26}$/);
+export const Bytes14Schema = z.string().regex(/^0x[a-fA-F0-9]{28}$/);
+export const Bytes15Schema = z.string().regex(/^0x[a-fA-F0-9]{30}$/);
+export const Bytes16Schema = z.string().regex(/^0x[a-fA-F0-9]{32}$/);
+export const Bytes17Schema = z.string().regex(/^0x[a-fA-F0-9]{34}$/);
+export const Bytes18Schema = z.string().regex(/^0x[a-fA-F0-9]{36}$/);
+export const Bytes19Schema = z.string().regex(/^0x[a-fA-F0-9]{38}$/);
+export const Bytes20Schema = z.string().regex(/^0x[a-fA-F0-9]{40}$/);
+export const Bytes21Schema = z.string().regex(/^0x[a-fA-F0-9]{42}$/);
+export const Bytes22Schema = z.string().regex(/^0x[a-fA-F0-9]{44}$/);
+export const Bytes23Schema = z.string().regex(/^0x[a-fA-F0-9]{46}$/);
+export const Bytes24Schema = z.string().regex(/^0x[a-fA-F0-9]{48}$/);
+export const Bytes25Schema = z.string().regex(/^0x[a-fA-F0-9]{50}$/);
+export const Bytes26Schema = z.string().regex(/^0x[a-fA-F0-9]{52}$/);
+export const Bytes27Schema = z.string().regex(/^0x[a-fA-F0-9]{54}$/);
+export const Bytes28Schema = z.string().regex(/^0x[a-fA-F0-9]{56}$/);
+export const Bytes29Schema = z.string().regex(/^0x[a-fA-F0-9]{58}$/);
+export const Bytes30Schema = z.string().regex(/^0x[a-fA-F0-9]{60}$/);
+export const Bytes31Schema = z.string().regex(/^0x[a-fA-F0-9]{62}$/);
+export const Bytes32Schema = z.string().regex(/^0x[a-fA-F0-9]{64}$/);
+
+export const BytesSchema = z.string().regex(/^0x([a-fA-F0-9][a-fA-F0-9])*$/);
+
 export const verify = (val: unknown, type: string): boolean => {
   switch (type) {
     case "uint256": {
@@ -259,8 +294,694 @@ export const verify = (val: unknown, type: string): boolean => {
       }
       break;
     }
+    case "uint248": {
+      const res = Uint248Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint240": {
+      const res = Uint240Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint232": {
+      const res = Uint232Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint224": {
+      const res = Uint224Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint216": {
+      const res = Uint216Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint208": {
+      const res = Uint208Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint200": {
+      const res = Uint200Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint192": {
+      const res = Uint192Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint184": {
+      const res = Uint184Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint176": {
+      const res = Uint176Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint168": {
+      const res = Uint168Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint160": {
+      const res = Uint160Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint152": {
+      const res = Uint152Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint144": {
+      const res = Uint144Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint136": {
+      const res = Uint136Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint128": {
+      const res = Uint128Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint120": {
+      const res = Uint120Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint112": {
+      const res = Uint112Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint104": {
+      const res = Uint104Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint96": {
+      const res = Uint96Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint88": {
+      const res = Uint88Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint80": {
+      const res = Uint80Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint72": {
+      const res = Uint72Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint64": {
+      const res = Uint64Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint56": {
+      const res = Uint56Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint48": {
+      const res = Uint48Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint40": {
+      const res = Uint40Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint32": {
+      const res = Uint32Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint24": {
+      const res = Uint24Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint16": {
+      const res = Uint16Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "uint8": {
+      const res = Uint8Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int256": {
+      const res = Uint256Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int248": {
+      const res = Int248Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int240": {
+      const res = Int240Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int232": {
+      const res = Int232Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int224": {
+      const res = Int224Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int216": {
+      const res = Int216Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int208": {
+      const res = Int208Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int200": {
+      const res = Int200Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int192": {
+      const res = Int192Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int184": {
+      const res = Int184Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int176": {
+      const res = Int176Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int168": {
+      const res = Int168Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int160": {
+      const res = Int160Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int152": {
+      const res = Int152Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int144": {
+      const res = Int144Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int136": {
+      const res = Int136Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int128": {
+      const res = Int128Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int120": {
+      const res = Int120Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int112": {
+      const res = Int112Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int104": {
+      const res = Int104Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int96": {
+      const res = Int96Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int88": {
+      const res = Int88Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int80": {
+      const res = Int80Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int72": {
+      const res = Int72Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int64": {
+      const res = Int64Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int56": {
+      const res = Int56Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int48": {
+      const res = Int48Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int40": {
+      const res = Int40Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int32": {
+      const res = Int32Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int24": {
+      const res = Int24Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int16": {
+      const res = Int16Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "int8": {
+      const res = Int8Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes1": {
+      const res = Bytes1Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes2": {
+      const res = Bytes2Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes3": {
+      const res = Bytes3Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes4": {
+      const res = Bytes4Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes5": {
+      const res = Bytes5Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes6": {
+      const res = Bytes6Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes7": {
+      const res = Bytes7Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes8": {
+      const res = Bytes8Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes9": {
+      const res = Bytes9Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes10": {
+      const res = Bytes10Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes11": {
+      const res = Bytes11Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes12": {
+      const res = Bytes12Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes13": {
+      const res = Bytes13Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes14": {
+      const res = Bytes14Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes15": {
+      const res = Bytes15Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes16": {
+      const res = Bytes16Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes17": {
+      const res = Bytes17Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes18": {
+      const res = Bytes18Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes19": {
+      const res = Bytes19Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes20": {
+      const res = Bytes20Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes21": {
+      const res = Bytes21Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes22": {
+      const res = Bytes22Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes23": {
+      const res = Bytes23Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes24": {
+      const res = Bytes24Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes25": {
+      const res = Bytes25Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes26": {
+      const res = Bytes26Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes27": {
+      const res = Bytes27Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes28": {
+      const res = Bytes28Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes29": {
+      const res = Bytes29Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes30": {
+      const res = Bytes30Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes31": {
+      const res = Bytes31Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes32": {
+      const res = Bytes32Schema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bytes": {
+      const res = BytesSchema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
     case "address": {
       const res = AddressSchema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "bool": {
+      const res = BooleanSchema.safeParse(val);
+      if (!res.success) {
+        return false;
+      }
+      break;
+    }
+    case "string": {
+      const res = StringSchema.safeParse(val);
       if (!res.success) {
         return false;
       }

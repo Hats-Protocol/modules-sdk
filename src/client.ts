@@ -122,9 +122,7 @@ export class HatsModulesClient {
         );
       }
 
-      if (!verify(hatId, "uint256")) {
-        throw new InvalidParamError(`Invalid hat ID parameter`);
-      }
+      this.verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
 
       const mutableArgsTypes = module.args.mutable.map((arg) => {
         return { type: arg.type };
@@ -171,8 +169,8 @@ export class HatsModulesClient {
             const event: any = decodeEventLog({
               abi: this._factory.abi,
               eventName: "HatsModuleFactory_ModuleDeployed",
-              data: receipt.logs[0].data,
-              topics: receipt.logs[0].topics,
+              data: receipt.logs[eventIndex].data,
+              topics: receipt.logs[eventIndex].topics,
             });
 
             instance = event.args.instance;
@@ -196,7 +194,47 @@ export class HatsModulesClient {
     }
   }
 
-  //verifyParameter()
+  verifyParameter(val: unknown, type: string): boolean {
+    return verify(val, type);
+  }
+
+  verifyModuleCreationArgs(
+    module: Module,
+    hatId: bigint,
+    immutableArgs: unknown[],
+    mutableArgs: unknown[]
+  ) {
+    // verify hat ID
+    if (!this.verifyParameter(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    // verify immutable and mutable array lengths
+    if (immutableArgs.length !== module.args.immutable.length) {
+      throw new Error();
+    }
+    if (mutableArgs.length !== module.args.mutable.length) {
+      throw new Error();
+    }
+
+    // verify immutable args
+    for (let i = 0; i < immutableArgs.length; i++) {
+      const val = immutableArgs[i];
+      const type = module.args.immutable[i].type;
+      if (!this.verifyParameter(val, type)) {
+        throw new Error(`Invalid immutable argument at index ${i}`);
+      }
+    }
+
+    // verify mutable args
+    for (let i = 0; i < mutableArgs.length; i++) {
+      const val = mutableArgs[i];
+      const type = module.args.mutable[i].type;
+      if (!this.verifyParameter(val, type)) {
+        throw new Error(`Invalid mutable argument at index ${i}`);
+      }
+    }
+  }
 
   getModuleById(moduleId: string): Module | undefined {
     if (this._modules !== undefined) {
