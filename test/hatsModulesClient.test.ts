@@ -106,4 +106,96 @@ describe("Eligibility Client Tests", () => {
     expect(termEndResult).toBe(termEnd);
     expect(topKResult).toBe(topK);
   });
+
+  test("Test get jokerace functions names", () => {
+    const jokeraceId =
+      "0x27ed8ea37bc9ab5183ee6b34a3ea9a0d48fd68cd2069f01925617060c467d51e";
+    const functions = hatsModulesClient.getFunctionsInModule(jokeraceId);
+    const expectedFunctions = [
+      {
+        name: "ADMIN_HAT",
+        type: "read",
+        inputs: [],
+      },
+      {
+        name: "eligibleWearersPerContest",
+        type: "read",
+        inputs: [
+          {
+            name: "wearer",
+            type: "address",
+          },
+          {
+            name: "contest",
+            type: "address",
+          },
+        ],
+      },
+      {
+        name: "getWearerStatus",
+        type: "read",
+        inputs: [
+          {
+            name: "_wearer",
+            type: "address",
+          },
+          {
+            name: "",
+            type: "uint256",
+          },
+        ],
+      },
+      {
+        name: "hatId",
+        type: "read",
+        inputs: [],
+      },
+      {
+        name: "pullElectionResults",
+        type: "write",
+        inputs: [],
+      },
+      {
+        name: "reelection",
+        type: "write",
+        inputs: [
+          {
+            name: "newUnderlyingContest",
+            type: "address",
+          },
+          {
+            name: "newTermEnd",
+            type: "uint256",
+          },
+          {
+            name: "newTopK",
+            type: "uint256",
+          },
+        ],
+      },
+      {
+        name: "reelectionAllowed",
+        type: "read",
+        inputs: [],
+      },
+      {
+        name: "termEnd",
+        type: "read",
+        inputs: [],
+      },
+      {
+        name: "topK",
+        type: "read",
+        inputs: [],
+      },
+      {
+        name: "underlyingContest",
+        type: "read",
+        inputs: [],
+      },
+    ];
+    //console.log(JSON.stringify(functions, null, 2));
+    expect(functions).toEqual(expectedFunctions);
+    //expect(1).toBe(1);
+  });
 });

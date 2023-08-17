@@ -15,10 +15,6 @@ import {
   TransactionRevertedError,
   InvalidParamError,
 } from "./errors";
-//import {
-//  eligibilityModules,
-//  eligibilityFactory,
-//} from "@hatsprotocol/modules-registry";
 import { verify } from "./schemas";
 import type {
   CreateInstanceResult,
@@ -28,7 +24,7 @@ import type {
 import * as fs from "fs";
 //import type { EligibilityModule } from "@hatsprotocol/modules-registry";
 import type { Account, Address } from "viem";
-import type { Module, Factory } from "./types";
+import type { Module, Factory, FunctionInfo } from "./types";
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
@@ -95,10 +91,6 @@ export class HatsModulesClient {
     }
 
     this._factory = modules[0];
-
-    //console.log(JSON.stringify(modulesInfo, null, 2));
-    //console.log(typeof modulesInfo);
-    //console.log("number of modules:", modulesInfo.length);
   }
 
   async createNewInstance({
@@ -114,6 +106,10 @@ export class HatsModulesClient {
     immutableArgs: unknown[];
     mutableArgs: unknown[];
   }): Promise<CreateInstanceResult> {
+    if (this._modules === undefined) {
+      throw new Error();
+    }
+
     if (this._modules !== undefined && this._factory !== undefined) {
       const module = this.getModuleById(moduleId);
       if (module === undefined) {
@@ -236,15 +232,61 @@ export class HatsModulesClient {
     }
   }
 
-  getModuleById(moduleId: string): Module | undefined {
-    if (this._modules !== undefined) {
-      return this._modules[moduleId];
+  getFunctionsInModule(moduleId: string): FunctionInfo[] {
+    if (this._modules === undefined) {
+      throw new Error();
     }
+
+    const functions: FunctionInfo[] = [];
+    const { abi } = this._modules[moduleId];
+
+    for (let i = 0; i < abi.length; i++) {
+      const abiItem = abi[i];
+      if (abiItem.type === "function") {
+        if (
+          abiItem.name === "IMPLEMENTATION" ||
+          abiItem.name === "HATS" ||
+          abiItem.name === "setUp" ||
+          abiItem.name === "version" ||
+          abiItem.name === "version_"
+        ) {
+          continue;
+        }
+
+        const functionType: "write" | "read" =
+          abiItem.stateMutability === "pure" ||
+          abiItem.stateMutability === "view"
+            ? "read"
+            : "write";
+
+        const functionInputs = abiItem.inputs.map((input) => {
+          return { name: input.name, type: input.type };
+        });
+
+        functions.push({
+          name: abiItem.name,
+          type: functionType,
+          inputs: functionInputs,
+        });
+      }
+    }
+
+    return functions;
   }
 
-  getAllModules(): { [id: string]: Module } | undefined {
-    if (this._modules !== undefined) {
-      return this._modules;
+  getModuleById(moduleId: string): Module {
+    if (this._modules === undefined) {
+      throw new Error();
     }
+
+    return this._modules[moduleId];
+  }
+
+  getAllModules(): { [id: string]: Module } {
+    if (this._modules === undefined) {
+      throw new Error();
+    }
+
+    return this._modules;
   }
 }

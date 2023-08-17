@@ -1,3 +1,5 @@
+import type { Abi } from "abitype";
+
 export interface TransactionResult {
   status: "success" | "reverted";
   transactionHash: `0x${string}`;
@@ -36,7 +38,7 @@ export type Module = {
     immutable: { name: string; description: string; type: string }[];
     mutable: { name: string; description: string; type: string }[];
   };
-  abi: any;
+  abi: Abi;
 };
 
 export type Factory = {
@@ -51,5 +53,11 @@ export type Factory = {
     chainId: string;
     block: string;
   }[];
-  abi: any;
+  abi: Abi;
+};
+
+export type FunctionInfo = {
+  name: string;
+  type: "write" | "read";
+  inputs: { name: string | undefined; type: string }[];
 };
