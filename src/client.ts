@@ -14,15 +14,11 @@ import {
   ModuleNotAvailableError,
   TransactionRevertedError,
   InvalidParamError,
+  ClientNotPreparedError,
 } from "./errors";
 import { verify } from "./schemas";
-import type {
-  CreateInstanceResult,
-  SupportedChain,
-  //CreateInstanceArg,
-} from "./types";
+import type { CreateInstanceResult, SupportedChain } from "./types";
 import * as fs from "fs";
-//import type { EligibilityModule } from "@hatsprotocol/modules-registry";
 import type { Account, Address } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
 
@@ -40,7 +36,7 @@ export class HatsModulesClient {
   }: {
     publicClient: PublicClient;
     walletClient: WalletClient;
-    chainId: "5" | "1";
+    chainId: SupportedChain;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Public client is required");
@@ -61,9 +57,9 @@ export class HatsModulesClient {
   }
 
   async prepare() {
-    if (this._modules !== undefined) {
-      throw new Error();
-    }
+    //if (this._modules !== undefined) {
+    //  throw new Error();
+    //}
 
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
@@ -72,14 +68,14 @@ export class HatsModulesClient {
     this._modules = {};
     for (let moduleIndex = 1; moduleIndex < modules.length; moduleIndex++) {
       const module = modules[moduleIndex];
-      let moduleSupportedInChian = false;
+      let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
         if (deployment.chainId === this._chainId.toString()) {
-          moduleSupportedInChian = true;
+          moduleSupportedInChain = true;
         }
       });
 
-      if (moduleSupportedInChian) {
+      if (moduleSupportedInChain) {
         const moduleId: string = keccak256(
           stringToBytes(JSON.stringify(module))
         );
@@ -106,87 +102,81 @@ export class HatsModulesClient {
     immutableArgs: unknown[];
     mutableArgs: unknown[];
   }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined) {
-      throw new Error();
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
     }
 
-    if (this._modules !== undefined && this._factory !== undefined) {
-      const module = this.getModuleById(moduleId);
-      if (module === undefined) {
-        throw new ModuleNotAvailableError(
-          `Module with id ${moduleId} does not exist`
-        );
-      }
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
+    }
 
-      this.verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
+    this.verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
 
-      const mutableArgsTypes = module.args.mutable.map((arg) => {
-        return { type: arg.type };
+    const mutableArgsTypes = module.args.mutable.map((arg) => {
+      return { type: arg.type };
+    });
+    const immutableArgsTypes = module.args.immutable.map((arg) => {
+      return arg.type;
+    });
+
+    const mutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
+        : "0x";
+    const immutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodePacked(immutableArgsTypes, immutableArgs)
+        : "0x";
+
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: this._factory.implementationAddress as `0x${string}`,
+        abi: this._factory.abi,
+        functionName: "createHatsModule",
+        account,
+        args: [
+          module.implementationAddress as `0x${string}`,
+          hatId,
+          immutableArgsEncoded,
+          mutableArgsEncoded,
+        ],
+        chain: this._walletClient.chain,
       });
-      const immutableArgsTypes = module.args.immutable.map((arg) => {
-        return arg.type;
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
       });
 
-      const mutableArgsEncoded =
-        immutableArgs.length > 0
-          ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
-          : "0x";
-      const immutableArgsEncoded =
-        immutableArgs.length > 0
-          ? encodePacked(immutableArgsTypes, immutableArgs)
-          : "0x";
+      let instance: `0x${string}` = "0x";
+      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+        try {
+          const event: any = decodeEventLog({
+            abi: this._factory.abi,
+            eventName: "HatsModuleFactory_ModuleDeployed",
+            data: receipt.logs[eventIndex].data,
+            topics: receipt.logs[eventIndex].topics,
+          });
 
-      try {
-        const hash = await this._walletClient.writeContract({
-          address: this._factory.implementationAddress as `0x${string}`,
-          abi: this._factory.abi,
-          functionName: "createHatsModule",
-          account,
-          args: [
-            module.implementationAddress as `0x${string}`,
-            hatId,
-            immutableArgsEncoded,
-            mutableArgsEncoded,
-          ],
-          chain: this._walletClient.chain,
-        });
-
-        const receipt = await this._publicClient.waitForTransactionReceipt({
-          hash,
-        });
-
-        let instance: `0x${string}` = "0x";
-        for (
-          let eventIndex = 0;
-          eventIndex < receipt.logs.length;
-          eventIndex++
-        ) {
-          try {
-            const event: any = decodeEventLog({
-              abi: this._factory.abi,
-              eventName: "HatsModuleFactory_ModuleDeployed",
-              data: receipt.logs[eventIndex].data,
-              topics: receipt.logs[eventIndex].topics,
-            });
-
-            instance = event.args.instance;
-            break;
-          } catch (err) {
-            // continue
-          }
+          instance = event.args.instance;
+          break;
+        } catch (err) {
+          // continue
         }
-
-        return {
-          status: receipt.status,
-          transactionHash: receipt.transactionHash,
-          newInstance: instance,
-        };
-      } catch (err) {
-        console.log(err);
-        throw new TransactionRevertedError("Transaction reverted");
       }
-    } else {
-      throw new Error();
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+        newInstance: instance,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Transaction reverted");
     }
   }
 
@@ -233,8 +223,10 @@ export class HatsModulesClient {
   }
 
   getFunctionsInModule(moduleId: string): FunctionInfo[] {
-    if (this._modules === undefined) {
-      throw new Error();
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
     }
 
     const functions: FunctionInfo[] = [];
@@ -275,16 +267,20 @@ export class HatsModulesClient {
   }
 
   getModuleById(moduleId: string): Module {
-    if (this._modules === undefined) {
-      throw new Error();
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
     }
 
     return this._modules[moduleId];
   }
 
   getAllModules(): { [id: string]: Module } {
-    if (this._modules === undefined) {
-      throw new Error();
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
     }
 
     return this._modules;
