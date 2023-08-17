@@ -33,6 +33,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
+    "@octokit/request": "^8.1.1",
     "abitype": "^0.9.6",
     "viem": "1.2.6",
     "zod": "^3.21.4"

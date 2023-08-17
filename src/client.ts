@@ -18,7 +18,8 @@ import {
 } from "./errors";
 import { verify } from "./schemas";
 import type { CreateInstanceResult, SupportedChain } from "./types";
-import * as fs from "fs";
+//import * as fs from "fs";
+import { request } from "@octokit/request";
 import type { Account, Address } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
 
@@ -57,13 +58,23 @@ export class HatsModulesClient {
   }
 
   async prepare() {
-    //if (this._modules !== undefined) {
-    //  throw new Error();
-    //}
+    //const modulesFile = new URL("modules.json", import.meta.url);
+    //const data = fs.readFileSync(modulesFile, "utf-8");
+    //const modules: Module[] = JSON.parse(data);
 
-    const modulesFile = new URL("modules.json", import.meta.url);
-    const data = fs.readFileSync(modulesFile, "utf-8");
-    const modules: Module[] = JSON.parse(data);
+    const result = await request("GET /repos/{owner}/{repo}/contents/{path}", {
+      headers: {
+        authorization: `token ${process.env.GITHUB_TOKEN}`,
+      },
+      owner: "Hats-Protocol",
+      repo: "modules-registry",
+      path: "modules.json",
+      mediaType: {
+        format: "raw",
+      },
+    });
+
+    const modules: Module[] = JSON.parse(result.data as unknown as string);
 
     this._modules = {};
     for (let moduleIndex = 1; moduleIndex < modules.length; moduleIndex++) {
