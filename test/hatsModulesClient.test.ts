@@ -194,8 +194,12 @@ describe("Eligibility Client Tests", () => {
         inputs: [],
       },
     ];
-    //console.log(JSON.stringify(functions, null, 2));
     expect(functions).toEqual(expectedFunctions);
-    //expect(1).toBe(1);
   });
+
+  //test("Test get all eligibility modules", () => {
+  //  const eligibilityModules = hatsModulesClient.getAllEligibilityModules();
+  //  console.log(Object.keys(eligibilityModules));
+  //  expect(1).toBe(1);
+  //});
 });

@@ -285,4 +285,58 @@ export class HatsModulesClient {
 
     return this._modules;
   }
+
+  getAllEligibilityModules(): { [id: string]: Module } {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const res: { [id: string]: Module } = {};
+    for (const id of Object.keys(this._modules)) {
+      const module = this._modules[id];
+      if (module.type.eligibility) {
+        res[id] = module;
+      }
+    }
+
+    return res;
+  }
+
+  getAllToggleModules(): { [id: string]: Module } {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const res: { [id: string]: Module } = {};
+    for (const id of Object.keys(this._modules)) {
+      const module = this._modules[id];
+      if (module.type.toggle) {
+        res[id] = module;
+      }
+    }
+
+    return res;
+  }
+
+  getAllHatterModules(): { [id: string]: Module } {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const res: { [id: string]: Module } = {};
+    for (const id of Object.keys(this._modules)) {
+      const module = this._modules[id];
+      if (module.type.hatter) {
+        res[id] = module;
+      }
+    }
+
+    return res;
+  }
 }
