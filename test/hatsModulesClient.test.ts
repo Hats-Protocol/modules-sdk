@@ -60,11 +60,9 @@ describe("Eligibility Client Tests", () => {
       "0xa3adb9634f813822f254bdfcecc48836b644a45f585121894409ac5eb01c67fc";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
 
-    const adminHat = BigInt(module.args.mutable[0].example as string);
-    const underlyingContest = "0x0000000000000000000000000000000000000001";
-    const termEnd = 1690803340n;
-    const topK = 1n;
-
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -93,15 +91,20 @@ describe("Eligibility Client Tests", () => {
 
       mutableArgs.push(arg);
     }
-    //const schema = hatsModulesClient.getZodSchema("uint256");
-    //let adminHat: z.infer<typeof schema>;
 
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: jokeraceId,
-      hatId: adminHat,
+      hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
+    });
+
+    const hatIdResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "hatId",
+      args: [],
     });
 
     const adminHatResult = await publicClient.readContract({
@@ -131,6 +134,8 @@ describe("Eligibility Client Tests", () => {
       functionName: "topK",
       args: [],
     });
+
+    expect(hatIdResult).toBe(hatId);
     expect(adminHatResult).toBe(immutableArgs[0]);
     expect(underlyingContestResult).toBe(mutableArgs[0]);
     expect(termEndResult).toBe(mutableArgs[1]);
@@ -225,6 +230,103 @@ describe("Eligibility Client Tests", () => {
       },
     ];
     expect(functions).toEqual(expectedFunctions);
+  });
+
+  test("Test create new staking instance", async () => {
+    //const modules = hatsModulesClient.getAllModules();
+    //console.log(Object.keys(modules));
+
+    const stakingId =
+      "0x62c11f54dfa48ad24d8b40532ade2d3e72648e9c6c37a7a679f24268be8b155d";
+    const module = hatsModulesClient.getModuleById(stakingId) as Module;
+
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
+    const immutableArgs: unknown[] = [];
+    const mutableArgs: unknown[] = [];
+
+    for (let i = 0; i < module.args.immutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.immutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.immutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else {
+        arg = exampleArg;
+      }
+
+      immutableArgs.push(arg);
+    }
+
+    for (let i = 0; i < module.args.mutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.mutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.mutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else {
+        arg = exampleArg;
+      }
+
+      mutableArgs.push(arg);
+    }
+
+    const res = await hatsModulesClient.createNewInstance({
+      account: deployerAccount,
+      moduleId: stakingId,
+      hatId: hatId,
+      immutableArgs: immutableArgs,
+      mutableArgs: mutableArgs,
+    });
+
+    const hatIdResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "hatId",
+      args: [],
+    });
+
+    const tokenResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "TOKEN",
+      args: [],
+    });
+
+    const minStakeResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "minStake",
+      args: [],
+    });
+
+    const judgeHatResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "judgeHat",
+      args: [],
+    });
+
+    const recipientHatResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "recipientHat",
+      args: [],
+    });
+    const cooldownPeriodResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "cooldownPeriod",
+      args: [],
+    });
+
+    expect(hatIdResult).toBe(hatId);
+    expect(tokenResult).toBe(immutableArgs[0]);
+    expect(minStakeResult).toBe(mutableArgs[0]);
+    expect(judgeHatResult).toBe(mutableArgs[1]);
+    expect(recipientHatResult).toBe(mutableArgs[2]);
+    expect(cooldownPeriodResult).toBe(mutableArgs[3]);
   });
 
   //test("Test get all eligibility modules", () => {
