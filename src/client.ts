@@ -15,11 +15,12 @@ import {
   TransactionRevertedError,
   InvalidParamError,
   ClientNotPreparedError,
+  ParametersLengthsMismatchError,
 } from "./errors";
 import { verify } from "./schemas";
 import type { CreateInstanceResult, SupportedChain } from "./types";
-//import * as fs from "fs";
-import { request } from "@octokit/request";
+import * as fs from "fs";
+//import { request } from "@octokit/request";
 import type { Account, Address } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
 
@@ -58,23 +59,23 @@ export class HatsModulesClient {
   }
 
   async prepare() {
-    //const modulesFile = new URL("modules.json", import.meta.url);
-    //const data = fs.readFileSync(modulesFile, "utf-8");
-    //const modules: Module[] = JSON.parse(data);
+    const modulesFile = new URL("modules.json", import.meta.url);
+    const data = fs.readFileSync(modulesFile, "utf-8");
+    const modules: Module[] = JSON.parse(data);
 
-    const result = await request("GET /repos/{owner}/{repo}/contents/{path}", {
-      headers: {
-        authorization: `token ${process.env.GITHUB_TOKEN}`,
-      },
-      owner: "Hats-Protocol",
-      repo: "modules-registry",
-      path: "modules.json",
-      mediaType: {
-        format: "raw",
-      },
-    });
-
-    const modules: Module[] = JSON.parse(result.data as unknown as string);
+    //const result = await request("GET /repos/{owner}/{repo}/contents/{path}", {
+    //  headers: {
+    //    authorization: `token ${process.env.GITHUB_TOKEN}`,
+    //  },
+    //  owner: "Hats-Protocol",
+    //  repo: "modules-registry",
+    //  path: "modules.json",
+    //  mediaType: {
+    //    format: "raw",
+    //  },
+    //});
+    //
+    //const modules: Module[] = JSON.parse(result.data as unknown as string);
 
     this._modules = {};
     for (let moduleIndex = 1; moduleIndex < modules.length; moduleIndex++) {
@@ -126,7 +127,7 @@ export class HatsModulesClient {
       );
     }
 
-    this.verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
+    this._verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
 
     const mutableArgsTypes = module.args.mutable.map((arg) => {
       return { type: arg.type };
@@ -188,48 +189,6 @@ export class HatsModulesClient {
     } catch (err) {
       console.log(err);
       throw new TransactionRevertedError("Transaction reverted");
-    }
-  }
-
-  verifyParameter(val: unknown, type: string): boolean {
-    return verify(val, type);
-  }
-
-  verifyModuleCreationArgs(
-    module: Module,
-    hatId: bigint,
-    immutableArgs: unknown[],
-    mutableArgs: unknown[]
-  ) {
-    // verify hat ID
-    if (!this.verifyParameter(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
-    }
-
-    // verify immutable and mutable array lengths
-    if (immutableArgs.length !== module.args.immutable.length) {
-      throw new Error();
-    }
-    if (mutableArgs.length !== module.args.mutable.length) {
-      throw new Error();
-    }
-
-    // verify immutable args
-    for (let i = 0; i < immutableArgs.length; i++) {
-      const val = immutableArgs[i];
-      const type = module.args.immutable[i].type;
-      if (!this.verifyParameter(val, type)) {
-        throw new Error(`Invalid immutable argument at index ${i}`);
-      }
-    }
-
-    // verify mutable args
-    for (let i = 0; i < mutableArgs.length; i++) {
-      const val = mutableArgs[i];
-      const type = module.args.mutable[i].type;
-      if (!this.verifyParameter(val, type)) {
-        throw new Error(`Invalid mutable argument at index ${i}`);
-      }
     }
   }
 
@@ -349,5 +308,47 @@ export class HatsModulesClient {
     }
 
     return res;
+  }
+
+  _verifyModuleCreationArgs(
+    module: Module,
+    hatId: bigint,
+    immutableArgs: unknown[],
+    mutableArgs: unknown[]
+  ) {
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    // verify immutable and mutable array lengths
+    if (immutableArgs.length !== module.args.immutable.length) {
+      throw new ParametersLengthsMismatchError(
+        "Immutable args array length doesn't match the module's schema"
+      );
+    }
+    if (mutableArgs.length !== module.args.mutable.length) {
+      throw new ParametersLengthsMismatchError(
+        "Mutable args array length doesn't match the module's schema"
+      );
+    }
+
+    // verify immutable args
+    for (let i = 0; i < immutableArgs.length; i++) {
+      const val = immutableArgs[i];
+      const type = module.args.immutable[i].type;
+      if (!verify(val, type)) {
+        throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
+      }
+    }
+
+    // verify mutable args
+    for (let i = 0; i < mutableArgs.length; i++) {
+      const val = mutableArgs[i];
+      const type = module.args.mutable[i].type;
+      if (!verify(val, type)) {
+        throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
+      }
+    }
   }
 }

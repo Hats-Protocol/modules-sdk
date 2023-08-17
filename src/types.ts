@@ -35,8 +35,18 @@ export type Module = {
     block: string;
   }[];
   args: {
-    immutable: { name: string; description: string; type: string }[];
-    mutable: { name: string; description: string; type: string }[];
+    immutable: {
+      name: string;
+      description: string;
+      type: string;
+      example: unknown;
+    }[];
+    mutable: {
+      name: string;
+      description: string;
+      type: string;
+      example: unknown;
+    }[];
   };
   abi: Abi;
 };

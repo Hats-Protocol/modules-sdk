@@ -46,3 +46,10 @@ export class ClientNotPreparedError extends Error {
     this.name = "ClientNotPreparedError";
   }
 }
+
+export class ParametersLengthsMismatchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ParametersLengthsMismatchError";
+  }
+}
