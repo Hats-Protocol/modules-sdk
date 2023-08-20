@@ -19,8 +19,8 @@ import {
 } from "./errors";
 import { verify } from "./schemas";
 import type { CreateInstanceResult, SupportedChain } from "./types";
-import * as fs from "fs";
-//import { request } from "@octokit/request";
+//import * as fs from "fs";
+import { request } from "@octokit/request";
 import type { Account, Address } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
 
@@ -58,28 +58,40 @@ export class HatsModulesClient {
     this._chainId = chainId;
   }
 
-  async prepare() {
-    const modulesFile = new URL("modules.json", import.meta.url);
-    const data = fs.readFileSync(modulesFile, "utf-8");
-    const modules: Module[] = JSON.parse(data);
+  async prepare(modules?: Module[]) {
+    //const modulesFile = new URL("modules.json", import.meta.url);
+    //const data = fs.readFileSync(modulesFile, "utf-8");
+    //const modules: Module[] = JSON.parse(data);
 
-    //const result = await request("GET /repos/{owner}/{repo}/contents/{path}", {
-    //  headers: {
-    //    authorization: `token ${process.env.GITHUB_TOKEN}`,
-    //  },
-    //  owner: "Hats-Protocol",
-    //  repo: "modules-registry",
-    //  path: "modules.json",
-    //  mediaType: {
-    //    format: "raw",
-    //  },
-    //});
-    //
-    //const modules: Module[] = JSON.parse(result.data as unknown as string);
+    let registryModules: Module[];
+    if (modules !== undefined) {
+      registryModules = modules;
+    } else {
+      const result = await request(
+        "GET /repos/{owner}/{repo}/contents/{path}",
+        {
+          headers: {
+            authorization: `token ${process.env.GITHUB_TOKEN}`,
+          },
+          owner: "Hats-Protocol",
+          repo: "modules-registry",
+          path: "modules.json",
+          mediaType: {
+            format: "raw",
+          },
+        }
+      );
+
+      registryModules = JSON.parse(result.data as unknown as string);
+    }
 
     this._modules = {};
-    for (let moduleIndex = 1; moduleIndex < modules.length; moduleIndex++) {
-      const module = modules[moduleIndex];
+    for (
+      let moduleIndex = 1;
+      moduleIndex < registryModules.length;
+      moduleIndex++
+    ) {
+      const module = registryModules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
         if (deployment.chainId === this._chainId.toString()) {
@@ -98,7 +110,7 @@ export class HatsModulesClient {
       }
     }
 
-    this._factory = modules[0];
+    this._factory = registryModules[0];
   }
 
   async createNewInstance({
