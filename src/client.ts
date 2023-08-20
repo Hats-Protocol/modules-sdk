@@ -59,10 +59,6 @@ export class HatsModulesClient {
   }
 
   async prepare(modules?: Module[]) {
-    //const modulesFile = new URL("modules.json", import.meta.url);
-    //const data = fs.readFileSync(modulesFile, "utf-8");
-    //const modules: Module[] = JSON.parse(data);
-
     let registryModules: Module[];
     if (modules !== undefined) {
       registryModules = modules;
@@ -83,6 +79,10 @@ export class HatsModulesClient {
       );
 
       registryModules = JSON.parse(result.data as unknown as string);
+
+      //const modulesFile = new URL("modules.json", import.meta.url);
+      //const data = fs.readFileSync(modulesFile, "utf-8");
+      //registryModules = JSON.parse(data);
     }
 
     this._modules = {};
@@ -151,11 +151,11 @@ export class HatsModulesClient {
     const mutableArgsEncoded =
       immutableArgs.length > 0
         ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
-        : "0x";
+        : "";
     const immutableArgsEncoded =
       immutableArgs.length > 0
         ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "0x";
+        : "";
 
     try {
       const hash = await this._walletClient.writeContract({

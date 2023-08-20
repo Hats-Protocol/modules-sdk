@@ -329,6 +329,80 @@ describe("Eligibility Client Tests", () => {
     expect(cooldownPeriodResult).toBe(mutableArgs[3]);
   });
 
+  test("Test create new erc20 eligibility instance", async () => {
+    //const modules = hatsModulesClient.getAllModules();
+    //console.log(Object.keys(modules));
+
+    const erc20Id =
+      "0x61ed5dcdd400854c4032ebbe1ba8a9ee43a937588ad95ccbcd4e538155fe7e3a";
+    const module = hatsModulesClient.getModuleById(erc20Id) as Module;
+
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
+    const immutableArgs: unknown[] = [];
+    const mutableArgs: unknown[] = [];
+
+    for (let i = 0; i < module.args.immutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.immutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.immutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else {
+        arg = exampleArg;
+      }
+
+      immutableArgs.push(arg);
+    }
+
+    for (let i = 0; i < module.args.mutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.mutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.mutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else {
+        arg = exampleArg;
+      }
+
+      mutableArgs.push(arg);
+    }
+
+    const res = await hatsModulesClient.createNewInstance({
+      account: deployerAccount,
+      moduleId: erc20Id,
+      hatId: hatId,
+      immutableArgs: immutableArgs,
+      mutableArgs: mutableArgs,
+    });
+
+    const hatIdResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "hatId",
+      args: [],
+    });
+
+    const tokenResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "TOKEN_ADDRESS",
+      args: [],
+    });
+
+    const minBalanceResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "MIN_BALANCE",
+      args: [],
+    });
+
+    expect(hatIdResult).toBe(hatId);
+    expect(tokenResult).toBe(immutableArgs[0]);
+    expect(minBalanceResult).toBe(immutableArgs[1]);
+  });
+
   //test("Test get all eligibility modules", () => {
   //  const eligibilityModules = hatsModulesClient.getAllEligibilityModules();
   //  console.log(Object.keys(eligibilityModules));
