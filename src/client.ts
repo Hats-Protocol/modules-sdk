@@ -248,7 +248,7 @@ export class HatsModulesClient {
     return functions;
   }
 
-  getModuleById(moduleId: string): Module {
+  getModuleById(moduleId: string): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
         "Client have not been initilized, requires a call to the prepare function"
@@ -256,6 +256,20 @@ export class HatsModulesClient {
     }
 
     return this._modules[moduleId];
+  }
+
+  getModuleByImplementaion(address: string): Module | undefined {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    for (const [, module] of Object.entries(this._modules)) {
+      if (module.implementationAddress === address) {
+        return module;
+      }
+    }
   }
 
   getAllModules(): { [id: string]: Module } {
