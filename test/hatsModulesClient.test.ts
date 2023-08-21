@@ -23,7 +23,6 @@ describe("Eligibility Client Tests", () => {
   beforeAll(async () => {
     anvil = createAnvil({
       forkUrl: process.env.GOERLI_RPC,
-      forkBlockNumber: 9428126n,
     });
     await anvil.start();
 
@@ -404,9 +403,6 @@ describe("Eligibility Client Tests", () => {
   });
 
   test("Test create new erc721 eligibility instance", async () => {
-    //const modules = hatsModulesClient.getAllModules();
-    //console.log(Object.keys(modules));
-
     const erc721Id =
       "0x40a3e1da005ca0bb15c678de0508683e516f7f39e6519be6fbb01f4e6d238c91";
     const module = hatsModulesClient.getModuleById(erc721Id) as Module;
@@ -487,7 +483,6 @@ describe("Eligibility Client Tests", () => {
     );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
-    console.log(module);
     for (let i = 0; i < module.args.immutable.length; i++) {
       let arg: unknown;
       const exampleArg = module.args.immutable[i].example;
@@ -564,5 +559,36 @@ describe("Eligibility Client Tests", () => {
     expect(arrayLengthResult).toBe(immutableArgs[1]);
     expect(tokenIdsResult).toEqual(immutableArgs[2]);
     expect(minBalancesResult).toEqual(immutableArgs[3]);
+  });
+
+  test("Test create new claims hatter instance", async () => {
+    //const modules = hatsModulesClient.getAllModules();
+    //console.log(Object.keys(modules));
+
+    const claimsHatterId =
+      "0x65d08c510207af375cce45e411803a12a4da2c49459061d584fd5b33e9089b43";
+    const module = hatsModulesClient.getModuleById(claimsHatterId) as Module;
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
+    const immutableArgs: unknown[] = [];
+    const mutableArgs: unknown[] = [];
+
+    const res = await hatsModulesClient.createNewInstance({
+      account: deployerAccount,
+      moduleId: claimsHatterId,
+      hatId: hatId,
+      immutableArgs: immutableArgs,
+      mutableArgs: mutableArgs,
+    });
+
+    const hatIdResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "hatId",
+      args: [],
+    });
+
+    expect(hatIdResult).toBe(hatId);
   });
 });
