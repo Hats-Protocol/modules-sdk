@@ -27,18 +27,32 @@ import type { Module, Factory, FunctionInfo } from "./types";
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
   private readonly _walletClient: WalletClient;
-  private readonly _chainId: SupportedChain;
   private _modules: { [key: string]: Module } | undefined;
   private _factory: Factory | undefined;
 
+  /**
+   * Initialize a HatsModulesClient.
+   *
+   * @param publicClient - Viem Public Client.
+   * @param walletClient - Viem Wallet Client.
+   * @param chainId - Client chain ID. The client is initialized to work with one specific chain.
+   * @returns A HatsModulesClient instance.
+   *
+   * @throws MissingPublicClientError
+   * Thrown when a public client is not provided.
+   *
+   * * @throws MissingWalletClientError
+   * Thrown when a wallet client is not provided.
+   *
+   * @throws ChainIdMismatchError
+   * Thrown when there is a chain ID mismatch between the Viem clients.
+   */
   constructor({
     publicClient,
     walletClient,
-    chainId,
   }: {
     publicClient: PublicClient;
     walletClient: WalletClient;
-    chainId: SupportedChain;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Public client is required");
@@ -55,9 +69,13 @@ export class HatsModulesClient {
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
-    this._chainId = chainId;
   }
 
+  /**
+   * Fetches the modules from the modules registry and prepares the client for usage.
+   *
+   * @param modules - Optional array of modules. If provided, then these modules will be used instead of fetching from the registry.
+   */
   async prepare(modules?: Module[]) {
     let registryModules: Module[];
     if (modules !== undefined) {
@@ -94,7 +112,7 @@ export class HatsModulesClient {
       const module = registryModules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
-        if (deployment.chainId === this._chainId.toString()) {
+        if (deployment.chainId === this._publicClient.chain?.id.toString()) {
           moduleSupportedInChain = true;
         }
       });
@@ -113,6 +131,25 @@ export class HatsModulesClient {
     this._factory = registryModules[0];
   }
 
+  /**
+   * Create a new module instance.
+   *
+   * @param account - A Viem account.
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @param mutableArgs - The module's mutable arguments.
+   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws ModuleNotAvailableError
+   * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws TransactionRevertedError
+   * Thrown if the transaction reverted.
+   */
   async createNewInstance({
     account,
     moduleId,
@@ -204,6 +241,16 @@ export class HatsModulesClient {
     }
   }
 
+  /**
+   * Get a module's functions.
+   *
+   * @param moduleId - The nodule ID.
+   * @returns A list of the moudle's functions. Each function's information includes the its name, whether it's a "read" of "write" operation and an array
+   * of inputs to the function.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getFunctionsInModule(moduleId: string): FunctionInfo[] {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -248,6 +295,15 @@ export class HatsModulesClient {
     return functions;
   }
 
+  /**
+   * Get a module by its ID.
+   *
+   * @param moduleId - The nodule ID.
+   * @returns The module matching the provided ID.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getModuleById(moduleId: string): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -258,6 +314,15 @@ export class HatsModulesClient {
     return this._modules[moduleId];
   }
 
+  /**
+   * Get a module by its implementation address.
+   *
+   * @param moduleId - The nodule ID.
+   * @returns The module matching the provided implementation address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getModuleByImplementaion(address: string): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -272,6 +337,14 @@ export class HatsModulesClient {
     }
   }
 
+  /**
+   * Get all the available modules.
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getAllModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -282,6 +355,14 @@ export class HatsModulesClient {
     return this._modules;
   }
 
+  /**
+   * Get all the available eligibility modules.
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding eligibility modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getAllEligibilityModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -300,6 +381,14 @@ export class HatsModulesClient {
     return res;
   }
 
+  /**
+   * Get all the available toggle modules.
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding toggle modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getAllToggleModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
@@ -318,6 +407,14 @@ export class HatsModulesClient {
     return res;
   }
 
+  /**
+   * Get all the available hatter modules.
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding hatter modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
   getAllHatterModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(

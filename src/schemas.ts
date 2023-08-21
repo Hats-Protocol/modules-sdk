@@ -813,6 +813,12 @@ export const typeToSchema: { [key: string]: ZodType } = {
   "string[]": ArrayStringSchema,
 };
 
+/**
+ * Get the Zod schema for a Solidity type.
+ *
+ * @param solidityType - A string matching the name of a Solidity type.
+ * @returns A Zod schema for the provided Solidity type.
+ */
 export const getSchema = (solidityType: string): ZodType => {
   const schema = typeToSchema[solidityType];
   if (schema === undefined) {
@@ -822,6 +828,13 @@ export const getSchema = (solidityType: string): ZodType => {
   return schema;
 };
 
+/**
+ * Verify a given value according to its matching Solidity type.
+ *
+ * @param val - The value to be verified.
+ * @param type - The Solidity type for the verification.
+ * @returns True if the value is verified for the given type, false otherwise.
+ */
 export const verify = (val: unknown, type: string): boolean => {
   const schema = typeToSchema[type];
   if (schema === undefined) {
@@ -832,6 +845,12 @@ export const verify = (val: unknown, type: string): boolean => {
   return res.success as boolean;
 };
 
+/**
+ * Get the Typescript type which is compatible with an expected Solidity type.
+ *
+ * @param type - The Solidity type for for which the compatible Typedcript type should be returned.
+ * @returns A string matching the compatible Typescript type for the provided Solidity type.
+ */
 export const solidityToTypescriptType = (
   type: string
 ):

@@ -44,7 +44,6 @@ describe("Eligibility Client Tests", () => {
     hatsModulesClient = new HatsModulesClient({
       publicClient,
       walletClient,
-      chainId: "5",
     });
 
     await hatsModulesClient.prepare();
@@ -232,9 +231,6 @@ describe("Eligibility Client Tests", () => {
   });
 
   test("Test create new staking instance", async () => {
-    //const modules = hatsModulesClient.getAllModules();
-    //console.log(Object.keys(modules));
-
     const stakingId =
       "0x62c11f54dfa48ad24d8b40532ade2d3e72648e9c6c37a7a679f24268be8b155d";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
@@ -329,9 +325,6 @@ describe("Eligibility Client Tests", () => {
   });
 
   test("Test create new erc20 eligibility instance", async () => {
-    //const modules = hatsModulesClient.getAllModules();
-    //console.log(Object.keys(modules));
-
     const erc20Id =
       "0x61ed5dcdd400854c4032ebbe1ba8a9ee43a937588ad95ccbcd4e538155fe7e3a";
     const module = hatsModulesClient.getModuleById(erc20Id) as Module;
