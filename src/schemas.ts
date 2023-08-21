@@ -498,6 +498,118 @@ export const BytesSchema = z
   .regex(/^0x([a-fA-F0-9][a-fA-F0-9])*$/)
   .describe("bigint");
 
+// Uint array
+export const ArrayUint8Schema = z.array(Uint8Schema).describe("number[]");
+export const ArrayUint16Schema = z.array(Uint16Schema).describe("number[]");
+export const ArrayUint24Schema = z.array(Uint24Schema).describe("number[]");
+export const ArrayUint32Schema = z.array(Uint32Schema).describe("number[]");
+export const ArrayUint40Schema = z.array(Uint40Schema).describe("number[]");
+export const ArrayUint48Schema = z.array(Uint48Schema).describe("number[]");
+export const ArrayUint56Schema = z.array(Uint56Schema).describe("bigint[]");
+export const ArrayUint64Schema = z.array(Uint64Schema).describe("bigint[]");
+export const ArrayUint72Schema = z.array(Uint72Schema).describe("bigint[]");
+export const ArrayUint80Schema = z.array(Uint80Schema).describe("bigint[]");
+export const ArrayUint88Schema = z.array(Uint88Schema).describe("bigint[]");
+export const ArrayUint96Schema = z.array(Uint96Schema).describe("bigint[]");
+export const ArrayUint104Schema = z.array(Uint104Schema).describe("bigint[]");
+export const ArrayUint112Schema = z.array(Uint112Schema).describe("bigint[]");
+export const ArrayUint120Schema = z.array(Uint120Schema).describe("bigint[]");
+export const ArrayUint128Schema = z.array(Uint128Schema).describe("bigint[]");
+export const ArrayUint136Schema = z.array(Uint136Schema).describe("bigint[]");
+export const ArrayUint144Schema = z.array(Uint144Schema).describe("bigint[]");
+export const ArrayUint152Schema = z.array(Uint152Schema).describe("bigint[]");
+export const ArrayUint160Schema = z.array(Uint160Schema).describe("bigint[]");
+export const ArrayUint168Schema = z.array(Uint168Schema).describe("bigint[]");
+export const ArrayUint176Schema = z.array(Uint176Schema).describe("bigint[]");
+export const ArrayUint184Schema = z.array(Uint184Schema).describe("bigint[]");
+export const ArrayUint192Schema = z.array(Uint192Schema).describe("bigint[]");
+export const ArrayUint200Schema = z.array(Uint200Schema).describe("bigint[]");
+export const ArrayUint208Schema = z.array(Uint208Schema).describe("bigint[]");
+export const ArrayUint216Schema = z.array(Uint216Schema).describe("bigint[]");
+export const ArrayUint224Schema = z.array(Uint224Schema).describe("bigint[]");
+export const ArrayUint232Schema = z.array(Uint232Schema).describe("bigint[]");
+export const ArrayUint240Schema = z.array(Uint240Schema).describe("bigint[]");
+export const ArrayUint248Schema = z.array(Uint248Schema).describe("bigint[]");
+export const ArrayUint256Schema = z.array(Uint256Schema).describe("bigint[]");
+
+// Int array
+export const ArrayInt8Schema = z.array(Int8Schema).describe("number[]");
+export const ArrayInt16Schema = z.array(Int16Schema).describe("number[]");
+export const ArrayInt24Schema = z.array(Int24Schema).describe("number[]");
+export const ArrayInt32Schema = z.array(Int32Schema).describe("number[]");
+export const ArrayInt40Schema = z.array(Int40Schema).describe("number[]");
+export const ArrayInt48Schema = z.array(Int48Schema).describe("number[]");
+export const ArrayInt56Schema = z.array(Int56Schema).describe("bigint[]");
+export const ArrayInt64Schema = z.array(Int64Schema).describe("bigint[]");
+export const ArrayInt72Schema = z.array(Int72Schema).describe("bigint[]");
+export const ArrayInt80Schema = z.array(Int80Schema).describe("bigint[]");
+export const ArrayInt88Schema = z.array(Int88Schema).describe("bigint[]");
+export const ArrayInt96Schema = z.array(Int96Schema).describe("bigint[]");
+export const ArrayInt104Schema = z.array(Int104Schema).describe("bigint[]");
+export const ArrayInt112Schema = z.array(Int112Schema).describe("bigint[]");
+export const ArrayInt120Schema = z.array(Int120Schema).describe("bigint[]");
+export const ArrayInt128Schema = z.array(Int128Schema).describe("bigint[]");
+export const ArrayInt136Schema = z.array(Int136Schema).describe("bigint[]");
+export const ArrayInt144Schema = z.array(Int144Schema).describe("bigint[]");
+export const ArrayInt152Schema = z.array(Int152Schema).describe("bigint[]");
+export const ArrayInt160Schema = z.array(Int160Schema).describe("bigint[]");
+export const ArrayInt168Schema = z.array(Int168Schema).describe("bigint[]");
+export const ArrayInt176Schema = z.array(Int176Schema).describe("bigint[]");
+export const ArrayInt184Schema = z.array(Int184Schema).describe("bigint[]");
+export const ArrayInt192Schema = z.array(Int192Schema).describe("bigint[]");
+export const ArrayInt200Schema = z.array(Int200Schema).describe("bigint[]");
+export const ArrayInt208Schema = z.array(Int208Schema).describe("bigint[]");
+export const ArrayInt216Schema = z.array(Int216Schema).describe("bigint[]");
+export const ArrayInt224Schema = z.array(Int224Schema).describe("bigint[]");
+export const ArrayInt232Schema = z.array(Int232Schema).describe("bigint[]");
+export const ArrayInt240Schema = z.array(Int240Schema).describe("bigint[]");
+export const ArrayInt248Schema = z.array(Int248Schema).describe("bigint[]");
+export const ArrayInt256Schema = z.array(Int256Schema).describe("bigint[]");
+
+// Bytes Array
+export const ArrayBytes1Schema = z.array(Bytes1Schema).describe("string[]");
+export const ArrayBytes2Schema = z.array(Bytes2Schema).describe("string[]");
+export const ArrayBytes3Schema = z.array(Bytes3Schema).describe("string[]");
+export const ArrayBytes4Schema = z.array(Bytes4Schema).describe("string[]");
+export const ArrayBytes5Schema = z.array(Bytes5Schema).describe("string[]");
+export const ArrayBytes6Schema = z.array(Bytes6Schema).describe("string[]");
+export const ArrayBytes7Schema = z.array(Bytes7Schema).describe("string[]");
+export const ArrayBytes8Schema = z.array(Bytes8Schema).describe("string[]");
+export const ArrayBytes9Schema = z.array(Bytes9Schema).describe("string[]");
+export const ArrayBytes10Schema = z.array(Bytes10Schema).describe("string[]");
+export const ArrayBytes11Schema = z.array(Bytes11Schema).describe("string[]");
+export const ArrayBytes12Schema = z.array(Bytes12Schema).describe("string[]");
+export const ArrayBytes13Schema = z.array(Bytes13Schema).describe("string[]");
+export const ArrayBytes14Schema = z.array(Bytes14Schema).describe("string[]");
+export const ArrayBytes15Schema = z.array(Bytes15Schema).describe("string[]");
+export const ArrayBytes16Schema = z.array(Bytes16Schema).describe("string[]");
+export const ArrayBytes17Schema = z.array(Bytes17Schema).describe("string[]");
+export const ArrayBytes18Schema = z.array(Bytes18Schema).describe("string[]");
+export const ArrayBytes19Schema = z.array(Bytes19Schema).describe("string[]");
+export const ArrayBytes20Schema = z.array(Bytes20Schema).describe("string[]");
+export const ArrayBytes21Schema = z.array(Bytes21Schema).describe("string[]");
+export const ArrayBytes22Schema = z.array(Bytes22Schema).describe("string[]");
+export const ArrayBytes23Schema = z.array(Bytes23Schema).describe("string[]");
+export const ArrayBytes24Schema = z.array(Bytes24Schema).describe("string[]");
+export const ArrayBytes25Schema = z.array(Bytes25Schema).describe("string[]");
+export const ArrayBytes26Schema = z.array(Bytes26Schema).describe("string[]");
+export const ArrayBytes27Schema = z.array(Bytes27Schema).describe("string[]");
+export const ArrayBytes28Schema = z.array(Bytes28Schema).describe("string[]");
+export const ArrayBytes29Schema = z.array(Bytes29Schema).describe("string[]");
+export const ArrayBytes30Schema = z.array(Bytes30Schema).describe("string[]");
+export const ArrayBytes31Schema = z.array(Bytes31Schema).describe("string[]");
+export const ArrayBytes32Schema = z.array(Bytes32Schema).describe("string[]");
+export const ArrayBytesSchema = z.array(BytesSchema).describe("string[]");
+
+// String array
+export const ArrayStringSchema = z.array(StringSchema).describe("string[]");
+
+// Boolean array
+export const ArrayBooleanSchema = z.array(BooleanSchema).describe("boolean[]");
+
+// Address array
+export const ArrayAddressSchema = z.array(AddressSchema).describe("string[]");
+
 export const typeToSchema: { [key: string]: ZodType } = {
   uint256: Uint256Schema,
   uint248: Uint248Schema,
@@ -599,6 +711,106 @@ export const typeToSchema: { [key: string]: ZodType } = {
   address: AddressSchema,
   bool: BooleanSchema,
   string: StringSchema,
+  "uint256[]": ArrayUint256Schema,
+  "uint248[]": ArrayUint248Schema,
+  "uint240[]": ArrayUint240Schema,
+  "uint232[]": ArrayUint232Schema,
+  "uint224[]": ArrayUint224Schema,
+  "uint216[]": ArrayUint216Schema,
+  "uint208[]": ArrayUint208Schema,
+  "uint200[]": ArrayUint200Schema,
+  "uint192[]": ArrayUint192Schema,
+  "uint184[]": ArrayUint184Schema,
+  "uint176[]": ArrayUint176Schema,
+  "uint168[]": ArrayUint168Schema,
+  "uint160[]": ArrayUint160Schema,
+  "uint152[]": ArrayUint152Schema,
+  "uint144[]": ArrayUint144Schema,
+  "uint136[]": ArrayUint136Schema,
+  "uint128[]": ArrayUint128Schema,
+  "uint120[]": ArrayUint120Schema,
+  "uint112[]": ArrayUint112Schema,
+  "uint104[]": ArrayUint104Schema,
+  "uint96[]": ArrayUint96Schema,
+  "uint88[]": ArrayUint88Schema,
+  "uint80[]": ArrayUint80Schema,
+  "uint72[]": ArrayUint72Schema,
+  "uint64[]": ArrayUint64Schema,
+  "uint56[]": ArrayUint56Schema,
+  "uint48[]": ArrayUint48Schema,
+  "uint40[]": ArrayUint40Schema,
+  "uint32[]": ArrayUint32Schema,
+  "uint24[]": ArrayUint24Schema,
+  "uint16[]": ArrayUint16Schema,
+  "uint8[]": ArrayUint8Schema,
+  "int256[]": ArrayInt256Schema,
+  "int248[]": ArrayInt248Schema,
+  "int240[]": ArrayInt240Schema,
+  "int232[]": ArrayInt232Schema,
+  "int224[]": ArrayInt224Schema,
+  "int216[]": ArrayInt216Schema,
+  "int208[]": ArrayInt208Schema,
+  "int200[]": ArrayInt200Schema,
+  "int192[]": ArrayInt192Schema,
+  "int184[]": ArrayInt184Schema,
+  "int176[]": ArrayInt176Schema,
+  "int168[]": ArrayInt168Schema,
+  "int160[]": ArrayInt160Schema,
+  "int152[]": ArrayInt152Schema,
+  "int144[]": ArrayInt144Schema,
+  "int136[]": ArrayInt136Schema,
+  "int128[]": ArrayInt128Schema,
+  "int120[]": ArrayInt120Schema,
+  "int112[]": ArrayInt112Schema,
+  "int104[]": ArrayInt104Schema,
+  "int96[]": ArrayInt96Schema,
+  "int88[]": ArrayInt88Schema,
+  "int80[]": ArrayInt80Schema,
+  "int72[]": ArrayInt72Schema,
+  "int64[]": ArrayInt64Schema,
+  "int56[]": ArrayInt56Schema,
+  "int48[]": ArrayInt48Schema,
+  "int40[]": ArrayInt40Schema,
+  "int32[]": ArrayInt32Schema,
+  "int24[]": ArrayInt24Schema,
+  "int16[]": ArrayInt16Schema,
+  "int8[]": ArrayInt8Schema,
+  "bytes1[]": ArrayBytes1Schema,
+  "bytes2[]": ArrayBytes2Schema,
+  "bytes3[]": ArrayBytes3Schema,
+  "bytes4[]": ArrayBytes4Schema,
+  "bytes5[]": ArrayBytes5Schema,
+  "bytes6[]": ArrayBytes6Schema,
+  "bytes7[]": ArrayBytes7Schema,
+  "bytes8[]": ArrayBytes8Schema,
+  "bytes9[]": ArrayBytes9Schema,
+  "bytes10[]": ArrayBytes10Schema,
+  "bytes11[]": ArrayBytes11Schema,
+  "bytes12[]": ArrayBytes12Schema,
+  "bytes13[]": ArrayBytes13Schema,
+  "bytes14[]": ArrayBytes14Schema,
+  "bytes15[]": ArrayBytes15Schema,
+  "bytes16[]": ArrayBytes16Schema,
+  "bytes17[]": ArrayBytes17Schema,
+  "bytes18[]": ArrayBytes18Schema,
+  "bytes19[]": ArrayBytes19Schema,
+  "bytes20[]": ArrayBytes20Schema,
+  "bytes21[]": ArrayBytes21Schema,
+  "bytes22[]": ArrayBytes22Schema,
+  "bytes23[]": ArrayBytes23Schema,
+  "bytes24[]": ArrayBytes24Schema,
+  "bytes25[]": ArrayBytes25Schema,
+  "bytes26[]": ArrayBytes26Schema,
+  "bytes27[]": ArrayBytes27Schema,
+  "bytes28[]": ArrayBytes28Schema,
+  "bytes29[]": ArrayBytes29Schema,
+  "bytes30[]": ArrayBytes30Schema,
+  "bytes31[]": ArrayBytes31Schema,
+  "bytes32[]": ArrayBytes32Schema,
+  "bytes[]": ArrayBytesSchema,
+  "address[]": ArrayAddressSchema,
+  "bool[]": ArrayBooleanSchema,
+  "string[]": ArrayStringSchema,
 };
 
 export const getSchema = (solidityType: string): ZodType => {
@@ -622,7 +834,16 @@ export const verify = (val: unknown, type: string): boolean => {
 
 export const solidityToTypescriptType = (
   type: string
-): "number" | "bigint" | "string" | "boolean" | "unknown" => {
+):
+  | "number"
+  | "bigint"
+  | "string"
+  | "boolean"
+  | "number[]"
+  | "bigint[]"
+  | "string[]"
+  | "boolean[]"
+  | "unknown" => {
   const schema = typeToSchema[type];
   if (schema === undefined) {
     return "unknown";
@@ -631,9 +852,13 @@ export const solidityToTypescriptType = (
   const tsType = schema.description;
   if (
     tsType === "number" ||
-    tsType == "bigint" ||
-    tsType == "string" ||
-    tsType == "boolean"
+    tsType === "bigint" ||
+    tsType === "string" ||
+    tsType === "boolean" ||
+    tsType === "number[]" ||
+    tsType === "bigint[]" ||
+    tsType === "string[]" ||
+    tsType === "boolean[]"
   ) {
     return tsType;
   } else {

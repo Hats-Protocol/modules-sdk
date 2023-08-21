@@ -477,9 +477,92 @@ describe("Eligibility Client Tests", () => {
     expect(minBalanceResult).toBe(immutableArgs[1]);
   });
 
-  //test("Test get all eligibility modules", () => {
-  //  const eligibilityModules = hatsModulesClient.getAllEligibilityModules();
-  //  console.log(Object.keys(eligibilityModules));
-  //  expect(1).toBe(1);
-  //});
+  test("Test create new erc1155 eligibility instance", async () => {
+    const erc1155Id =
+      "0x6ba54170154b15251037f4fdb42249717419d1845715dc3f619123fbad0d3d7e";
+    const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
+
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
+    const immutableArgs: unknown[] = [];
+    const mutableArgs: unknown[] = [];
+    console.log(module);
+    for (let i = 0; i < module.args.immutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.immutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.immutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else if (tsType === "bigint[]") {
+        arg = (exampleArg as Array<string>).map((val) => BigInt(val));
+      } else {
+        arg = exampleArg;
+      }
+
+      immutableArgs.push(arg);
+    }
+
+    for (let i = 0; i < module.args.mutable.length; i++) {
+      let arg: unknown;
+      const exampleArg = module.args.mutable[i].example;
+      const tsType = solidityToTypescriptType(module.args.mutable[i].type);
+      if (tsType === "bigint") {
+        arg = BigInt(exampleArg as string);
+      } else {
+        arg = exampleArg;
+      }
+
+      mutableArgs.push(arg);
+    }
+
+    const res = await hatsModulesClient.createNewInstance({
+      account: deployerAccount,
+      moduleId: erc1155Id,
+      hatId: hatId,
+      immutableArgs: immutableArgs,
+      mutableArgs: mutableArgs,
+    });
+
+    const hatIdResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "hatId",
+      args: [],
+    });
+
+    const tokenResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "TOKEN_ADDRESS",
+      args: [],
+    });
+
+    const arrayLengthResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "ARRAY_LENGTH",
+      args: [],
+    });
+
+    const tokenIdsResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "TOKEN_IDS",
+      args: [],
+    });
+
+    const minBalancesResult = await publicClient.readContract({
+      address: res.newInstance as Address,
+      abi: module.abi,
+      functionName: "MIN_BALANCES",
+      args: [],
+    });
+
+    expect(hatIdResult).toBe(hatId);
+    expect(tokenResult).toBe(immutableArgs[0]);
+    expect(arrayLengthResult).toBe(immutableArgs[1]);
+    expect(tokenIdsResult).toEqual(immutableArgs[2]);
+    expect(minBalancesResult).toEqual(immutableArgs[3]);
+  });
 });
