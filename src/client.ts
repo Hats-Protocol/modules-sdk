@@ -19,7 +19,6 @@ import {
 } from "./errors";
 import { verify } from "./schemas";
 import type { CreateInstanceResult } from "./types";
-//import * as fs from "fs";
 import { request } from "@octokit/request";
 import type { Account, Address } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
@@ -97,10 +96,6 @@ export class HatsModulesClient {
       );
 
       registryModules = JSON.parse(result.data as unknown as string);
-
-      //const modulesFile = new URL("modules.json", import.meta.url);
-      //const data = fs.readFileSync(modulesFile, "utf-8");
-      //registryModules = JSON.parse(data);
     }
 
     this._modules = {};

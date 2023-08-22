@@ -3,6 +3,7 @@ import { createPublicClient, createWalletClient, http } from "viem";
 import { goerli } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
+import * as fs from "fs";
 import type {
   PublicClient,
   WalletClient,
@@ -40,13 +41,16 @@ describe("Eligibility Client Tests", () => {
       transport: http("http://127.0.0.1:8545"),
     });
 
-    // init jokerace eligibility and hats clients
+    const modulesFile = new URL("modules.json", import.meta.url);
+    const data = fs.readFileSync(modulesFile, "utf-8");
+    const registryModules: Module[] = JSON.parse(data);
+
     hatsModulesClient = new HatsModulesClient({
       publicClient,
       walletClient,
     });
 
-    await hatsModulesClient.prepare();
+    await hatsModulesClient.prepare(registryModules);
   }, 30000);
 
   afterAll(async () => {
@@ -583,5 +587,19 @@ describe("Eligibility Client Tests", () => {
     });
 
     expect(hatIdResult).toBe(hatId);
+  });
+
+  test("Test get module by implementation", async () => {
+    const claimsHatterId =
+      "0x65d08c510207af375cce45e411803a12a4da2c49459061d584fd5b33e9089b43";
+    const claimsHatterModule = hatsModulesClient.getModuleById(
+      claimsHatterId
+    ) as Module;
+
+    expect(
+      hatsModulesClient.getModuleByImplementaion(
+        "0xd42dfDb6cf5CDe8a17E44FB9fA4480A325e9bf4a"
+      )
+    ).toEqual(claimsHatterModule);
   });
 });
