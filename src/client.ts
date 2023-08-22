@@ -18,7 +18,7 @@ import {
   ParametersLengthsMismatchError,
 } from "./errors";
 import { verify } from "./schemas";
-import type { CreateInstanceResult, SupportedChain } from "./types";
+import type { CreateInstanceResult } from "./types";
 //import * as fs from "fs";
 import { request } from "@octokit/request";
 import type { Account, Address } from "viem";
