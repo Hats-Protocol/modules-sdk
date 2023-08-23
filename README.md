@@ -1,4 +1,4 @@
-# Hats-Protocol V1 Modules SDK
+# Hats-Protocol Modules SDK
 
 ## Install
 
