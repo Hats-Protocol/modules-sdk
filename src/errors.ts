@@ -53,3 +53,17 @@ export class ParametersLengthsMismatchError extends Error {
     this.name = "ParametersLengthsMismatchError";
   }
 }
+
+export class MissingTokenError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingTokenError";
+  }
+}
+
+export class ModulesRegistryFetchError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ModulesRegistryFetchError";
+  }
+}

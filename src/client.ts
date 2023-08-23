@@ -16,6 +16,8 @@ import {
   InvalidParamError,
   ClientNotPreparedError,
   ParametersLengthsMismatchError,
+  MissingTokenError,
+  ModulesRegistryFetchError,
 } from "./errors";
 import { verify } from "./schemas";
 import type { CreateInstanceResult } from "./types";
@@ -26,6 +28,7 @@ import type { Module, Factory, FunctionInfo } from "./types";
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
   private readonly _walletClient: WalletClient;
+  private readonly _registryToken: string;
   private _modules: { [key: string]: Module } | undefined;
   private _factory: Factory | undefined;
 
@@ -34,14 +37,17 @@ export class HatsModulesClient {
    *
    * @param publicClient - Viem Public Client.
    * @param walletClient - Viem Wallet Client.
-   * @param chainId - Client chain ID. The client is initialized to work with one specific chain.
+   * @param registryToken - GitHub token for fetching modules from the registry.
    * @returns A HatsModulesClient instance.
    *
    * @throws MissingPublicClientError
    * Thrown when a public client is not provided.
    *
-   * * @throws MissingWalletClientError
+   * @throws MissingWalletClientError
    * Thrown when a wallet client is not provided.
+   *
+   * @throws MissingTokenError
+   * Thrown when registry token is not provided.
    *
    * @throws ChainIdMismatchError
    * Thrown when there is a chain ID mismatch between the Viem clients.
@@ -49,9 +55,11 @@ export class HatsModulesClient {
   constructor({
     publicClient,
     walletClient,
+    registryToken,
   }: {
     publicClient: PublicClient;
     walletClient: WalletClient;
+    registryToken: string;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Public client is required");
@@ -59,7 +67,9 @@ export class HatsModulesClient {
     if (walletClient === undefined) {
       throw new MissingWalletClientError("Wallet client is required");
     }
-
+    if (registryToken === undefined) {
+      throw new MissingTokenError("Token is required");
+    }
     if (walletClient.chain?.id !== publicClient.chain?.id) {
       throw new ChainIdMismatchError(
         "Provided chain id should match the wallet client chain id"
@@ -68,34 +78,43 @@ export class HatsModulesClient {
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
+    this._registryToken = registryToken;
   }
 
   /**
    * Fetches the modules from the modules registry and prepares the client for usage.
    *
    * @param modules - Optional array of modules. If provided, then these modules will be used instead of fetching from the registry.
+   *
+   * @throws ModulesRegistryFetchError
+   * Thrown in case there was an error while fetching from the modules registry.
    */
   async prepare(modules?: Module[]) {
     let registryModules: Module[];
     if (modules !== undefined) {
       registryModules = modules;
     } else {
-      const result = await request(
-        "GET /repos/{owner}/{repo}/contents/{path}",
-        {
-          headers: {
-            authorization: `token ${process.env.GITHUB_TOKEN}`,
-          },
-          owner: "Hats-Protocol",
-          repo: "modules-registry",
-          path: "modules.json",
-          mediaType: {
-            format: "raw",
-          },
-        }
-      );
-
-      registryModules = JSON.parse(result.data as unknown as string);
+      try {
+        const result = await request(
+          "GET /repos/{owner}/{repo}/contents/{path}",
+          {
+            headers: {
+              authorization: `token ${this._registryToken}`,
+            },
+            owner: "Hats-Protocol",
+            repo: "modules-registry",
+            path: "modules.json",
+            mediaType: {
+              format: "raw",
+            },
+          }
+        );
+        registryModules = JSON.parse(result.data as unknown as string);
+      } catch (err) {
+        throw new ModulesRegistryFetchError(
+          "Could not fetch modules from the registry"
+        );
+      }
     }
 
     this._modules = {};

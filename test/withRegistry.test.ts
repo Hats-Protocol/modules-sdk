@@ -42,6 +42,7 @@ describe("Eligibility Client Tests", () => {
     hatsModulesClient = new HatsModulesClient({
       publicClient,
       walletClient,
+      registryToken: process.env.GITHUB_TOKEN as string,
     });
 
     await hatsModulesClient.prepare();
