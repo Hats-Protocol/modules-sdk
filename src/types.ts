@@ -9,6 +9,10 @@ export interface CreateInstanceResult extends TransactionResult {
   newInstance: `0x${string}`;
 }
 
+export interface BatchCreateInstancesResult extends TransactionResult {
+  newInstances: Array<`0x${string}`>;
+}
+
 export type CreateInstanceArg = {
   name: string;
   description: string;

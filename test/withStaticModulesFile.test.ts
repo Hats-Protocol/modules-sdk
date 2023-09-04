@@ -14,7 +14,7 @@ import type { Anvil } from "@viem/anvil";
 import type { Module } from "../src/types";
 import "dotenv/config";
 
-describe("Eligibility Client Tests", () => {
+describe("Client Tests With a Static Modules File", () => {
   let publicClient: PublicClient;
   let walletClient: WalletClient;
   let hatsModulesClient: HatsModulesClient;
