@@ -6,7 +6,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
 import type { PublicClient, WalletClient, PrivateKeyAccount } from "viem";
 import type { Anvil } from "@viem/anvil";
-import type { Module } from "../src/types";
+import type { Module, Registry } from "../src/types";
 import "dotenv/config";
 import { Abi } from "abitype";
 
@@ -57,7 +57,7 @@ describe("Batch Create Client Tests", () => {
 
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
-    const registryModules: Module[] = JSON.parse(data);
+    const registryModules: Registry = JSON.parse(data);
 
     hatsModulesClient = new HatsModulesClient({
       publicClient,

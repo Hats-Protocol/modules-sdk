@@ -73,3 +73,10 @@ export type FunctionInfo = {
   type: "write" | "read";
   inputs: { name: string | undefined; type: string }[];
 };
+
+export type Registry = {
+  factory: Module;
+  eligibilitiesChain: Module;
+  togglesChain: Module;
+  modules: Module[];
+};

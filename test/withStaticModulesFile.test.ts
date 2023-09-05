@@ -11,7 +11,7 @@ import type {
   Address,
 } from "viem";
 import type { Anvil } from "@viem/anvil";
-import type { Module } from "../src/types";
+import type { Module, Registry } from "../src/types";
 import "dotenv/config";
 
 describe("Client Tests With a Static Modules File", () => {
@@ -24,6 +24,7 @@ describe("Client Tests With a Static Modules File", () => {
   beforeAll(async () => {
     anvil = createAnvil({
       forkUrl: process.env.GOERLI_RPC,
+      startTimeout: 20000,
     });
     await anvil.start();
 
@@ -43,7 +44,7 @@ describe("Client Tests With a Static Modules File", () => {
 
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
-    const registryModules: Module[] = JSON.parse(data);
+    const registryModules: Registry = JSON.parse(data);
 
     hatsModulesClient = new HatsModulesClient({
       publicClient,

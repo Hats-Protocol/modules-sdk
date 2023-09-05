@@ -20,7 +20,11 @@ import {
   ModulesRegistryFetchError,
 } from "./errors";
 import { verify } from "./schemas";
-import type { CreateInstanceResult, BatchCreateInstancesResult } from "./types";
+import type {
+  CreateInstanceResult,
+  BatchCreateInstancesResult,
+  Registry,
+} from "./types";
 import { request } from "@octokit/request";
 import type { Account, Address, TransactionReceipt } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
@@ -82,17 +86,17 @@ export class HatsModulesClient {
   }
 
   /**
-   * Fetches the modules from the modules registry and prepares the client for usage.
+   * Fetches the modules registry and prepares the client for usage.
    *
-   * @param modules - Optional array of modules. If provided, then these modules will be used instead of fetching from the registry.
+   * @param modules - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
    *
    * @throws ModulesRegistryFetchError
    * Thrown in case there was an error while fetching from the modules registry.
    */
-  async prepare(modules?: Module[]) {
-    let registryModules: Module[];
+  async prepare(modules?: Registry) {
+    let registry: Registry;
     if (modules !== undefined) {
-      registryModules = modules;
+      registry = modules;
     } else {
       try {
         const result = await request(
@@ -109,7 +113,7 @@ export class HatsModulesClient {
             },
           }
         );
-        registryModules = JSON.parse(result.data as unknown as string);
+        registry = JSON.parse(result.data as unknown as string);
       } catch (err) {
         throw new ModulesRegistryFetchError(
           "Could not fetch modules from the registry"
@@ -119,11 +123,11 @@ export class HatsModulesClient {
 
     this._modules = {};
     for (
-      let moduleIndex = 1;
-      moduleIndex < registryModules.length;
+      let moduleIndex = 0;
+      moduleIndex < registry.modules.length;
       moduleIndex++
     ) {
-      const module = registryModules[moduleIndex];
+      const module = registry.modules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
         if (deployment.chainId === this._publicClient.chain?.id.toString()) {
@@ -142,7 +146,7 @@ export class HatsModulesClient {
       }
     }
 
-    this._factory = registryModules[0];
+    this._factory = registry.factory;
   }
 
   /**
