@@ -68,6 +68,21 @@ export type Factory = {
   abi: Abi;
 };
 
+export type ChainModule = {
+  name: string;
+  description: string;
+  github: {
+    owner: string;
+    repo: string;
+  };
+  implementationAddress: string;
+  deployments: {
+    chainId: string;
+    block: string;
+  }[];
+  abi: Abi;
+};
+
 export type FunctionInfo = {
   name: string;
   type: "write" | "read";

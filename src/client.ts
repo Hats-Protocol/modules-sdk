@@ -27,7 +27,7 @@ import type {
 } from "./types";
 import { request } from "@octokit/request";
 import type { Account, Address, TransactionReceipt } from "viem";
-import type { Module, Factory, FunctionInfo } from "./types";
+import type { Module, Factory, FunctionInfo, ChainModule } from "./types";
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
@@ -35,6 +35,8 @@ export class HatsModulesClient {
   private readonly _registryToken: string;
   private _modules: { [key: string]: Module } | undefined;
   private _factory: Factory | undefined;
+  private _eligibilitiesChain: ChainModule | undefined;
+  private _togglesChain: ChainModule | undefined;
 
   /**
    * Initialize a HatsModulesClient.
@@ -147,6 +149,8 @@ export class HatsModulesClient {
     }
 
     this._factory = registry.factory;
+    this._eligibilitiesChain = registry.eligibilitiesChain;
+    this._togglesChain = registry.togglesChain;
   }
 
   /**
@@ -385,6 +389,212 @@ export class HatsModulesClient {
   }
 
   /**
+   * Create a new eligibilities chain module.
+   *
+   * @param account - A Viem account.
+   * @param hatId - The hat ID for which the module is created.
+   * @param numClauses - Number of conjunction clauses.
+   * @param clausesLengths - Lengths of each clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clause.
+   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws TransactionRevertedError
+   * Thrown if the transaction reverted.
+   */
+  async createEligibilitiesChain({
+    account,
+    hatId,
+    numClauses,
+    clausesLengths,
+    modules,
+  }: {
+    account: Account | Address;
+    hatId: bigint;
+    numClauses: number;
+    clausesLengths: number[];
+    modules: `0x${string}`[];
+  }): Promise<CreateInstanceResult> {
+    if (
+      this._modules === undefined ||
+      this._factory === undefined ||
+      this._eligibilitiesChain === undefined
+    ) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const numModules = clausesLengths.reduce(
+      (partialSum, len) => partialSum + len,
+      0
+    );
+    const immutableArgsTypes = ["uint256", "uint256[]"];
+    const immutableArgs: unknown[] = [numClauses, clausesLengths];
+    for (let i = 0; i < numModules; i++) {
+      immutableArgsTypes.push("address");
+      immutableArgs.push(modules[i]);
+    }
+
+    const mutableArgsEncoded = "";
+    const immutableArgsEncoded = encodePacked(
+      immutableArgsTypes,
+      immutableArgs
+    );
+
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: this._factory.implementationAddress as `0x${string}`,
+        abi: this._factory.abi,
+        functionName: "createHatsModule",
+        account,
+        args: [
+          this._eligibilitiesChain.implementationAddress,
+          hatId,
+          immutableArgsEncoded,
+          mutableArgsEncoded,
+        ],
+        chain: this._walletClient.chain,
+      });
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      let instance: `0x${string}` = "0x";
+      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+        try {
+          const event: any = decodeEventLog({
+            abi: this._factory.abi,
+            eventName: "HatsModuleFactory_ModuleDeployed",
+            data: receipt.logs[eventIndex].data,
+            topics: receipt.logs[eventIndex].topics,
+          });
+
+          instance = event.args.instance;
+          break;
+        } catch (err) {
+          // continue
+        }
+      }
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+        newInstance: instance,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Transaction reverted");
+    }
+  }
+
+  /**
+   * Create a new toggles chain module.
+   *
+   * @param account - A Viem account.
+   * @param hatId - The hat ID for which the module is created.
+   * @param numClauses - Number of conjunction clauses.
+   * @param clausesLengths - Lengths of each clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clause.
+   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws TransactionRevertedError
+   * Thrown if the transaction reverted.
+   */
+  async createTogglesChain({
+    account,
+    hatId,
+    numClauses,
+    clausesLengths,
+    modules,
+  }: {
+    account: Account | Address;
+    hatId: bigint;
+    numClauses: number;
+    clausesLengths: number[];
+    modules: `0x${string}`[];
+  }): Promise<CreateInstanceResult> {
+    if (
+      this._modules === undefined ||
+      this._factory === undefined ||
+      this._togglesChain === undefined
+    ) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const numModules = clausesLengths.reduce(
+      (partialSum, len) => partialSum + len,
+      0
+    );
+    const immutableArgsTypes = ["uint256", "uint256[]"];
+    const immutableArgs: unknown[] = [numClauses, clausesLengths];
+    for (let i = 0; i < numModules; i++) {
+      immutableArgsTypes.push("address");
+      immutableArgs.push(modules[i]);
+    }
+
+    const mutableArgsEncoded = "";
+    const immutableArgsEncoded = encodePacked(
+      immutableArgsTypes,
+      immutableArgs
+    );
+
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: this._factory.implementationAddress as `0x${string}`,
+        abi: this._factory.abi,
+        functionName: "createHatsModule",
+        account,
+        args: [
+          this._togglesChain.implementationAddress,
+          hatId,
+          immutableArgsEncoded,
+          mutableArgsEncoded,
+        ],
+        chain: this._walletClient.chain,
+      });
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      let instance: `0x${string}` = "0x";
+      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+        try {
+          const event: any = decodeEventLog({
+            abi: this._factory.abi,
+            eventName: "HatsModuleFactory_ModuleDeployed",
+            data: receipt.logs[eventIndex].data,
+            topics: receipt.logs[eventIndex].topics,
+          });
+
+          instance = event.args.instance;
+          break;
+        } catch (err) {
+          // continue
+        }
+      }
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+        newInstance: instance,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Transaction reverted");
+    }
+  }
+
+  /**
    * Get a module's functions.
    *
    * @param moduleId - The nodule ID.
@@ -574,6 +784,42 @@ export class HatsModulesClient {
     }
 
     return res;
+  }
+
+  /**
+   * Get eligibilities chain module.
+   *
+   * @returns the eligibilities chain module.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  getElibilitiesChainModule(): ChainModule {
+    if (this._eligibilitiesChain === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    return this._eligibilitiesChain;
+  }
+
+  /**
+   * Get toggles chain module.
+   *
+   * @returns the toggles chain module.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  getTogglesChainModule(): ChainModule {
+    if (this._togglesChain === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    return this._togglesChain;
   }
 
   _verifyModuleCreationArgs(
