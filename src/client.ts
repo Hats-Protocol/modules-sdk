@@ -20,9 +20,13 @@ import {
   ModulesRegistryFetchError,
 } from "./errors";
 import { verify } from "./schemas";
-import type { CreateInstanceResult } from "./types";
+import type {
+  CreateInstanceResult,
+  BatchCreateInstancesResult,
+  Registry,
+} from "./types";
 import { request } from "@octokit/request";
-import type { Account, Address } from "viem";
+import type { Account, Address, TransactionReceipt } from "viem";
 import type { Module, Factory, FunctionInfo } from "./types";
 
 export class HatsModulesClient {
@@ -82,17 +86,17 @@ export class HatsModulesClient {
   }
 
   /**
-   * Fetches the modules from the modules registry and prepares the client for usage.
+   * Fetches the modules registry and prepares the client for usage.
    *
-   * @param modules - Optional array of modules. If provided, then these modules will be used instead of fetching from the registry.
+   * @param modules - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
    *
    * @throws ModulesRegistryFetchError
    * Thrown in case there was an error while fetching from the modules registry.
    */
-  async prepare(modules?: Module[]) {
-    let registryModules: Module[];
+  async prepare(modules?: Registry) {
+    let registry: Registry;
     if (modules !== undefined) {
-      registryModules = modules;
+      registry = modules;
     } else {
       try {
         const result = await request(
@@ -109,7 +113,7 @@ export class HatsModulesClient {
             },
           }
         );
-        registryModules = JSON.parse(result.data as unknown as string);
+        registry = JSON.parse(result.data as unknown as string);
       } catch (err) {
         throw new ModulesRegistryFetchError(
           "Could not fetch modules from the registry"
@@ -119,11 +123,11 @@ export class HatsModulesClient {
 
     this._modules = {};
     for (
-      let moduleIndex = 1;
-      moduleIndex < registryModules.length;
+      let moduleIndex = 0;
+      moduleIndex < registry.modules.length;
       moduleIndex++
     ) {
-      const module = registryModules[moduleIndex];
+      const module = registry.modules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
         if (deployment.chainId === this._publicClient.chain?.id.toString()) {
@@ -142,7 +146,7 @@ export class HatsModulesClient {
       }
     }
 
-    this._factory = registryModules[0];
+    this._factory = registry.factory;
   }
 
   /**
@@ -200,7 +204,7 @@ export class HatsModulesClient {
     });
 
     const mutableArgsEncoded =
-      immutableArgs.length > 0
+      mutableArgs.length > 0
         ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
         : "";
     const immutableArgsEncoded =
@@ -253,6 +257,131 @@ export class HatsModulesClient {
       console.log(err);
       throw new TransactionRevertedError("Transaction reverted");
     }
+  }
+
+  /**
+   * Batch create new module instances.
+   *
+   * @param account - A Viem account.
+   * @param moduleIds - The module IDs.
+   * @param hatIds - The hat IDs for which the modules are created.
+   * @param immutableArgsArray - Each module's immutable arguments.
+   * @param mutableArgsArray - Each module's mutable arguments.
+   * @returns An object containing the status of the call, the transaction hash and the new module instances addresses.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws ModuleNotAvailableError
+   * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws TransactionRevertedError
+   * Thrown if the transaction reverted.
+   */
+  async batchCreateNewInstances({
+    account,
+    moduleIds,
+    hatIds,
+    immutableArgsArray,
+    mutableArgsArray,
+  }: {
+    account: Account | Address;
+    moduleIds: string[];
+    hatIds: bigint[];
+    immutableArgsArray: unknown[][];
+    mutableArgsArray: unknown[][];
+  }): Promise<BatchCreateInstancesResult> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    const implementations: Array<string> = [];
+    const encodedImmutableArgsArray: Array<`0x${string}` | ""> = [];
+    const encodedMutableArgsArray: Array<`0x${string}` | ""> = [];
+
+    for (let i = 0; i < moduleIds.length; i++) {
+      const module = this.getModuleById(moduleIds[i]);
+      if (module === undefined) {
+        throw new ModuleNotAvailableError(
+          `Module with id ${moduleIds[i]} does not exist`
+        );
+      }
+
+      this._verifyModuleCreationArgs(
+        module,
+        hatIds[i],
+        immutableArgsArray[i],
+        mutableArgsArray[i]
+      );
+
+      const mutableArgsTypes = module.args.mutable.map((arg) => {
+        return { type: arg.type };
+      });
+      const immutableArgsTypes = module.args.immutable.map((arg) => {
+        return arg.type;
+      });
+
+      const mutableArgsEncoded =
+        mutableArgsArray[i].length > 0
+          ? encodeAbiParameters(mutableArgsTypes, mutableArgsArray[i])
+          : "";
+      const immutableArgsEncoded =
+        immutableArgsArray[i].length > 0
+          ? encodePacked(immutableArgsTypes, immutableArgsArray[i])
+          : "";
+
+      encodedMutableArgsArray.push(mutableArgsEncoded);
+      encodedImmutableArgsArray.push(immutableArgsEncoded);
+      implementations.push(module.implementationAddress);
+    }
+
+    let receipt: TransactionReceipt;
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: this._factory.implementationAddress as `0x${string}`,
+        abi: this._factory.abi,
+        functionName: "batchCreateHatsModule",
+        account,
+        args: [
+          implementations as Array<`0x${string}`>,
+          hatIds,
+          encodedImmutableArgsArray,
+          encodedMutableArgsArray,
+        ],
+        chain: this._walletClient.chain,
+      });
+
+      receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Transaction reverted");
+    }
+
+    const instances: Array<`0x${string}`> = [];
+    for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+      try {
+        const event: any = decodeEventLog({
+          abi: this._factory.abi,
+          eventName: "HatsModuleFactory_ModuleDeployed",
+          data: receipt.logs[eventIndex].data,
+          topics: receipt.logs[eventIndex].topics,
+        });
+
+        instances.push(event.args.instance);
+      } catch (err) {
+        // continue
+      }
+    }
+
+    return {
+      status: receipt.status,
+      transactionHash: receipt.transactionHash,
+      newInstances: instances,
+    };
   }
 
   /**

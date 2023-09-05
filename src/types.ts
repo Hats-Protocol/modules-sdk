@@ -9,6 +9,10 @@ export interface CreateInstanceResult extends TransactionResult {
   newInstance: `0x${string}`;
 }
 
+export interface BatchCreateInstancesResult extends TransactionResult {
+  newInstances: Array<`0x${string}`>;
+}
+
 export type CreateInstanceArg = {
   name: string;
   description: string;
@@ -68,4 +72,11 @@ export type FunctionInfo = {
   name: string;
   type: "write" | "read";
   inputs: { name: string | undefined; type: string }[];
+};
+
+export type Registry = {
+  factory: Module;
+  eligibilitiesChain: Module;
+  togglesChain: Module;
+  modules: Module[];
 };
