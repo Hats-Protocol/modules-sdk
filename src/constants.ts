@@ -1,16 +1,6 @@
-import type { Address } from "viem";
-
-export const HATS_MODULE_FACTORY: Address =
-  "0x60f7bE2ffc5672934146713fAe20Df350F21d8E2";
-
-export const HATS_MODULE_FACTORY_ABI = [
+export const HATS_MODULE_ABI = [
   {
     inputs: [
-      {
-        internalType: "contract IHats",
-        name: "_hats",
-        type: "address",
-      },
       {
         internalType: "string",
         name: "_version",
@@ -21,61 +11,16 @@ export const HATS_MODULE_FACTORY_ABI = [
     type: "constructor",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "implementation",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "hatId",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "otherImmutableArgs",
-        type: "bytes",
-      },
-    ],
-    name: "HatsModuleFactory_ModuleAlreadyDeployed",
-    type: "error",
-  },
-  {
     anonymous: false,
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "implementation",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "instance",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "hatId",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "bytes",
-        name: "otherImmutableArgs",
-        type: "bytes",
-      },
-      {
-        indexed: false,
-        internalType: "bytes",
-        name: "initData",
-        type: "bytes",
+        internalType: "uint8",
+        name: "version",
+        type: "uint8",
       },
     ],
-    name: "HatsModuleFactory_ModuleDeployed",
+    name: "Initialized",
     type: "event",
   },
   {
@@ -88,96 +33,56 @@ export const HATS_MODULE_FACTORY_ABI = [
         type: "address",
       },
     ],
-    stateMutability: "view",
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "IMPLEMENTATION",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "hatId",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "pure",
     type: "function",
   },
   {
     inputs: [
-      {
-        internalType: "address",
-        name: "_implementation",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_hatId",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "_otherImmutableArgs",
-        type: "bytes",
-      },
       {
         internalType: "bytes",
         name: "_initData",
         type: "bytes",
       },
     ],
-    name: "createHatsModule",
-    outputs: [
-      {
-        internalType: "address",
-        name: "_instance",
-        type: "address",
-      },
-    ],
+    name: "setUp",
+    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_implementation",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_hatId",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "_otherImmutableArgs",
-        type: "bytes",
-      },
-    ],
-    name: "deployed",
+    inputs: [],
+    name: "version",
     outputs: [
       {
-        internalType: "bool",
+        internalType: "string",
         name: "",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_implementation",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "_hatId",
-        type: "uint256",
-      },
-      {
-        internalType: "bytes",
-        name: "_otherImmutableArgs",
-        type: "bytes",
-      },
-    ],
-    name: "getHatsModuleAddress",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
+        type: "string",
       },
     ],
     stateMutability: "view",
@@ -185,7 +90,7 @@ export const HATS_MODULE_FACTORY_ABI = [
   },
   {
     inputs: [],
-    name: "version",
+    name: "version_",
     outputs: [
       {
         internalType: "string",

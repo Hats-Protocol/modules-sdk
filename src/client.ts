@@ -20,6 +20,7 @@ import {
   ModulesRegistryFetchError,
 } from "./errors";
 import { verify } from "./schemas";
+import { HATS_MODULE_ABI } from "./constants";
 import type {
   CreateInstanceResult,
   BatchCreateInstancesResult,
@@ -687,6 +688,36 @@ export class HatsModulesClient {
       if (module.implementationAddress === address) {
         return module;
       }
+    }
+  }
+
+  /**
+   * Get a module by its implementation address.
+   *
+   * @param moduleId - The nodule ID.
+   * @returns The module matching the provided implementation address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  async getModuleByInstance(address: Address): Promise<Module | undefined> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client have not been initilized, requires a call to the prepare function"
+      );
+    }
+
+    try {
+      const implementationAddress = await this._publicClient.readContract({
+        address: address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+
+      const res = this.getModuleByImplementaion(implementationAddress);
+      return res;
+    } catch (err) {
+      return undefined;
     }
   }
 
