@@ -1,6 +1,6 @@
 {
   "name": "@hatsprotocol/modules-sdk",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "author": "Haberdasher Labs",
   "license": "MIT",
   "main": "dist/modules-sdk.cjs.js",
@@ -34,10 +34,10 @@
   "dependencies": {
     "@octokit/request": "^8.1.1",
     "abitype": "^0.9.6",
-    "viem": "1.2.6",
+    "viem": "1.9.5",
     "zod": "^3.21.4"
   },
   "peerDependencies": {
-    "viem": "1.2.6"
+    "viem": "1.9.5"
   }
 }
