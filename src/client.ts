@@ -200,10 +200,10 @@ export class HatsModulesClient {
 
     this._verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
 
-    const mutableArgsTypes = module.args.mutable.map((arg) => {
+    const mutableArgsTypes = module.creationArgs.mutable.map((arg) => {
       return { type: arg.type };
     });
-    const immutableArgsTypes = module.args.immutable.map((arg) => {
+    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
       return arg.type;
     });
 
@@ -320,10 +320,10 @@ export class HatsModulesClient {
         mutableArgsArray[i]
       );
 
-      const mutableArgsTypes = module.args.mutable.map((arg) => {
+      const mutableArgsTypes = module.creationArgs.mutable.map((arg) => {
         return { type: arg.type };
       });
-      const immutableArgsTypes = module.args.immutable.map((arg) => {
+      const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
         return arg.type;
       });
 
@@ -834,12 +834,12 @@ export class HatsModulesClient {
     }
 
     // verify immutable and mutable array lengths
-    if (immutableArgs.length !== module.args.immutable.length) {
+    if (immutableArgs.length !== module.creationArgs.immutable.length) {
       throw new ParametersLengthsMismatchError(
         "Immutable args array length doesn't match the module's schema"
       );
     }
-    if (mutableArgs.length !== module.args.mutable.length) {
+    if (mutableArgs.length !== module.creationArgs.mutable.length) {
       throw new ParametersLengthsMismatchError(
         "Mutable args array length doesn't match the module's schema"
       );
@@ -848,7 +848,7 @@ export class HatsModulesClient {
     // verify immutable args
     for (let i = 0; i < immutableArgs.length; i++) {
       const val = immutableArgs[i];
-      const type = module.args.immutable[i].type;
+      const type = module.creationArgs.immutable[i].type;
       if (!verify(val, type)) {
         throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
       }
@@ -857,7 +857,7 @@ export class HatsModulesClient {
     // verify mutable args
     for (let i = 0; i < mutableArgs.length; i++) {
       const val = mutableArgs[i];
-      const type = module.args.mutable[i].type;
+      const type = module.creationArgs.mutable[i].type;
       if (!verify(val, type)) {
         throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
       }

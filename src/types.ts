@@ -21,11 +21,16 @@ export type CreateInstanceArg = {
 
 export type Module = {
   name: string;
-  description: string;
-  github: {
-    owner: string;
-    repo: string;
-  };
+  details: string;
+  links: {
+    label: string;
+    link: string;
+  }[];
+  parameters: {
+    label: string;
+    funactionName: string;
+    dispalyType: string;
+  }[];
   type: {
     eligibility: boolean;
     toggle: boolean;
@@ -36,18 +41,20 @@ export type Module = {
     chainId: string;
     block: string;
   }[];
-  args: {
+  creationArgs: {
     immutable: {
       name: string;
       description: string;
       type: string;
       example: unknown;
+      dispalyType: string;
     }[];
     mutable: {
       name: string;
       description: string;
       type: string;
       example: unknown;
+      dispalyType: string;
     }[];
   };
   abi: Abi;
@@ -55,11 +62,11 @@ export type Module = {
 
 export type Factory = {
   name: string;
-  description: string;
-  github: {
-    owner: string;
-    repo: string;
-  };
+  details: string;
+  links: {
+    label: string;
+    link: string;
+  }[];
   implementationAddress: string;
   deployments: {
     chainId: string;
@@ -70,11 +77,11 @@ export type Factory = {
 
 export type ChainModule = {
   name: string;
-  description: string;
-  github: {
-    owner: string;
-    repo: string;
-  };
+  details: string;
+  links: {
+    label: string;
+    link: string;
+  }[];
   implementationAddress: string;
   deployments: {
     chainId: string;
@@ -90,8 +97,8 @@ export type FunctionInfo = {
 };
 
 export type Registry = {
-  factory: Module;
-  eligibilitiesChain: Module;
-  togglesChain: Module;
+  factory: Factory;
+  eligibilitiesChain: ChainModule;
+  togglesChain: ChainModule;
   modules: Module[];
 };

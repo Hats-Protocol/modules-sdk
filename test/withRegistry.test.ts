@@ -62,10 +62,12 @@ describe("Eligibility Client Tests", () => {
       const immutableArgs: unknown[] = [];
       const mutableArgs: unknown[] = [];
 
-      for (let i = 0; i < module.args.immutable.length; i++) {
+      for (let i = 0; i < module.creationArgs.immutable.length; i++) {
         let arg: unknown;
-        const exampleArg = module.args.immutable[i].example;
-        const tsType = solidityToTypescriptType(module.args.immutable[i].type);
+        const exampleArg = module.creationArgs.immutable[i].example;
+        const tsType = solidityToTypescriptType(
+          module.creationArgs.immutable[i].type
+        );
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -77,10 +79,12 @@ describe("Eligibility Client Tests", () => {
         immutableArgs.push(arg);
       }
 
-      for (let i = 0; i < module.args.mutable.length; i++) {
+      for (let i = 0; i < module.creationArgs.mutable.length; i++) {
         let arg: unknown;
-        const exampleArg = module.args.mutable[i].example;
-        const tsType = solidityToTypescriptType(module.args.mutable[i].type);
+        const exampleArg = module.creationArgs.mutable[i].example;
+        const tsType = solidityToTypescriptType(
+          module.creationArgs.mutable[i].type
+        );
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {

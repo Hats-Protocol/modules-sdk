@@ -70,15 +70,15 @@ describe("Batch Create Client Tests", () => {
     mutableArgs = [];
 
     const jokeraceId =
-      "0xa3adb9634f813822f254bdfcecc48836b644a45f585121894409ac5eb01c67fc";
+      "0xf0f5628b66bb62ee20d3af78e2f3fdc776778c19f31a156dc9da25e0f2024838";
     const stakingId =
-      "0x62c11f54dfa48ad24d8b40532ade2d3e72648e9c6c37a7a679f24268be8b155d";
+      "0xf6097eef343ddc8abecc76eb95131a0404c071b6622003c9619e08df9e7b9e4a";
     const erc20Id =
-      "0x61ed5dcdd400854c4032ebbe1ba8a9ee43a937588ad95ccbcd4e538155fe7e3a";
+      "0x20c63b02c721d706826d9cb051c1f3d900a4e34437c0ea2f0bf5e77a54dbe605";
     const erc721Id =
-      "0x40a3e1da005ca0bb15c678de0508683e516f7f39e6519be6fbb01f4e6d238c91";
+      "0xdc8eca16b384dac049617719134fce02cc5a8ef5e767d03c2124f95782ee1369";
     const erc1155Id =
-      "0x6ba54170154b15251037f4fdb42249717419d1845715dc3f619123fbad0d3d7e";
+      "0x7e585bcd45d8a5436d13a61ac27f2b759155ef1057c7f80763356797506aea8b";
 
     const jokeraceModule = hatsModulesClient.getModuleById(
       jokeraceId
@@ -125,10 +125,12 @@ describe("Batch Create Client Tests", () => {
       const moduleImmutableArgs: unknown[] = [];
       const moduleMutableArgs: unknown[] = [];
 
-      for (let i = 0; i < module.args.immutable.length; i++) {
+      for (let i = 0; i < module.creationArgs.immutable.length; i++) {
         let arg: unknown;
-        const exampleArg = module.args.immutable[i].example;
-        const tsType = solidityToTypescriptType(module.args.immutable[i].type);
+        const exampleArg = module.creationArgs.immutable[i].example;
+        const tsType = solidityToTypescriptType(
+          module.creationArgs.immutable[i].type
+        );
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -141,10 +143,12 @@ describe("Batch Create Client Tests", () => {
       }
       immutableArgs.push(moduleImmutableArgs);
 
-      for (let i = 0; i < module.args.mutable.length; i++) {
+      for (let i = 0; i < module.creationArgs.mutable.length; i++) {
         let arg: unknown;
-        const exampleArg = module.args.mutable[i].example;
-        const tsType = solidityToTypescriptType(module.args.mutable[i].type);
+        const exampleArg = module.creationArgs.mutable[i].example;
+        const tsType = solidityToTypescriptType(
+          module.creationArgs.mutable[i].type
+        );
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
