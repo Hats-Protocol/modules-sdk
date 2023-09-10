@@ -19,6 +19,8 @@ describe("Eligibility Client Tests", () => {
   let anvil: Anvil;
   let deployerAccount: PrivateKeyAccount;
 
+  let instances: { implementation: Address; instance: Address }[];
+
   beforeAll(async () => {
     anvil = createAnvil({
       forkUrl: process.env.GOERLI_RPC,
@@ -47,6 +49,8 @@ describe("Eligibility Client Tests", () => {
     });
 
     await hatsModulesClient.prepare();
+
+    instances = [];
   }, 30000);
 
   afterAll(async () => {
@@ -103,6 +107,10 @@ describe("Eligibility Client Tests", () => {
         immutableArgs: immutableArgs,
         mutableArgs: mutableArgs,
       });
+      instances.push({
+        implementation: module.implementationAddress as Address,
+        instance: res.newInstance,
+      });
 
       const hatIdResult = await publicClient.readContract({
         address: res.newInstance as Address,
@@ -113,4 +121,17 @@ describe("Eligibility Client Tests", () => {
       expect(hatIdResult).toBe(hatId);
     }
   }, 30000);
+
+  test("Test get module by instance address", async () => {
+    for (let i = 0; i < instances.length; i++) {
+      const { instance, implementation } = instances[i];
+      const module = await hatsModulesClient.getModuleByInstance(instance);
+      expect(module?.implementationAddress).toBe(implementation);
+    }
+
+    const nonExistentModule = await hatsModulesClient.getModuleByInstance(
+      "0x0000000000000000000000000000000000000000"
+    );
+    expect(nonExistentModule).toBe(undefined);
+  });
 });
