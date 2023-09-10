@@ -16,18 +16,17 @@ import {
   InvalidParamError,
   ClientNotPreparedError,
   ParametersLengthsMismatchError,
-  MissingTokenError,
   ModulesRegistryFetchError,
   ModuleParameterError,
 } from "./errors";
 import { verify } from "./schemas";
 import { HATS_MODULE_ABI } from "./constants";
+import axios from "axios";
 import type {
   CreateInstanceResult,
   BatchCreateInstancesResult,
   Registry,
 } from "./types";
-import { request } from "@octokit/request";
 import type { Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
@@ -40,7 +39,6 @@ import type {
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
   private readonly _walletClient: WalletClient;
-  private readonly _registryToken: string;
   private _modules: { [key: string]: Module } | undefined;
   private _factory: Factory | undefined;
   private _eligibilitiesChain: ChainModule | undefined;
@@ -51,7 +49,6 @@ export class HatsModulesClient {
    *
    * @param publicClient - Viem Public Client.
    * @param walletClient - Viem Wallet Client.
-   * @param registryToken - GitHub token for fetching modules from the registry.
    * @returns A HatsModulesClient instance.
    *
    * @throws MissingPublicClientError
@@ -69,20 +66,15 @@ export class HatsModulesClient {
   constructor({
     publicClient,
     walletClient,
-    registryToken,
   }: {
     publicClient: PublicClient;
     walletClient: WalletClient;
-    registryToken: string;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Public client is required");
     }
     if (walletClient === undefined) {
       throw new MissingWalletClientError("Wallet client is required");
-    }
-    if (registryToken === undefined) {
-      throw new MissingTokenError("Token is required");
     }
     if (walletClient.chain?.id !== publicClient.chain?.id) {
       throw new ChainIdMismatchError(
@@ -92,7 +84,6 @@ export class HatsModulesClient {
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
-    this._registryToken = registryToken;
   }
 
   /**
@@ -109,21 +100,10 @@ export class HatsModulesClient {
       registry = modules;
     } else {
       try {
-        const result = await request(
-          "GET /repos/{owner}/{repo}/contents/{path}",
-          {
-            headers: {
-              authorization: `token ${this._registryToken}`,
-            },
-            owner: "Hats-Protocol",
-            repo: "modules-registry",
-            path: "modules.json",
-            mediaType: {
-              format: "raw",
-            },
-          }
+        const result = await axios.get(
+          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/main/modules.json"
         );
-        registry = JSON.parse(result.data as unknown as string);
+        registry = result.data;
       } catch (err) {
         throw new ModulesRegistryFetchError(
           "Could not fetch modules from the registry"
