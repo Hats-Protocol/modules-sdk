@@ -21,7 +21,7 @@ export type CreateInstanceArg = {
 
 export type Module = {
   name: string;
-  details: string;
+  details: string[];
   links: {
     label: string;
     link: string;
