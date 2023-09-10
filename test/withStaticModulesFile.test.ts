@@ -49,7 +49,6 @@ describe("Client Tests With a Static Modules File", () => {
     hatsModulesClient = new HatsModulesClient({
       publicClient,
       walletClient,
-      registryToken: process.env.GITHUB_TOKEN as string,
     });
 
     await hatsModulesClient.prepare(registryModules);
