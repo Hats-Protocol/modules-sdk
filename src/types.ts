@@ -96,6 +96,13 @@ export type FunctionInfo = {
   inputs: { name: string | undefined; type: string }[];
 };
 
+export type ModuleParameter = {
+  label: string;
+  value: unknown;
+  solidityType: string;
+  displayType: string;
+};
+
 export type Registry = {
   factory: Factory;
   eligibilitiesChain: ChainModule;

@@ -18,6 +18,7 @@ import {
   ParametersLengthsMismatchError,
   MissingTokenError,
   ModulesRegistryFetchError,
+  ModuleParameterError,
 } from "./errors";
 import { verify } from "./schemas";
 import { HATS_MODULE_ABI } from "./constants";
@@ -28,7 +29,13 @@ import type {
 } from "./types";
 import { request } from "@octokit/request";
 import type { Account, Address, TransactionReceipt } from "viem";
-import type { Module, Factory, FunctionInfo, ChainModule } from "./types";
+import type {
+  Module,
+  Factory,
+  FunctionInfo,
+  ChainModule,
+  ModuleParameter,
+} from "./types";
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
@@ -188,7 +195,7 @@ export class HatsModulesClient {
   }): Promise<CreateInstanceResult> {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -298,7 +305,7 @@ export class HatsModulesClient {
   }): Promise<BatchCreateInstancesResult> {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -424,7 +431,7 @@ export class HatsModulesClient {
       this._eligibilitiesChain === undefined
     ) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -527,7 +534,7 @@ export class HatsModulesClient {
       this._togglesChain === undefined
     ) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -608,7 +615,7 @@ export class HatsModulesClient {
   getFunctionsInModule(moduleId: string): FunctionInfo[] {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -650,6 +657,87 @@ export class HatsModulesClient {
   }
 
   /**
+   * Get module instance's parameters.
+   * The parameters to fetch are listed in the module's registry object. If the given address is not a registry module, returns 'undefined'.
+   *
+   * @param instance - The module instace address.
+   * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
+   * the given address is not an instance of a registry module, then returms 'undefined'.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws ModuleParameterError
+   * Thrown if failed reading a module's parameter.
+   */
+  async getInstanceParameters(
+    instance: Address
+  ): Promise<ModuleParameter[] | undefined> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const moduleParameters: ModuleParameter[] = [];
+    const module = await this.getModuleByInstance(instance);
+
+    // check if instance is a registry module
+    if (module === undefined) {
+      return undefined;
+    }
+
+    for (
+      let paramIndex = 0;
+      paramIndex < module.parameters.length;
+      paramIndex++
+    ) {
+      const param = module.parameters[paramIndex];
+
+      for (
+        let abiItemIndex = 0;
+        abiItemIndex < module.abi.length;
+        abiItemIndex++
+      ) {
+        const abiItem = module.abi[abiItemIndex];
+
+        if (
+          abiItem.type === "function" &&
+          abiItem.name === param.funactionName
+        ) {
+          if (abiItem.inputs.length > 0 || abiItem.outputs.length !== 1) {
+            break;
+          }
+
+          let parameterValue: unknown;
+          try {
+            parameterValue = await this._publicClient.readContract({
+              address: instance,
+              abi: module.abi,
+              functionName: param.funactionName,
+            });
+          } catch (err) {
+            throw new ModuleParameterError(
+              `Failed reading function ${param.funactionName} from the module instance`
+            );
+          }
+
+          const solidityType = abiItem.outputs[0].type;
+
+          moduleParameters.push({
+            label: param.label,
+            value: parameterValue,
+            solidityType: solidityType,
+            displayType: param.dispalyType,
+          });
+        }
+      }
+    }
+
+    return moduleParameters;
+  }
+
+  /**
    * Get a module by its ID.
    *
    * @param moduleId - The nodule ID.
@@ -661,7 +749,7 @@ export class HatsModulesClient {
   getModuleById(moduleId: string): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -671,16 +759,16 @@ export class HatsModulesClient {
   /**
    * Get a module by its implementation address.
    *
-   * @param moduleId - The nodule ID.
-   * @returns The module matching the provided implementation address.
+   * @param address - The implementation address.
+   * @returns The module matching the provided implementation address. If no matching, returns 'undefined'.
    *
    * @throws ClientNotPreparedError
    * Thrown if the "prepare" function has not been called yet.
    */
-  getModuleByImplementaion(address: string): Module | undefined {
+  getModuleByImplementaion(address: Address): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -692,10 +780,11 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get a module by its implementation address.
+   * Get the module object of an instance.
    *
-   * @param moduleId - The nodule ID.
-   * @returns The module matching the provided implementation address.
+   * @param address - Instance address.
+   * @returns The module matching the provided instance address. If the given address is not an insance of a registry module, then returns
+   * 'undefined'.
    *
    * @throws ClientNotPreparedError
    * Thrown if the "prepare" function has not been called yet.
@@ -703,7 +792,7 @@ export class HatsModulesClient {
   async getModuleByInstance(address: Address): Promise<Module | undefined> {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -732,7 +821,7 @@ export class HatsModulesClient {
   getAllModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -750,7 +839,7 @@ export class HatsModulesClient {
   getAllEligibilityModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -776,7 +865,7 @@ export class HatsModulesClient {
   getAllToggleModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -802,7 +891,7 @@ export class HatsModulesClient {
   getAllHatterModules(): { [id: string]: Module } {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -828,7 +917,7 @@ export class HatsModulesClient {
   getElibilitiesChainModule(): ChainModule {
     if (this._eligibilitiesChain === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -846,7 +935,7 @@ export class HatsModulesClient {
   getTogglesChainModule(): ChainModule {
     if (this._togglesChain === undefined) {
       throw new ClientNotPreparedError(
-        "Client have not been initilized, requires a call to the prepare function"
+        "Client has not been initialized, requires a call to the prepare function"
       );
     }
 

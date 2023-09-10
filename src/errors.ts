@@ -67,3 +67,10 @@ export class ModulesRegistryFetchError extends Error {
     this.name = "ModulesRegistryFetchError";
   }
 }
+
+export class ModuleParameterError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ModuleParameterError";
+  }
+}

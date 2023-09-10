@@ -11,7 +11,7 @@ import type {
   Address,
 } from "viem";
 import type { Anvil } from "@viem/anvil";
-import type { Module, Registry } from "../src/types";
+import type { Module, Registry, ModuleParameter } from "../src/types";
 import "dotenv/config";
 
 describe("Client Tests With a Static Modules File", () => {
@@ -59,7 +59,7 @@ describe("Client Tests With a Static Modules File", () => {
     await anvil.stop();
   }, 30000);
 
-  test("Test create new jokerace instance", async () => {
+  test("Test create new jokerace instance and get instace parameters", async () => {
     const jokeraceId =
       "0xf0f5628b66bb62ee20d3af78e2f3fdc776778c19f31a156dc9da25e0f2024838";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
@@ -148,6 +148,21 @@ describe("Client Tests With a Static Modules File", () => {
     expect(underlyingContestResult).toBe(mutableArgs[0]);
     expect(termEndResult).toBe(mutableArgs[1]);
     expect(topKResult).toBe(mutableArgs[2]);
+
+    // Test getting instance parameters
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(
+      res.newInstance
+    )) as ModuleParameter[];
+
+    expect(instanceParams).not.toBe(undefined);
+    expect(instanceParams[0].value).toBe(adminHatResult);
+    expect(instanceParams[0].solidityType).toBe("uint256");
+    expect(instanceParams[1].value).toBe(underlyingContestResult);
+    expect(instanceParams[1].solidityType).toBe("address");
+    expect(instanceParams[2].value).toBe(termEndResult);
+    expect(instanceParams[2].solidityType).toBe("uint256");
+    expect(instanceParams[3].value).toBe(topKResult);
+    expect(instanceParams[3].solidityType).toBe("uint256");
   }, 10000);
 
   test("Test get jokerace functions names", () => {
@@ -240,7 +255,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(functions).toEqual(expectedFunctions);
   });
 
-  test("Test create new staking instance", async () => {
+  test("Test create new staking instance and get instace parameters", async () => {
     const stakingId =
       "0xf6097eef343ddc8abecc76eb95131a0404c071b6622003c9619e08df9e7b9e4a";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
@@ -336,9 +351,24 @@ describe("Client Tests With a Static Modules File", () => {
     expect(judgeHatResult).toBe(mutableArgs[1]);
     expect(recipientHatResult).toBe(mutableArgs[2]);
     expect(cooldownPeriodResult).toBe(mutableArgs[3]);
+
+    // Test getting instance parameters
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(
+      res.newInstance
+    )) as ModuleParameter[];
+
+    expect(instanceParams).not.toBe(undefined);
+    expect(instanceParams[0].value).toBe(tokenResult);
+    expect(instanceParams[0].solidityType).toBe("address");
+    expect(instanceParams[1].value).toBe(minStakeResult);
+    expect(instanceParams[1].solidityType).toBe("uint248");
+    expect(instanceParams[2].value).toBe(judgeHatResult);
+    expect(instanceParams[2].solidityType).toBe("uint256");
+    expect(instanceParams[3].value).toBe(recipientHatResult);
+    expect(instanceParams[3].solidityType).toBe("uint256");
   });
 
-  test("Test create new erc20 eligibility instance", async () => {
+  test("Test create new erc20 eligibility instance and get instance parameters", async () => {
     const erc20Id =
       "0x20c63b02c721d706826d9cb051c1f3d900a4e34437c0ea2f0bf5e77a54dbe605";
     const module = hatsModulesClient.getModuleById(erc20Id) as Module;
@@ -411,9 +441,20 @@ describe("Client Tests With a Static Modules File", () => {
     expect(hatIdResult).toBe(hatId);
     expect(tokenResult).toBe(immutableArgs[0]);
     expect(minBalanceResult).toBe(immutableArgs[1]);
+
+    // Test getting instance parameters
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(
+      res.newInstance
+    )) as ModuleParameter[];
+
+    expect(instanceParams).not.toBe(undefined);
+    expect(instanceParams[0].value).toBe(tokenResult);
+    expect(instanceParams[0].solidityType).toBe("address");
+    expect(instanceParams[1].value).toBe(minBalanceResult);
+    expect(instanceParams[1].solidityType).toBe("uint256");
   });
 
-  test("Test create new erc721 eligibility instance", async () => {
+  test("Test create new erc721 eligibility instance and get instance parameters", async () => {
     const erc721Id =
       "0xdc8eca16b384dac049617719134fce02cc5a8ef5e767d03c2124f95782ee1369";
     const module = hatsModulesClient.getModuleById(erc721Id) as Module;
@@ -486,9 +527,20 @@ describe("Client Tests With a Static Modules File", () => {
     expect(hatIdResult).toBe(hatId);
     expect(tokenResult).toBe(immutableArgs[0]);
     expect(minBalanceResult).toBe(immutableArgs[1]);
+
+    // Test getting instance parameters
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(
+      res.newInstance
+    )) as ModuleParameter[];
+
+    expect(instanceParams).not.toBe(undefined);
+    expect(instanceParams[0].value).toBe(tokenResult);
+    expect(instanceParams[0].solidityType).toBe("address");
+    expect(instanceParams[1].value).toBe(minBalanceResult);
+    expect(instanceParams[1].solidityType).toBe("uint256");
   });
 
-  test("Test create new erc1155 eligibility instance", async () => {
+  test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
     const erc1155Id =
       "0x7e585bcd45d8a5436d13a61ac27f2b759155ef1057c7f80763356797506aea8b";
     const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
@@ -578,12 +630,22 @@ describe("Client Tests With a Static Modules File", () => {
     expect(arrayLengthResult).toBe(immutableArgs[1]);
     expect(tokenIdsResult).toEqual(immutableArgs[2]);
     expect(minBalancesResult).toEqual(immutableArgs[3]);
+
+    // Test getting instance parameters
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(
+      res.newInstance
+    )) as ModuleParameter[];
+
+    expect(instanceParams).not.toBe(undefined);
+    expect(instanceParams[0].value).toBe(tokenResult);
+    expect(instanceParams[0].solidityType).toBe("address");
+    expect(instanceParams[1].value).toEqual(tokenIdsResult);
+    expect(instanceParams[1].solidityType).toBe("uint256[]");
+    expect(instanceParams[2].value).toEqual(minBalancesResult);
+    expect(instanceParams[2].solidityType).toBe("uint256[]");
   });
 
   test("Test create new claims hatter instance", async () => {
-    //const modules = hatsModulesClient.getAllModules();
-    //console.log(Object.keys(modules));
-
     const claimsHatterId =
       "0xe755ba756e0617e672bebe30a0d39dcfb7d0d0c2aac2144fd67a660cc7e344e1";
     const module = hatsModulesClient.getModuleById(claimsHatterId) as Module;
