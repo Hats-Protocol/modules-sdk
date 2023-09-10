@@ -28,8 +28,8 @@ export type Module = {
   }[];
   parameters: {
     label: string;
-    funactionName: string;
-    dispalyType: string;
+    functionName: string;
+    displayType: string;
   }[];
   type: {
     eligibility: boolean;
@@ -47,14 +47,14 @@ export type Module = {
       description: string;
       type: string;
       example: unknown;
-      dispalyType: string;
+      displayType: string;
     }[];
     mutable: {
       name: string;
       description: string;
       type: string;
       example: unknown;
-      dispalyType: string;
+      displayType: string;
     }[];
   };
   abi: Abi;

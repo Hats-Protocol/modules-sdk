@@ -71,15 +71,15 @@ describe("Batch Create Client Tests", () => {
     mutableArgs = [];
 
     const jokeraceId =
-      "0xf0f5628b66bb62ee20d3af78e2f3fdc776778c19f31a156dc9da25e0f2024838";
+      "0x7361672a53d246afa75a76b693df21e4592940570a9c934f9cb8afa161c01163";
     const stakingId =
-      "0xf6097eef343ddc8abecc76eb95131a0404c071b6622003c9619e08df9e7b9e4a";
+      "0xf650f73dbb6f081bd193e142f14ec43f4ffbd4e1e0c4a7e1af09dff5cd46f01e";
     const erc20Id =
-      "0x20c63b02c721d706826d9cb051c1f3d900a4e34437c0ea2f0bf5e77a54dbe605";
+      "0x7b22c54dd5310e6a320ceef6b50e11a78248b357ac9b59b863b85be404cb0b00";
     const erc721Id =
-      "0xdc8eca16b384dac049617719134fce02cc5a8ef5e767d03c2124f95782ee1369";
+      "0x397bfaa15ce406221434fa4f46402f4c070952b1054a9f974aac99e2371ae96d";
     const erc1155Id =
-      "0x7e585bcd45d8a5436d13a61ac27f2b759155ef1057c7f80763356797506aea8b";
+      "0x85385cde46786f5665f0f9a6f5b539629fe54f152bbf6eef64c431749fda4a77";
     const claimsHatterId =
       "0xe755ba756e0617e672bebe30a0d39dcfb7d0d0c2aac2144fd67a660cc7e344e1";
 

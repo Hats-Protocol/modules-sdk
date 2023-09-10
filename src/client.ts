@@ -703,7 +703,7 @@ export class HatsModulesClient {
 
         if (
           abiItem.type === "function" &&
-          abiItem.name === param.funactionName
+          abiItem.name === param.functionName
         ) {
           if (abiItem.inputs.length > 0 || abiItem.outputs.length !== 1) {
             break;
@@ -714,11 +714,11 @@ export class HatsModulesClient {
             parameterValue = await this._publicClient.readContract({
               address: instance,
               abi: module.abi,
-              functionName: param.funactionName,
+              functionName: param.functionName,
             });
           } catch (err) {
             throw new ModuleParameterError(
-              `Failed reading function ${param.funactionName} from the module instance`
+              `Failed reading function ${param.functionName} from the module instance`
             );
           }
 
@@ -728,7 +728,7 @@ export class HatsModulesClient {
             label: param.label,
             value: parameterValue,
             solidityType: solidityType,
-            displayType: param.dispalyType,
+            displayType: param.displayType,
           });
         }
       }
