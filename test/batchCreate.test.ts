@@ -70,17 +70,17 @@ describe("Batch Create Client Tests", () => {
     mutableArgs = [];
 
     const jokeraceId =
-      "0x7361672a53d246afa75a76b693df21e4592940570a9c934f9cb8afa161c01163";
+      "0xf915b108579dae62bf6d23b311a62ab3dda02f7f3d049b3f4ccbc4cfcf0dcadc";
     const stakingId =
-      "0xf650f73dbb6f081bd193e142f14ec43f4ffbd4e1e0c4a7e1af09dff5cd46f01e";
+      "0xf4dbad25011bb0f2be10227467255124a41571e92e75b28d920b2ac3b6e4295a";
     const erc20Id =
-      "0x7b22c54dd5310e6a320ceef6b50e11a78248b357ac9b59b863b85be404cb0b00";
+      "0x3106b7a7f3153f5c03ee25afee4e7813819fba697a5e635e071d7e883f9dbd4f";
     const erc721Id =
-      "0x397bfaa15ce406221434fa4f46402f4c070952b1054a9f974aac99e2371ae96d";
+      "0x435f4e54d7fe7a3ac636612e08baed44234aeff371b0aa9e1f7b30ba22d9edf7";
     const erc1155Id =
-      "0x85385cde46786f5665f0f9a6f5b539629fe54f152bbf6eef64c431749fda4a77";
+      "0xabcc32da24cdaf054a19bf0fa9292876ace83a98f2ead98bc2ed19c270018e11";
     const claimsHatterId =
-      "0xe755ba756e0617e672bebe30a0d39dcfb7d0d0c2aac2144fd67a660cc7e344e1";
+      "0x9b58749ca97f09f9ef0de791e61eec57e2596f7642e041733e2ec9295b8bfd7e";
 
     const jokeraceModule = hatsModulesClient.getModuleById(
       jokeraceId
