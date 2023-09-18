@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ZodType } from "zod";
+import type { ArgumentTsType } from "./types";
 
 // Uint
 export const Uint8Schema = z
@@ -851,18 +852,7 @@ export const verify = (val: unknown, type: string): boolean => {
  * @param type - The Solidity type for for which the compatible Typedcript type should be returned.
  * @returns A string matching the compatible Typescript type for the provided Solidity type.
  */
-export const solidityToTypescriptType = (
-  type: string
-):
-  | "number"
-  | "bigint"
-  | "string"
-  | "boolean"
-  | "number[]"
-  | "bigint[]"
-  | "string[]"
-  | "boolean[]"
-  | "unknown" => {
+export const solidityToTypescriptType = (type: string): ArgumentTsType => {
   const schema = typeToSchema[type];
   if (schema === undefined) {
     return "unknown";

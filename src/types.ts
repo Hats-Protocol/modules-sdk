@@ -42,6 +42,13 @@ export type Module = {
     block: string;
   }[];
   creationArgs: {
+    hatId: {
+      name: string;
+      description: string;
+      type: string;
+      example: string;
+      displayType: string;
+    };
     immutable: {
       name: string;
       description: string;
@@ -109,3 +116,14 @@ export type Registry = {
   togglesChain: ChainModule;
   modules: Module[];
 };
+
+export type ArgumentTsType =
+  | "number"
+  | "bigint"
+  | "string"
+  | "boolean"
+  | "number[]"
+  | "bigint[]"
+  | "string[]"
+  | "boolean[]"
+  | "unknown";
