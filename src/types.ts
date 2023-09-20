@@ -13,12 +13,6 @@ export interface BatchCreateInstancesResult extends TransactionResult {
   newInstances: Array<`0x${string}`>;
 }
 
-export type CreateInstanceArg = {
-  name: string;
-  description: string;
-  type: string;
-};
-
 export type Module = {
   name: string;
   details: string[];
@@ -41,29 +35,7 @@ export type Module = {
     chainId: string;
     block: string;
   }[];
-  creationArgs: {
-    hatId: {
-      name: string;
-      description: string;
-      type: string;
-      example: string;
-      displayType: string;
-    };
-    immutable: {
-      name: string;
-      description: string;
-      type: string;
-      example: unknown;
-      displayType: string;
-    }[];
-    mutable: {
-      name: string;
-      description: string;
-      type: string;
-      example: unknown;
-      displayType: string;
-    }[];
-  };
+  creationArgs: ModuleCreationArgs;
   abi: Abi;
 };
 
@@ -127,3 +99,17 @@ export type ArgumentTsType =
   | "string[]"
   | "boolean[]"
   | "unknown";
+
+export type ModuleCreationArg = {
+  name: string;
+  description: string;
+  type: string;
+  example: unknown;
+  displayType: string;
+};
+
+export type ModuleCreationArgs = {
+  useHatId: boolean;
+  immutable: ModuleCreationArg[];
+  mutable: ModuleCreationArg[];
+};
