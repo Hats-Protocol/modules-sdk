@@ -60,10 +60,12 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new jokerace instance and get instace parameters", async () => {
     const jokeraceId =
-      "0xf915b108579dae62bf6d23b311a62ab3dda02f7f3d049b3f4ccbc4cfcf0dcadc";
+      "0x9133cb8000d45cf7696221994811d3dff2683f9705a2b60c3afe47aada6ce962";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
 
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -164,7 +166,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test get jokerace functions names", () => {
     const jokeraceId =
-      "0xf915b108579dae62bf6d23b311a62ab3dda02f7f3d049b3f4ccbc4cfcf0dcadc";
+      "0x9133cb8000d45cf7696221994811d3dff2683f9705a2b60c3afe47aada6ce962";
     const functions = hatsModulesClient.getFunctionsInModule(jokeraceId);
     const expectedFunctions = [
       {
@@ -254,10 +256,12 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new staking instance and get instace parameters", async () => {
     const stakingId =
-      "0xf4dbad25011bb0f2be10227467255124a41571e92e75b28d920b2ac3b6e4295a";
+      "0xc60b48afd642c07b7831c4474f2a2c310427611772a1ab017c02b5d117d13359";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
 
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -365,10 +369,12 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc20 eligibility instance and get instance parameters", async () => {
     const erc20Id =
-      "0x3106b7a7f3153f5c03ee25afee4e7813819fba697a5e635e071d7e883f9dbd4f";
+      "0x1bc8bb463fabb4dfecffcc6aa9e97c48c03339f4655762d96adaca075f2fdb40";
     const module = hatsModulesClient.getModuleById(erc20Id) as Module;
 
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -449,10 +455,12 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc721 eligibility instance and get instance parameters", async () => {
     const erc721Id =
-      "0x435f4e54d7fe7a3ac636612e08baed44234aeff371b0aa9e1f7b30ba22d9edf7";
+      "0x99b323f319484142731e53256e946a2a1f95308f56f951c16c9e5558a28e1d37";
     const module = hatsModulesClient.getModuleById(erc721Id) as Module;
 
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -533,10 +541,12 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
     const erc1155Id =
-      "0xabcc32da24cdaf054a19bf0fa9292876ace83a98f2ead98bc2ed19c270018e11";
+      "0xd6417d54c12444ce2009b6ea4745a17ec54042c1cfb17ee10e0212fe39825a69";
     const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
 
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
     for (let i = 0; i < module.creationArgs.immutable.length; i++) {
@@ -636,9 +646,11 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new claims hatter instance", async () => {
     const claimsHatterId =
-      "0x9b58749ca97f09f9ef0de791e61eec57e2596f7642e041733e2ec9295b8bfd7e";
+      "0x1d00ea1a1a17b2a70961fedcb2d9eec031bacabb1c3c7dc1ac16305c4828f61e";
     const module = hatsModulesClient.getModuleById(claimsHatterId) as Module;
-    const hatId = BigInt(module.creationArgs.hatId.example);
+    const hatId = BigInt(
+      "0x0000000100000000000000000000000000000000000000000000000000000000"
+    );
     const immutableArgs: unknown[] = [];
     const mutableArgs: unknown[] = [];
 
@@ -677,13 +689,13 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test get module by implementation", async () => {
     const claimsHatterId =
-      "0x9b58749ca97f09f9ef0de791e61eec57e2596f7642e041733e2ec9295b8bfd7e";
+      "0x1d00ea1a1a17b2a70961fedcb2d9eec031bacabb1c3c7dc1ac16305c4828f61e";
     const claimsHatterModule = hatsModulesClient.getModuleById(
       claimsHatterId
     ) as Module;
 
     expect(
-      hatsModulesClient.getModuleByImplementaion(
+      hatsModulesClient.getModuleByImplementation(
         "0x11124220fe23Fd4d25C739508294E6b2305E073C"
       )
     ).toEqual(claimsHatterModule);

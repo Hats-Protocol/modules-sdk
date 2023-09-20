@@ -745,7 +745,7 @@ export class HatsModulesClient {
    * @throws ClientNotPreparedError
    * Thrown if the "prepare" function has not been called yet.
    */
-  getModuleByImplementaion(address: Address): Module | undefined {
+  getModuleByImplementation(address: Address): Module | undefined {
     if (this._modules === undefined || this._factory === undefined) {
       throw new ClientNotPreparedError(
         "Client has not been initialized, requires a call to the prepare function"
@@ -783,7 +783,7 @@ export class HatsModulesClient {
         functionName: "IMPLEMENTATION",
       });
 
-      const res = this.getModuleByImplementaion(implementationAddress);
+      const res = this.getModuleByImplementation(implementationAddress);
       return res;
     } catch (err) {
       return undefined;

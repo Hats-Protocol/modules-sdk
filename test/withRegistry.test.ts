@@ -59,7 +59,11 @@ describe("Eligibility Client Tests", () => {
   test("Test create all modules", async () => {
     const modules = hatsModulesClient.getAllModules();
     for (const [id, module] of Object.entries(modules)) {
-      const hatId = BigInt(module.creationArgs.hatId.example);
+      const hatId = module.creationArgs.useHatId
+        ? BigInt(
+            "0x0000000100000000000000000000000000000000000000000000000000000000"
+          )
+        : BigInt("0");
       const immutableArgs: unknown[] = [];
       const mutableArgs: unknown[] = [];
 
