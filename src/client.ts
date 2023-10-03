@@ -57,9 +57,6 @@ export class HatsModulesClient {
    * @throws MissingWalletClientError
    * Thrown when a wallet client is not provided.
    *
-   * @throws MissingTokenError
-   * Thrown when registry token is not provided.
-   *
    * @throws ChainIdMismatchError
    * Thrown when there is a chain ID mismatch between the Viem clients.
    */
@@ -89,21 +86,21 @@ export class HatsModulesClient {
   /**
    * Fetches the modules registry and prepares the client for usage.
    *
-   * @param modules - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
+   * @param registry - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
    *
    * @throws ModulesRegistryFetchError
    * Thrown in case there was an error while fetching from the modules registry.
    */
-  async prepare(modules?: Registry) {
-    let registry: Registry;
-    if (modules !== undefined) {
-      registry = modules;
+  async prepare(registry?: Registry) {
+    let registryToUse: Registry;
+    if (registry !== undefined) {
+      registryToUse = registry;
     } else {
       try {
         const result = await axios.get(
           "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/main/modules.json"
         );
-        registry = result.data;
+        registryToUse = result.data;
       } catch (err) {
         throw new ModulesRegistryFetchError(
           "Could not fetch modules from the registry"
@@ -114,10 +111,10 @@ export class HatsModulesClient {
     this._modules = {};
     for (
       let moduleIndex = 0;
-      moduleIndex < registry.modules.length;
+      moduleIndex < registryToUse.modules.length;
       moduleIndex++
     ) {
-      const module = registry.modules[moduleIndex];
+      const module = registryToUse.modules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
         if (deployment.chainId === this._publicClient.chain?.id.toString()) {
@@ -136,9 +133,9 @@ export class HatsModulesClient {
       }
     }
 
-    this._factory = registry.factory;
-    this._eligibilitiesChain = registry.eligibilitiesChain;
-    this._togglesChain = registry.togglesChain;
+    this._factory = registryToUse.factory;
+    this._eligibilitiesChain = registryToUse.eligibilitiesChain;
+    this._togglesChain = registryToUse.togglesChain;
   }
 
   /**
@@ -156,6 +153,12 @@ export class HatsModulesClient {
    *
    * @throws ModuleNotAvailableError
    * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws InvalidParamError
+   * Thrown if the provided 'hatId' parameter or one of the creation args is invalid.
+   *
+   * @throws ParametersLengthsMismatchError
+   * Thrown if one of the creation args array's length doens't match the module's schema.
    *
    * @throws TransactionRevertedError
    * Thrown if the transaction reverted.
@@ -266,6 +269,12 @@ export class HatsModulesClient {
    *
    * @throws ModuleNotAvailableError
    * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws InvalidParamError
+   * Thrown if one of the provided 'hatId' parameters or one of the creation args is invalid.
+   *
+   * @throws ParametersLengthsMismatchError
+   * Thrown if one of the creation args array's length doens't match the module's schema.
    *
    * @throws TransactionRevertedError
    * Thrown if the transaction reverted.
@@ -383,7 +392,7 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param numClauses - Number of conjunction clauses.
    * @param clausesLengths - Lengths of each clause.
-   * @param modules - Array of module instances to chain, at the order corresponding to the provided clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
    *
    * @throws ClientNotPreparedError
@@ -486,7 +495,7 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param numClauses - Number of conjunction clauses.
    * @param clausesLengths - Lengths of each clause.
-   * @param modules - Array of module instances to chain, at the order corresponding to the provided clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
    *
    * @throws ClientNotPreparedError
@@ -583,10 +592,142 @@ export class HatsModulesClient {
   }
 
   /**
+   * Predict a module's address.
+   *
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @returns The module's predicted address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws ModuleNotAvailableError
+   * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws InvalidParamError
+   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
+   *
+   * @throws ParametersLengthsMismatchError
+   * Thrown if immutable args array's length doens't match the module's schema.
+   */
+  async predictHatsModuleAddress({
+    moduleId,
+    hatId,
+    immutableArgs,
+  }: {
+    moduleId: string;
+    hatId: bigint;
+    immutableArgs: unknown[];
+  }): Promise<Address> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
+    }
+
+    this._verifyModuleAddressPredictArgs(module, hatId, immutableArgs);
+
+    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
+      return arg.type;
+    });
+    const immutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodePacked(immutableArgsTypes, immutableArgs)
+        : "";
+
+    const predictedAddress: Address = (await this._publicClient.readContract({
+      address: this._factory.implementationAddress as Address,
+      abi: this._factory.abi,
+      functionName: "getHatsModuleAddress",
+      args: [
+        module.implementationAddress as Address,
+        hatId,
+        immutableArgsEncoded,
+      ],
+    })) as Address;
+
+    return predictedAddress;
+  }
+
+  /**
+   * Check if a module is already deployed.
+   *
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @returns The module's predicted address.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   *
+   * @throws ModuleNotAvailableError
+   * Thrown if there is no module that matches the provided module ID.
+   *
+   * @throws InvalidParamError
+   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
+   *
+   * @throws ParametersLengthsMismatchError
+   * Thrown if immutable args array's length doens't match the module's schema.
+   */
+  async isModuleDeployed({
+    moduleId,
+    hatId,
+    immutableArgs,
+  }: {
+    moduleId: string;
+    hatId: bigint;
+    immutableArgs: unknown[];
+  }): Promise<boolean> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
+    }
+
+    this._verifyModuleAddressPredictArgs(module, hatId, immutableArgs);
+
+    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
+      return arg.type;
+    });
+    const immutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodePacked(immutableArgsTypes, immutableArgs)
+        : "";
+
+    const deployed: boolean = (await this._publicClient.readContract({
+      address: this._factory.implementationAddress as Address,
+      abi: this._factory.abi,
+      functionName: "deployed",
+      args: [
+        module.implementationAddress as Address,
+        hatId,
+        immutableArgsEncoded,
+      ],
+    })) as boolean;
+
+    return deployed;
+  }
+
+  /**
    * Get a module's functions.
    *
    * @param moduleId - The nodule ID.
-   * @returns A list of the moudle's functions. Each function's information includes the its name, whether it's a "read" of "write" operation and an array
+   * @returns A list of the moudle's functions. Each function's information includes its name, whether it's a "read" or "write" operation and an array
    * of inputs to the function.
    *
    * @throws ClientNotPreparedError
@@ -642,7 +783,7 @@ export class HatsModulesClient {
    *
    * @param instance - The module instace address.
    * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
-   * the given address is not an instance of a registry module, then returms 'undefined'.
+   * the given address is not an instance of a registry module, then returns 'undefined'.
    *
    * @throws ClientNotPreparedError
    * Thrown if the "prepare" function has not been called yet.
@@ -720,7 +861,7 @@ export class HatsModulesClient {
   /**
    * Get a module by its ID.
    *
-   * @param moduleId - The nodule ID.
+   * @param moduleId - The module ID.
    * @returns The module matching the provided ID.
    *
    * @throws ClientNotPreparedError
@@ -960,6 +1101,33 @@ export class HatsModulesClient {
       const type = module.creationArgs.mutable[i].type;
       if (!verify(val, type)) {
         throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
+      }
+    }
+  }
+
+  _verifyModuleAddressPredictArgs(
+    module: Module,
+    hatId: bigint,
+    immutableArgs: unknown[]
+  ) {
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    // verify immutable and mutable array lengths
+    if (immutableArgs.length !== module.creationArgs.immutable.length) {
+      throw new ParametersLengthsMismatchError(
+        "Immutable args array length doesn't match the module's schema"
+      );
+    }
+
+    // verify immutable args
+    for (let i = 0; i < immutableArgs.length; i++) {
+      const val = immutableArgs[i];
+      const type = module.creationArgs.immutable[i].type;
+      if (!verify(val, type)) {
+        throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
       }
     }
   }

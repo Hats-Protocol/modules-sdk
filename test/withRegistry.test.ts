@@ -101,6 +101,15 @@ describe("Eligibility Client Tests", () => {
         mutableArgs.push(arg);
       }
 
+      // check that module is not yet deployed
+      const isDeployedPrev = await hatsModulesClient.isModuleDeployed({
+        moduleId: id,
+        hatId: hatId,
+        immutableArgs: immutableArgs,
+      });
+      expect(isDeployedPrev).toBe(false);
+
+      // create a new instance
       const res = await hatsModulesClient.createNewInstance({
         account: deployerAccount,
         moduleId: id,
@@ -119,7 +128,26 @@ describe("Eligibility Client Tests", () => {
         functionName: "hatId",
         args: [],
       });
+
       expect(hatIdResult).toBe(hatId);
+
+      // predict module address
+      const predictedAddress = await hatsModulesClient.predictHatsModuleAddress(
+        {
+          moduleId: id,
+          hatId: hatId,
+          immutableArgs: immutableArgs,
+        }
+      );
+      expect(predictedAddress).toBe(res.newInstance);
+
+      // check that module is deployed
+      const isDeployedAfter = await hatsModulesClient.isModuleDeployed({
+        moduleId: id,
+        hatId: hatId,
+        immutableArgs: immutableArgs,
+      });
+      expect(isDeployedAfter).toBe(true);
     }
   }, 30000);
 
