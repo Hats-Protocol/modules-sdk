@@ -4,7 +4,6 @@ import {
   keccak256,
   stringToBytes,
   encodePacked,
-  encodeAbiParameters,
   decodeEventLog,
 } from "viem";
 import {
@@ -22,6 +21,7 @@ import {
 import { verify } from "./schemas";
 import { HATS_MODULE_ABI } from "./constants";
 import axios from "axios";
+import { checkAndEncodeArgs, getNewInstancesFromReceipt } from "./utils";
 import type {
   CreateInstanceResult,
   BatchCreateInstancesResult,
@@ -189,23 +189,16 @@ export class HatsModulesClient {
       );
     }
 
-    this._verifyModuleCreationArgs(module, hatId, immutableArgs, mutableArgs);
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
 
-    const mutableArgsTypes = module.creationArgs.mutable.map((arg) => {
-      return { type: arg.type };
+    const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
+      module,
+      immutableArgs,
+      mutableArgs,
     });
-    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
-      return arg.type;
-    });
-
-    const mutableArgsEncoded =
-      mutableArgs.length > 0
-        ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
-        : "";
-    const immutableArgsEncoded =
-      immutableArgs.length > 0
-        ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "";
 
     try {
       const hash = await this._walletClient.writeContract({
@@ -216,8 +209,8 @@ export class HatsModulesClient {
         args: [
           module.implementationAddress as `0x${string}`,
           hatId,
-          immutableArgsEncoded,
-          mutableArgsEncoded,
+          encodedImmutableArgs,
+          encodedMutableArgs,
         ],
         chain: this._walletClient.chain,
       });
@@ -226,27 +219,16 @@ export class HatsModulesClient {
         hash,
       });
 
-      let instance: `0x${string}` = "0x";
-      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
-        try {
-          const event: any = decodeEventLog({
-            abi: this._factory.abi,
-            eventName: "HatsModuleFactory_ModuleDeployed",
-            data: receipt.logs[eventIndex].data,
-            topics: receipt.logs[eventIndex].topics,
-          });
+      const instances = getNewInstancesFromReceipt(receipt);
 
-          instance = event.args.instance;
-          break;
-        } catch (err) {
-          // continue
-        }
+      if (instances.length != 1) {
+        throw new Error("Unexpected error: instance address was not found");
       }
 
       return {
         status: receipt.status,
         transactionHash: receipt.transactionHash,
-        newInstance: instance,
+        newInstance: instances[0],
       };
     } catch (err) {
       console.log(err);
@@ -310,31 +292,19 @@ export class HatsModulesClient {
         );
       }
 
-      this._verifyModuleCreationArgs(
+      // verify hat ID
+      if (!verify(hatIds[i], "uint256")) {
+        throw new InvalidParamError(`Invalid hat ID parameter`);
+      }
+
+      const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
         module,
-        hatIds[i],
-        immutableArgsArray[i],
-        mutableArgsArray[i]
-      );
-
-      const mutableArgsTypes = module.creationArgs.mutable.map((arg) => {
-        return { type: arg.type };
-      });
-      const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
-        return arg.type;
+        immutableArgs: immutableArgsArray[i],
+        mutableArgs: mutableArgsArray[i],
       });
 
-      const mutableArgsEncoded =
-        mutableArgsArray[i].length > 0
-          ? encodeAbiParameters(mutableArgsTypes, mutableArgsArray[i])
-          : "";
-      const immutableArgsEncoded =
-        immutableArgsArray[i].length > 0
-          ? encodePacked(immutableArgsTypes, immutableArgsArray[i])
-          : "";
-
-      encodedMutableArgsArray.push(mutableArgsEncoded);
-      encodedImmutableArgsArray.push(immutableArgsEncoded);
+      encodedMutableArgsArray.push(encodedMutableArgs);
+      encodedImmutableArgsArray.push(encodedImmutableArgs);
       implementations.push(module.implementationAddress);
     }
 
@@ -362,21 +332,7 @@ export class HatsModulesClient {
       throw new TransactionRevertedError("Transaction reverted");
     }
 
-    const instances: Array<`0x${string}`> = [];
-    for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
-      try {
-        const event: any = decodeEventLog({
-          abi: this._factory.abi,
-          eventName: "HatsModuleFactory_ModuleDeployed",
-          data: receipt.logs[eventIndex].data,
-          topics: receipt.logs[eventIndex].topics,
-        });
-
-        instances.push(event.args.instance);
-      } catch (err) {
-        // continue
-      }
-    }
+    const instances = getNewInstancesFromReceipt(receipt);
 
     return {
       status: receipt.status,
