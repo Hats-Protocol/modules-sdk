@@ -1031,4 +1031,22 @@ export class HatsModulesClient {
 
     return this._togglesChain;
   }
+
+  /**
+   * Get the Hats Module Factory from the registry.
+   *
+   * @returns the factory.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  getFactory(): Factory {
+    if (this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    return this._factory;
+  }
 }
