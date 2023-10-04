@@ -14,14 +14,17 @@ import {
   TransactionRevertedError,
   InvalidParamError,
   ClientNotPreparedError,
-  ParametersLengthsMismatchError,
   ModulesRegistryFetchError,
   ModuleParameterError,
 } from "./errors";
 import { verify } from "./schemas";
 import { HATS_MODULE_ABI } from "./constants";
 import axios from "axios";
-import { checkAndEncodeArgs, getNewInstancesFromReceipt } from "./utils";
+import {
+  checkAndEncodeArgs,
+  checkImmutableArgs,
+  getNewInstancesFromReceipt,
+} from "./utils";
 import type {
   CreateInstanceResult,
   BatchCreateInstancesResult,
@@ -589,7 +592,12 @@ export class HatsModulesClient {
       );
     }
 
-    this._verifyModuleAddressPredictArgs(module, hatId, immutableArgs);
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    checkImmutableArgs({ module, immutableArgs });
 
     const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
       return arg.type;
@@ -655,7 +663,12 @@ export class HatsModulesClient {
       );
     }
 
-    this._verifyModuleAddressPredictArgs(module, hatId, immutableArgs);
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    checkImmutableArgs({ module, immutableArgs });
 
     const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
       return arg.type;
@@ -1017,74 +1030,5 @@ export class HatsModulesClient {
     }
 
     return this._togglesChain;
-  }
-
-  _verifyModuleCreationArgs(
-    module: Module,
-    hatId: bigint,
-    immutableArgs: unknown[],
-    mutableArgs: unknown[]
-  ) {
-    // verify hat ID
-    if (!verify(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
-    }
-
-    // verify immutable and mutable array lengths
-    if (immutableArgs.length !== module.creationArgs.immutable.length) {
-      throw new ParametersLengthsMismatchError(
-        "Immutable args array length doesn't match the module's schema"
-      );
-    }
-    if (mutableArgs.length !== module.creationArgs.mutable.length) {
-      throw new ParametersLengthsMismatchError(
-        "Mutable args array length doesn't match the module's schema"
-      );
-    }
-
-    // verify immutable args
-    for (let i = 0; i < immutableArgs.length; i++) {
-      const val = immutableArgs[i];
-      const type = module.creationArgs.immutable[i].type;
-      if (!verify(val, type)) {
-        throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
-      }
-    }
-
-    // verify mutable args
-    for (let i = 0; i < mutableArgs.length; i++) {
-      const val = mutableArgs[i];
-      const type = module.creationArgs.mutable[i].type;
-      if (!verify(val, type)) {
-        throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
-      }
-    }
-  }
-
-  _verifyModuleAddressPredictArgs(
-    module: Module,
-    hatId: bigint,
-    immutableArgs: unknown[]
-  ) {
-    // verify hat ID
-    if (!verify(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
-    }
-
-    // verify immutable and mutable array lengths
-    if (immutableArgs.length !== module.creationArgs.immutable.length) {
-      throw new ParametersLengthsMismatchError(
-        "Immutable args array length doesn't match the module's schema"
-      );
-    }
-
-    // verify immutable args
-    for (let i = 0; i < immutableArgs.length; i++) {
-      const val = immutableArgs[i];
-      const type = module.creationArgs.immutable[i].type;
-      if (!verify(val, type)) {
-        throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
-      }
-    }
   }
 }
