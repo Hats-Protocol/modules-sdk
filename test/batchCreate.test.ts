@@ -22,14 +22,12 @@ describe("Batch Create Client Tests", () => {
   let erc20Instance: `0x${string}`;
   let erc721Instance: `0x${string}`;
   let erc1155Instance: `0x${string}`;
-  let claimsInstance: `0x${string}`;
 
   let jokeraceAbi: Abi;
   let stakingAbi: Abi;
   let erc20Abi: Abi;
   let erc721Abi: Abi;
   let erc1155Abi: Abi;
-  let claimsAbi: Abi;
 
   let immutableArgs: unknown[][];
   let mutableArgs: unknown[][];
@@ -70,17 +68,15 @@ describe("Batch Create Client Tests", () => {
     mutableArgs = [];
 
     const jokeraceId =
-      "0x9133cb8000d45cf7696221994811d3dff2683f9705a2b60c3afe47aada6ce962";
+      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
     const stakingId =
-      "0xc60b48afd642c07b7831c4474f2a2c310427611772a1ab017c02b5d117d13359";
+      "0x33d53892ca1e344814cea8062e3985d945f1e1a1999519cdb2fe38530ee0b59b";
     const erc20Id =
-      "0x1bc8bb463fabb4dfecffcc6aa9e97c48c03339f4655762d96adaca075f2fdb40";
+      "0xdf3b1fc065bdc76f163c2b612f1763fd6ffd0dd15040d414ee8cda17cd437735";
     const erc721Id =
-      "0x99b323f319484142731e53256e946a2a1f95308f56f951c16c9e5558a28e1d37";
+      "0xdf16f18da1351629f5be196578c9e17e35bdb0fd9dfe8d4cefbba80cd2bcede6";
     const erc1155Id =
-      "0xd6417d54c12444ce2009b6ea4745a17ec54042c1cfb17ee10e0212fe39825a69";
-    const claimsHatterId =
-      "0x1d00ea1a1a17b2a70961fedcb2d9eec031bacabb1c3c7dc1ac16305c4828f61e";
+      "0xd8273e662c11dfb6a02797962c5c876e831efd4286d8a2098dfc7e4c9f1fcc0e";
 
     const jokeraceModule = hatsModulesClient.getModuleById(
       jokeraceId
@@ -89,16 +85,12 @@ describe("Batch Create Client Tests", () => {
     const erc20Module = hatsModulesClient.getModuleById(erc20Id) as Module;
     const erc721Module = hatsModulesClient.getModuleById(erc721Id) as Module;
     const erc1155Module = hatsModulesClient.getModuleById(erc1155Id) as Module;
-    const claimsHatterModule = hatsModulesClient.getModuleById(
-      claimsHatterId
-    ) as Module;
 
     jokeraceAbi = jokeraceModule.abi;
     stakingAbi = stakingModule.abi;
     erc20Abi = erc20Module.abi;
     erc721Abi = erc721Module.abi;
     erc1155Abi = erc1155Module.abi;
-    claimsAbi = claimsHatterModule.abi;
 
     const modules: Module[] = [
       jokeraceModule,
@@ -106,7 +98,6 @@ describe("Batch Create Client Tests", () => {
       erc20Module,
       erc721Module,
       erc1155Module,
-      claimsHatterModule,
     ];
     const moduleIds: string[] = [
       jokeraceId,
@@ -114,12 +105,8 @@ describe("Batch Create Client Tests", () => {
       erc20Id,
       erc721Id,
       erc1155Id,
-      claimsHatterId,
     ];
     const hatIds: bigint[] = [
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
       BigInt(
         "0x0000000100000000000000000000000000000000000000000000000000000000"
       ),
@@ -192,7 +179,6 @@ describe("Batch Create Client Tests", () => {
     erc20Instance = res.newInstances[2];
     erc721Instance = res.newInstances[3];
     erc1155Instance = res.newInstances[4];
-    claimsInstance = res.newInstances[5];
   }, 35000);
 
   afterAll(async () => {
@@ -407,20 +393,5 @@ describe("Batch Create Client Tests", () => {
     expect(arrayLengthResult).toBe(immutableArgs[4][1]);
     expect(tokenIdsResult).toEqual(immutableArgs[4][2]);
     expect(minBalancesResult).toEqual(immutableArgs[4][3]);
-  });
-
-  test("Test claims hatter instance", async () => {
-    const hatIdResult = await publicClient.readContract({
-      address: claimsInstance,
-      abi: claimsAbi,
-      functionName: "hatId",
-      args: [],
-    });
-
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
   });
 });
