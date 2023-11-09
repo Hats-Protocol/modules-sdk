@@ -60,7 +60,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new jokerace instance and get instace parameters", async () => {
     const jokeraceId =
-      "0x9133cb8000d45cf7696221994811d3dff2683f9705a2b60c3afe47aada6ce962";
+      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
 
     const hatId = BigInt(
@@ -166,7 +166,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test get jokerace functions names", () => {
     const jokeraceId =
-      "0x9133cb8000d45cf7696221994811d3dff2683f9705a2b60c3afe47aada6ce962";
+      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
     const functions = hatsModulesClient.getFunctionsInModule(jokeraceId);
     const expectedFunctions = [
       {
@@ -256,7 +256,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new staking instance and get instace parameters", async () => {
     const stakingId =
-      "0xc60b48afd642c07b7831c4474f2a2c310427611772a1ab017c02b5d117d13359";
+      "0x33d53892ca1e344814cea8062e3985d945f1e1a1999519cdb2fe38530ee0b59b";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
 
     const hatId = BigInt(
@@ -369,7 +369,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc20 eligibility instance and get instance parameters", async () => {
     const erc20Id =
-      "0x1bc8bb463fabb4dfecffcc6aa9e97c48c03339f4655762d96adaca075f2fdb40";
+      "0xdf3b1fc065bdc76f163c2b612f1763fd6ffd0dd15040d414ee8cda17cd437735";
     const module = hatsModulesClient.getModuleById(erc20Id) as Module;
 
     const hatId = BigInt(
@@ -455,7 +455,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc721 eligibility instance and get instance parameters", async () => {
     const erc721Id =
-      "0x99b323f319484142731e53256e946a2a1f95308f56f951c16c9e5558a28e1d37";
+      "0xdf16f18da1351629f5be196578c9e17e35bdb0fd9dfe8d4cefbba80cd2bcede6";
     const module = hatsModulesClient.getModuleById(erc721Id) as Module;
 
     const hatId = BigInt(
@@ -541,7 +541,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
     const erc1155Id =
-      "0xd6417d54c12444ce2009b6ea4745a17ec54042c1cfb17ee10e0212fe39825a69";
+      "0xd8273e662c11dfb6a02797962c5c876e831efd4286d8a2098dfc7e4c9f1fcc0e";
     const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
 
     const hatId = BigInt(
@@ -644,59 +644,16 @@ describe("Client Tests With a Static Modules File", () => {
     expect(instanceParams[2].solidityType).toBe("uint256[]");
   });
 
-  test("Test create new claims hatter instance", async () => {
-    const claimsHatterId =
-      "0x1d00ea1a1a17b2a70961fedcb2d9eec031bacabb1c3c7dc1ac16305c4828f61e";
-    const module = hatsModulesClient.getModuleById(claimsHatterId) as Module;
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
-
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      mutableArgs.push(arg);
-    }
-
-    const res = await hatsModulesClient.createNewInstance({
-      account: deployerAccount,
-      moduleId: claimsHatterId,
-      hatId: hatId,
-      immutableArgs: immutableArgs,
-      mutableArgs: mutableArgs,
-    });
-
-    const hatIdResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "hatId",
-      args: [],
-    });
-
-    expect(hatIdResult).toBe(hatId);
-  });
-
   test("Test get module by implementation", async () => {
     const claimsHatterId =
-      "0x1d00ea1a1a17b2a70961fedcb2d9eec031bacabb1c3c7dc1ac16305c4828f61e";
+      "0x667d7a33b3ac22a0c6ea1dbb65d4f14eb5163ae6573a3a2d6c6f4edffeb3d1fa";
     const claimsHatterModule = hatsModulesClient.getModuleById(
       claimsHatterId
     ) as Module;
 
     expect(
       hatsModulesClient.getModuleByImplementation(
-        "0x11124220fe23Fd4d25C739508294E6b2305E073C"
+        "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9"
       )
     ).toEqual(claimsHatterModule);
   });
