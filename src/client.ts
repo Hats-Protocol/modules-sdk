@@ -126,9 +126,7 @@ export class HatsModulesClient {
       });
 
       if (moduleSupportedInChain) {
-        const moduleId: string = keccak256(
-          stringToBytes(JSON.stringify(module))
-        );
+        const moduleId: string = module.implementationAddress;
 
         if (this._modules !== undefined) {
           this._modules[moduleId] = module;

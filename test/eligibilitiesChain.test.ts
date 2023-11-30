@@ -68,16 +68,11 @@ describe("Batch Create Client Tests", () => {
     immutableArgs = [];
     mutableArgs = [];
 
-    const jokeraceId =
-      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
-    const stakingId =
-      "0x33d53892ca1e344814cea8062e3985d945f1e1a1999519cdb2fe38530ee0b59b";
-    const erc20Id =
-      "0xdf3b1fc065bdc76f163c2b612f1763fd6ffd0dd15040d414ee8cda17cd437735";
-    const erc721Id =
-      "0xdf16f18da1351629f5be196578c9e17e35bdb0fd9dfe8d4cefbba80cd2bcede6";
-    const erc1155Id =
-      "0xd8273e662c11dfb6a02797962c5c876e831efd4286d8a2098dfc7e4c9f1fcc0e";
+    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
+    const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
+    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
+    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
+    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
 
     const jokeraceModule = hatsModulesClient.getModuleById(
       jokeraceId
