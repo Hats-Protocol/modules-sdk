@@ -1,9 +1,11 @@
-import type { Abi } from "abitype";
+import type { Abi } from "viem";
 
 export interface TransactionResult {
   status: "success" | "reverted";
   transactionHash: `0x${string}`;
 }
+
+export interface CallInstanceWriteFunctionResult extends TransactionResult {}
 
 export interface CreateInstanceResult extends TransactionResult {
   newInstance: `0x${string}`;
@@ -35,8 +37,29 @@ export type Module = {
     chainId: string;
     block: string;
   }[];
+  roles: Role[];
   creationArgs: ModuleCreationArgs;
   abi: Abi;
+};
+
+export type Role = {
+  id: string;
+  name: string;
+  criteria: string;
+  functions: WriteFunction[];
+};
+
+export type WriteFunction = {
+  functionName: string;
+  label: string;
+  description: string;
+  primary?: boolean;
+  args: {
+    name: string;
+    description: string;
+    type: string;
+    displayType: string;
+  }[];
 };
 
 export type Factory = {

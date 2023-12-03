@@ -1,11 +1,4 @@
-import {
-  PublicClient,
-  WalletClient,
-  keccak256,
-  stringToBytes,
-  encodePacked,
-  decodeEventLog,
-} from "viem";
+import { PublicClient, WalletClient, encodePacked, decodeEventLog } from "viem";
 import {
   MissingPublicClientError,
   ChainIdMismatchError,
@@ -16,20 +9,17 @@ import {
   ClientNotPreparedError,
   ModulesRegistryFetchError,
   ModuleParameterError,
+  getModuleFunctionError,
 } from "./errors";
 import { verify } from "./schemas";
-import { HATS_MODULE_ABI } from "./constants";
+import { HATS_MODULE_ABI, HATS_ABI, HATS_V1 } from "./constants";
 import axios from "axios";
 import {
   checkAndEncodeArgs,
   checkImmutableArgs,
   getNewInstancesFromReceipt,
+  checkWriteFunctionArgs,
 } from "./utils";
-import type {
-  CreateInstanceResult,
-  BatchCreateInstancesResult,
-  Registry,
-} from "./types";
 import type { Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
@@ -37,6 +27,12 @@ import type {
   FunctionInfo,
   ChainModule,
   ModuleParameter,
+  CreateInstanceResult,
+  BatchCreateInstancesResult,
+  CallInstanceWriteFunctionResult,
+  Registry,
+  Role,
+  WriteFunction,
 } from "./types";
 
 export class HatsModulesClient {
@@ -1046,5 +1042,143 @@ export class HatsModulesClient {
     }
 
     return this._factory;
+  }
+
+  /*//////////////////////////////////////////////////////////////
+                  Module Roles & Write Functions
+  //////////////////////////////////////////////////////////////*/
+
+  async getRolesOfHatInInstance(
+    instance: Address,
+    hat: bigint
+  ): Promise<Role[]> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = await this.getModuleByInstance(instance);
+    if (module === undefined) {
+      throw new Error("Not a module instance");
+    }
+
+    const roles: Role[] = [];
+
+    const criteriaHats: bigint[] = [];
+    for (let i = 2; i < module.roles.length; i++) {
+      const criteriaHat = (await this._publicClient.readContract({
+        address: instance,
+        abi: module.abi,
+        functionName: module.roles[i].criteria,
+      })) as bigint;
+      criteriaHats.push(criteriaHat);
+    }
+
+    let instanceUsesHatsAdmins = false;
+    if (module.roles[1].functions.length > 0 || criteriaHats.includes(0n)) {
+      instanceUsesHatsAdmins = true;
+    }
+
+    let isAdmin = false;
+    if (instanceUsesHatsAdmins) {
+      const moduleOfHat = (await this._publicClient.readContract({
+        address: instance,
+        abi: module.abi,
+        functionName: "hatId",
+      })) as bigint;
+
+      const hatLevel = await this._publicClient.readContract({
+        address: HATS_V1,
+        abi: HATS_ABI,
+        functionName: "getHatLevel",
+        args: [moduleOfHat],
+      });
+
+      const calls = [];
+      for (let level = hatLevel - 1; level >= 0; level--) {
+        calls.push({
+          address: HATS_V1 as Address,
+          abi: HATS_ABI,
+          functionName: "getAdminAtLevel",
+          args: [moduleOfHat, level],
+        });
+      }
+      const admins = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      for (let i = 0; i < admins.length; i++) {
+        if (admins[i].result == hat) {
+          isAdmin = true;
+          break;
+        }
+      }
+    }
+
+    if (module.roles[1].functions.length > 0 && isAdmin) {
+      roles.push(module.roles[1]);
+    }
+    criteriaHats.forEach((criteriaHat, index) => {
+      if (criteriaHat == hat) {
+        roles.push(module.roles[index + 2]);
+      }
+    });
+
+    return roles;
+  }
+
+  async callInstanceWriteFunction({
+    account,
+    moduleId,
+    instance,
+    func,
+    args,
+  }: {
+    account: Account | Address;
+    moduleId: string;
+    instance: Address;
+    func: WriteFunction;
+    args: unknown[];
+  }): Promise<CallInstanceWriteFunctionResult> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      if (module === undefined) {
+        throw new ModuleNotAvailableError(
+          `Module with id ${moduleId} does not exist`
+        );
+      }
+    }
+
+    checkWriteFunctionArgs({ func, args });
+
+    try {
+      const { request } = await this._publicClient.simulateContract({
+        address: instance,
+        abi: module.abi,
+        functionName: func.functionName,
+        args: args,
+        account,
+      });
+
+      const hash = await this._walletClient.writeContract(request);
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+      };
+    } catch (err) {
+      getModuleFunctionError(err);
+    }
   }
 }

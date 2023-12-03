@@ -1,7 +1,7 @@
 import { ParametersLengthsMismatchError, InvalidParamError } from "./errors";
 import { verify } from "./schemas";
 import { encodePacked, encodeAbiParameters, decodeEventLog } from "viem";
-import type { Module } from "./types";
+import type { Module, WriteFunction } from "./types";
 import type { TransactionReceipt } from "viem";
 
 /**
@@ -116,6 +116,28 @@ export const checkMutableArgs = ({
     const type = module.creationArgs.mutable[i].type;
     if (!verify(val, type)) {
       throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
+    }
+  }
+};
+
+export const checkWriteFunctionArgs = ({
+  func,
+  args,
+}: {
+  func: WriteFunction;
+  args: unknown[];
+}) => {
+  if (args.length !== func.args.length) {
+    throw new ParametersLengthsMismatchError(
+      "Arguments array length doesn't match the expected number of the function's arguments"
+    );
+  }
+
+  for (let i = 0; i < args.length; i++) {
+    const val = args[i];
+    const type = func.args[i].type;
+    if (!verify(val, type)) {
+      throw new InvalidParamError(`Invalid argument at index ${i}`);
     }
   }
 };
