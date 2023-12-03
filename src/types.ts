@@ -43,9 +43,9 @@ export type Module = {
 };
 
 export type Role = {
-  id: string;
   name: string;
   criteria: string;
+  optional?: boolean;
   functions: WriteFunction[];
 };
 
@@ -129,6 +129,7 @@ export type ModuleCreationArg = {
   type: string;
   example: unknown;
   displayType: string;
+  optional?: boolean;
 };
 
 export type ModuleCreationArgs = {

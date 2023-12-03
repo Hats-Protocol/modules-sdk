@@ -1066,6 +1066,8 @@ export class HatsModulesClient {
     const roles: Role[] = [];
 
     const criteriaHats: bigint[] = [];
+    let instanceUsesHatsAdmins = module.roles[1].functions.length > 0;
+
     for (let i = 2; i < module.roles.length; i++) {
       const criteriaHat = (await this._publicClient.readContract({
         address: instance,
@@ -1073,11 +1075,14 @@ export class HatsModulesClient {
         functionName: module.roles[i].criteria,
       })) as bigint;
       criteriaHats.push(criteriaHat);
-    }
 
-    let instanceUsesHatsAdmins = false;
-    if (module.roles[1].functions.length > 0 || criteriaHats.includes(0n)) {
-      instanceUsesHatsAdmins = true;
+      if (
+        !instanceUsesHatsAdmins &&
+        criteriaHat == 0n &&
+        module.roles[i].optional === true
+      ) {
+        instanceUsesHatsAdmins = true;
+      }
     }
 
     let isAdmin = false;
@@ -1119,8 +1124,9 @@ export class HatsModulesClient {
     if (module.roles[1].functions.length > 0 && isAdmin) {
       roles.push(module.roles[1]);
     }
+
     criteriaHats.forEach((criteriaHat, index) => {
-      if (criteriaHat == hat) {
+      if (criteriaHat == hat || (criteriaHat == 0n && isAdmin)) {
         roles.push(module.roles[index + 2]);
       }
     });
