@@ -225,6 +225,119 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
   });
 
+  describe("JokeRace Eligibility Scenario 1 Tests", () => {
+    let jokeraceInstance: Address;
+
+    beforeAll(async () => {
+      const resJokeraceInstance = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        hatId: hat1_1_1,
+        immutableArgs: [hat1_1],
+        mutableArgs: [
+          "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+          1723155807n,
+          3n,
+        ],
+      });
+      jokeraceInstance = resJokeraceInstance.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: jokeraceInstance,
+      });
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with the admin hat", async () => {
+      const rolesHat1_1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1_1
+      );
+      const jokeraceModule = hatsModulesClient.getModuleById(
+        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
+      );
+      expect(rolesHat1_1.length).toBe(1);
+      expect(rolesHat1_1[0]).toStrictEqual(jokeraceModule?.roles[2]);
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with a no-role hat", async () => {
+      const rolesHat1_1_1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1_1_1
+      );
+
+      expect(rolesHat1_1_1.length).toBe(0);
+    }, 30000);
+  });
+
+  describe("JokeRace Eligibility Scenario 2 Tests", () => {
+    let jokeraceInstance: Address;
+
+    beforeAll(async () => {
+      const resJokeraceInstance = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        hatId: hat1_1_1,
+        immutableArgs: [0n],
+        mutableArgs: [
+          "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+          1723155807n,
+          3n,
+        ],
+      });
+      jokeraceInstance = resJokeraceInstance.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: jokeraceInstance,
+      });
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with admin hat", async () => {
+      const rolesHat1_1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1_1
+      );
+      const jokeraceModule = hatsModulesClient.getModuleById(
+        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
+      );
+      expect(rolesHat1_1.length).toBe(1);
+      expect(rolesHat1_1[0]).toStrictEqual(jokeraceModule?.roles[2]);
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with admin hat", async () => {
+      const rolesHat1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1
+      );
+      const jokeraceModule = hatsModulesClient.getModuleById(
+        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
+      );
+      expect(rolesHat1.length).toBe(1);
+      expect(rolesHat1[0]).toStrictEqual(jokeraceModule?.roles[2]);
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with a no-role hat", async () => {
+      const rolesHat1_1_1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1_1_1
+      );
+
+      expect(rolesHat1_1_1.length).toBe(0);
+    }, 30000);
+
+    test("Test getRolesOfHatInInstance with a no-role hat", async () => {
+      const rolesHat1_2_1 = await hatsModulesClient.getRolesOfHatInInstance(
+        jokeraceInstance,
+        hat1_2_1
+      );
+
+      expect(rolesHat1_2_1.length).toBe(0);
+    }, 30000);
+  });
+
   afterAll(async () => {
     await anvil.stop();
   }, 30000);
