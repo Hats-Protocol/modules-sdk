@@ -15,7 +15,7 @@ import type { Anvil } from "@viem/anvil";
 import type { Module, Registry } from "../src/types";
 import "dotenv/config";
 
-describe("Write Functions Client Tests", () => {
+describe("Module Roles Client Tests", () => {
   let publicClient: PublicClient;
   let walletClient: WalletClient;
   let hatsModulesClient: HatsModulesClient;
