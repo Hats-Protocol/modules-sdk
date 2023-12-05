@@ -24,7 +24,6 @@ import type { Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
   Factory,
-  FunctionInfo,
   ChainModule,
   ModuleParameter,
   CreateInstanceResult,

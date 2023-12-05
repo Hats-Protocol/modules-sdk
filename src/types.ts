@@ -97,12 +97,6 @@ export type ChainModule = {
   abi: Abi;
 };
 
-export type FunctionInfo = {
-  name: string;
-  type: "write" | "read";
-  inputs: { name: string | undefined; type: string }[];
-};
-
 export type ModuleParameter = {
   label: string;
   value: unknown;
