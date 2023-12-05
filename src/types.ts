@@ -37,29 +37,34 @@ export type Module = {
     chainId: string;
     block: string;
   }[];
-  roles: Role[];
   creationArgs: ModuleCreationArgs;
+  roles: Role[];
+  writeFunctions: WriteFunction[];
   abi: Abi;
 };
 
 export type Role = {
+  id: string;
   name: string;
   criteria: string;
-  optional?: boolean;
-  functions: WriteFunction[];
+  hatAdminsFallback?: boolean;
 };
 
 export type WriteFunction = {
+  roles: string[];
   functionName: string;
   label: string;
   description: string;
   primary?: boolean;
-  args: {
-    name: string;
-    description: string;
-    type: string;
-    displayType: string;
-  }[];
+  args: WriteFunctionArg[];
+};
+
+export type WriteFunctionArg = {
+  name: string;
+  description: string;
+  type: string;
+  displayType: string;
+  optional?: boolean;
 };
 
 export type Factory = {

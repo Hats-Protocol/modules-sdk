@@ -157,7 +157,7 @@ describe("Write Functions Client Tests", () => {
         account: account1,
         moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
         instance: allowListInstance,
-        func: module?.roles[2].functions[0],
+        func: module?.writeFunctions[0],
         args: [account2.address],
       });
 
@@ -181,7 +181,7 @@ describe("Write Functions Client Tests", () => {
         account: account1,
         moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
         instance: allowListInstance,
-        func: module?.roles[2].functions[2],
+        func: module?.writeFunctions[2],
         args: [account2.address],
       });
 

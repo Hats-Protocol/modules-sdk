@@ -14,6 +14,9 @@ import type {
   ArgumentTsType,
   ModuleCreationArg,
   ModuleCreationArgs,
+  Role,
+  WriteFunction,
+  WriteFunctionArg,
 } from "./types";
 
 export {
@@ -34,4 +37,7 @@ export type {
   ArgumentTsType,
   ModuleCreationArg,
   ModuleCreationArgs,
+  Role,
+  WriteFunction,
+  WriteFunctionArg,
 };

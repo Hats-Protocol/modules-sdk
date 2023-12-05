@@ -12,7 +12,7 @@ import {
   getModuleFunctionError,
 } from "./errors";
 import { verify } from "./schemas";
-import { HATS_MODULE_ABI, HATS_ABI, HATS_V1 } from "./constants";
+import { HATS_MODULE_ABI } from "./constants";
 import axios from "axios";
 import {
   checkAndEncodeArgs,
@@ -31,7 +31,6 @@ import type {
   BatchCreateInstancesResult,
   CallInstanceWriteFunctionResult,
   Registry,
-  Role,
   WriteFunction,
 } from "./types";
 
@@ -687,60 +686,6 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get a module's functions.
-   *
-   * @param moduleId - The nodule ID.
-   * @returns A list of the moudle's functions. Each function's information includes its name, whether it's a "read" or "write" operation and an array
-   * of inputs to the function.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getFunctionsInModule(moduleId: string): FunctionInfo[] {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const functions: FunctionInfo[] = [];
-    const { abi } = this._modules[moduleId];
-
-    for (let i = 0; i < abi.length; i++) {
-      const abiItem = abi[i];
-      if (abiItem.type === "function") {
-        if (
-          abiItem.name === "IMPLEMENTATION" ||
-          abiItem.name === "HATS" ||
-          abiItem.name === "setUp" ||
-          abiItem.name === "version" ||
-          abiItem.name === "version_"
-        ) {
-          continue;
-        }
-
-        const functionType: "write" | "read" =
-          abiItem.stateMutability === "pure" ||
-          abiItem.stateMutability === "view"
-            ? "read"
-            : "write";
-
-        const functionInputs = abiItem.inputs.map((input) => {
-          return { name: input.name, type: input.type };
-        });
-
-        functions.push({
-          name: abiItem.name,
-          type: functionType,
-          inputs: functionInputs,
-        });
-      }
-    }
-
-    return functions;
-  }
-
-  /**
    * Get module instance's parameters.
    * The parameters to fetch are listed in the module's registry object. If the given address is not a registry module, returns 'undefined'.
    *
@@ -820,6 +765,10 @@ export class HatsModulesClient {
 
     return moduleParameters;
   }
+
+  /*//////////////////////////////////////////////////////////////
+                       Module Getters
+  //////////////////////////////////////////////////////////////*/
 
   /**
    * Get a module by its ID.
@@ -1045,94 +994,8 @@ export class HatsModulesClient {
   }
 
   /*//////////////////////////////////////////////////////////////
-                  Module Roles & Write Functions
+                    Module Write Functions
   //////////////////////////////////////////////////////////////*/
-
-  async getRolesOfHatInInstance(
-    instance: Address,
-    hat: bigint
-  ): Promise<Role[]> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const module = await this.getModuleByInstance(instance);
-    if (module === undefined) {
-      throw new Error("Not a module instance");
-    }
-
-    const roles: Role[] = [];
-
-    const criteriaHats: bigint[] = [];
-    let instanceUsesHatsAdmins = module.roles[1].functions.length > 0;
-
-    for (let i = 2; i < module.roles.length; i++) {
-      const criteriaHat = (await this._publicClient.readContract({
-        address: instance,
-        abi: module.abi,
-        functionName: module.roles[i].criteria,
-      })) as bigint;
-      criteriaHats.push(criteriaHat);
-
-      if (
-        !instanceUsesHatsAdmins &&
-        criteriaHat == 0n &&
-        module.roles[i].optional === true
-      ) {
-        instanceUsesHatsAdmins = true;
-      }
-    }
-
-    let isAdmin = false;
-    if (instanceUsesHatsAdmins) {
-      const moduleOfHat = (await this._publicClient.readContract({
-        address: instance,
-        abi: module.abi,
-        functionName: "hatId",
-      })) as bigint;
-
-      const hatLevel = await this._publicClient.readContract({
-        address: HATS_V1,
-        abi: HATS_ABI,
-        functionName: "getHatLevel",
-        args: [moduleOfHat],
-      });
-
-      const calls = [];
-      for (let level = hatLevel - 1; level >= 0; level--) {
-        calls.push({
-          address: HATS_V1 as Address,
-          abi: HATS_ABI,
-          functionName: "getAdminAtLevel",
-          args: [moduleOfHat, level],
-        });
-      }
-      const admins = await this._publicClient.multicall({
-        contracts: calls,
-      });
-
-      for (let i = 0; i < admins.length; i++) {
-        if (admins[i].result == hat) {
-          isAdmin = true;
-          break;
-        }
-      }
-    }
-
-    if (module.roles[1].functions.length > 0 && isAdmin) {
-      roles.push(module.roles[1]);
-    }
-
-    criteriaHats.forEach((criteriaHat, index) => {
-      if (criteriaHat == hat || (criteriaHat == 0n && isAdmin)) {
-        roles.push(module.roles[index + 2]);
-      }
-    });
-
-    return roles;
-  }
 
   async callInstanceWriteFunction({
     account,
@@ -1155,11 +1018,9 @@ export class HatsModulesClient {
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
-      if (module === undefined) {
-        throw new ModuleNotAvailableError(
-          `Module with id ${moduleId} does not exist`
-        );
-      }
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
     }
 
     checkWriteFunctionArgs({ func, args });
