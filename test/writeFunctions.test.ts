@@ -348,6 +348,255 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
   });
 
+  describe("Hat Elections Eligibility Write Functions", () => {
+    let hatElectionsInstance: Address;
+    let electionsEndTime: bigint;
+
+    beforeAll(async () => {
+      const block = await publicClient.getBlock();
+      electionsEndTime = block.timestamp + 3600n;
+
+      const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance(
+        {
+          account: account1,
+          moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+          hatId: hat1_1_1,
+          immutableArgs: [hat1_1, hat1_2],
+          mutableArgs: [electionsEndTime],
+        }
+      );
+      hatElectionsInstance = hatElectionsInstanceRes.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: hatElectionsInstance,
+      });
+    }, 30000);
+
+    test("Test elect", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0x99081d45920818557203CCD62eD36dC2FaD9a43E"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+          instance: hatElectionsInstance,
+          func: module?.writeFunctions[1],
+          args: [electionsEndTime, [account1.address]],
+        });
+      }).rejects.toThrow(
+        "Error: the caller does not wear the module's Ballot Box Hat"
+      );
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account2,
+        moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+        instance: hatElectionsInstance,
+        func: module?.writeFunctions[1],
+        args: [electionsEndTime, [account1.address]],
+      });
+
+      const eligibilityRes = (await publicClient.readContract({
+        address: hatElectionsInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account1.address, hat1_1_1],
+      })) as boolean[];
+
+      expect(res.status).toBe("success");
+      expect(eligibilityRes[0]).toBe(true);
+    }, 30000);
+  });
+
+  describe("JokeRace Eligibility Write Functions", () => {
+    let jokeraceInstance: Address;
+    let electionsEndTime: bigint;
+
+    beforeAll(async () => {
+      const block = await publicClient.getBlock();
+      electionsEndTime = block.timestamp + 3600n;
+
+      const jokeraceInstanceRes = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        hatId: hat1_1_1,
+        immutableArgs: [hat1_1],
+        mutableArgs: [
+          "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+          electionsEndTime,
+          3n,
+        ],
+      });
+      jokeraceInstance = jokeraceInstanceRes.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: jokeraceInstance,
+      });
+    }, 30000);
+
+    test("Test pullElectionResults and reelection", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+          instance: jokeraceInstance,
+          func: module?.writeFunctions[1],
+          args: [
+            "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+            electionsEndTime,
+            5n,
+          ],
+        });
+      }).rejects.toThrow(
+        "Error: can only set a new election once the current term has ended"
+      );
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account2,
+        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        instance: jokeraceInstance,
+        func: module?.writeFunctions[0],
+        args: [],
+      });
+
+      expect(res.status).toBe("success");
+    }, 30000);
+  });
+
+  describe("Passthrough Eligibility Write Functions", () => {
+    let passthroughInstance: Address;
+
+    beforeAll(async () => {
+      const passthroughInstanceRes = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+        hatId: hat1_1_1,
+        immutableArgs: [hat1_1],
+        mutableArgs: [],
+      });
+      passthroughInstance = passthroughInstanceRes.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: passthroughInstance,
+      });
+    }, 30000);
+
+    test("Test setHatWearerStatus", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0x050079a8fbFCE76818C62481BA015b89567D2d35"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+          instance: passthroughInstance,
+          func: module?.writeFunctions[0],
+          args: [hat1_1_1, account2.address, false, false],
+        });
+      }).rejects.toThrow(
+        "Error: caller is not wearing the eligibility/toggle passthrough hat"
+      );
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account2,
+        moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+        instance: passthroughInstance,
+        func: module?.writeFunctions[0],
+        args: [hat1_1_1, account2.address, false, false],
+      });
+
+      expect(res.status).toBe("success");
+    }, 30000);
+  });
+
+  describe("Season Toggle Write Functions", () => {
+    let seasonInstance: Address;
+
+    beforeAll(async () => {
+      const seasonInstanceRes = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0xFb6bD2e96B123d0854064823f6cb59420A285C00",
+        hatId: hat1_2,
+        immutableArgs: [],
+        mutableArgs: [2592000n, 5000n],
+      });
+      seasonInstance = seasonInstanceRes.newInstance;
+
+      await hatsClient.changeHatToggle({
+        account: account1,
+        hatId: hat1_2,
+        newToggle: seasonInstance,
+      });
+    }, 30000);
+
+    test("Test extend", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xFb6bD2e96B123d0854064823f6cb59420A285C00"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: "0xFb6bD2e96B123d0854064823f6cb59420A285C00",
+          instance: seasonInstance,
+          func: module?.writeFunctions[0],
+          args: [2592000n, 5000n],
+        });
+      }).rejects.toThrow(
+        "Error: caller is not an admin of the season toggle branch"
+      );
+    }, 30000);
+  });
+
+  describe("Staking Eligibility Write Functions", () => {
+    let stakingInstance: Address;
+
+    beforeAll(async () => {
+      const stakingInstanceRes = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7",
+        hatId: hat1_1_1,
+        immutableArgs: ["0x1d256A1154382921067d4B17CA52209f2d3bE106"],
+        mutableArgs: [100n, hat1_1, hat1_1, 86400n],
+      });
+      stakingInstance = stakingInstanceRes.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: stakingInstance,
+      });
+    }, 30000);
+
+    test("Test slash", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7",
+          instance: stakingInstance,
+          func: module?.writeFunctions[8],
+          args: [account2.address],
+        });
+      }).rejects.toThrow("Error: caller is not wearing the Judge Hat");
+    }, 30000);
+  });
+
   afterAll(async () => {
     await anvil.stop();
   }, 30000);
