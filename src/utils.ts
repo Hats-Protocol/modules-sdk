@@ -73,7 +73,7 @@ export const checkImmutableArgs = ({
 }) => {
   if (immutableArgs.length !== module.creationArgs.immutable.length) {
     throw new ParametersLengthsMismatchError(
-      "Immutable args array length doesn't match the module's schema"
+      "Error: not all creation arguments were provided"
     );
   }
 
@@ -81,7 +81,9 @@ export const checkImmutableArgs = ({
     const val = immutableArgs[i];
     const type = module.creationArgs.immutable[i].type;
     if (!verify(val, type)) {
-      throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${module.creationArgs.immutable[i].name}'`
+      );
     }
   }
 };
@@ -107,7 +109,7 @@ export const checkMutableArgs = ({
 }) => {
   if (mutableArgs.length !== module.creationArgs.mutable.length) {
     throw new ParametersLengthsMismatchError(
-      "Mutable args array length doesn't match the module's schema"
+      "Error: not all creation arguments were provided"
     );
   }
 
@@ -115,7 +117,9 @@ export const checkMutableArgs = ({
     const val = mutableArgs[i];
     const type = module.creationArgs.mutable[i].type;
     if (!verify(val, type)) {
-      throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${module.creationArgs.mutable[i].name}'`
+      );
     }
   }
 };
@@ -129,7 +133,7 @@ export const checkWriteFunctionArgs = ({
 }) => {
   if (args.length !== func.args.length) {
     throw new ParametersLengthsMismatchError(
-      "Arguments array length doesn't match the expected number of the function's arguments"
+      "Error: not all function arguments were provided"
     );
   }
 
@@ -137,7 +141,9 @@ export const checkWriteFunctionArgs = ({
     const val = args[i];
     const type = func.args[i].type;
     if (!verify(val, type)) {
-      throw new InvalidParamError(`Invalid argument at index ${i}`);
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${func.args[i].name}'`
+      );
     }
   }
 };

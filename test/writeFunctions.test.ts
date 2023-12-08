@@ -1,11 +1,10 @@
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import { HatsModulesClient } from "../src/index";
 import { HatsClient } from "@hatsprotocol/sdk-v1-core";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { goerli } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
-import { ModuleFunctionRevertedError } from "../src/errors";
 import type {
   PublicClient,
   WalletClient,
@@ -170,6 +169,18 @@ describe("Write Functions Client Tests", () => {
         });
       }).rejects.toThrow(
         "Error: the caller does not wear the module's Owner Hat"
+      );
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          instance: allowListInstance,
+          func: module?.writeFunctions[0],
+          args: [1],
+        });
+      }).rejects.toThrow(
+        "Error: received an invalid value for parameter 'Account'"
       );
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
