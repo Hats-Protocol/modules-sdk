@@ -1044,7 +1044,7 @@ export class HatsModulesClient {
         transactionHash: receipt.transactionHash,
       };
     } catch (err) {
-      getModuleFunctionError(err);
+      getModuleFunctionError(err, moduleId);
     }
   }
 }

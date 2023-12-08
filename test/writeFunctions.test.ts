@@ -169,7 +169,7 @@ describe("Write Functions Client Tests", () => {
           args: [account2.address],
         });
       }).rejects.toThrow(
-        "Error: module function reverted with error name AllowlistEligibility_NotOwner"
+        "Error: the caller does not wear the module's Owner Hat"
       );
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
@@ -275,6 +275,76 @@ describe("Write Functions Client Tests", () => {
       expect(res.status).toBe("success");
       expect(eligibilityRes1[0]).toBe(false);
       expect(eligibilityRes2[0]).toBe(false);
+    }, 30000);
+
+    test("Test setStandingForAccount", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          instance: allowListInstance,
+          func: module?.writeFunctions[5],
+          args: [account2.address, false],
+        });
+      }).rejects.toThrow(
+        "Error: the caller does not wear the module's Arbitrator Hat"
+      );
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account2,
+        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        instance: allowListInstance,
+        func: module?.writeFunctions[5],
+        args: [account2.address, false],
+      });
+
+      const standingRes = (await publicClient.readContract({
+        address: allowListInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account2.address, hat1_1_1],
+      })) as boolean[];
+
+      expect(res.status).toBe("success");
+      expect(standingRes[1]).toBe(false);
+    }, 30000);
+
+    test("Test removeAccountAndBurnHat", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          instance: allowListInstance,
+          func: module?.writeFunctions[3],
+          args: [account2.address],
+        });
+      }).rejects.toThrow(
+        "Error: Attempting to burn a hat that an account is not wearing"
+      );
+    }, 30000);
+
+    test("Test setStandingForAccounts", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+      ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          instance: allowListInstance,
+          func: module?.writeFunctions[7],
+          args: [[account2.address], [true, false]],
+        });
+      }).rejects.toThrow("Error: array arguments are not of the same length");
     }, 30000);
   });
 
