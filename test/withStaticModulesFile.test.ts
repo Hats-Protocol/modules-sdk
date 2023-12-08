@@ -20,6 +20,7 @@ describe("Client Tests With a Static Modules File", () => {
   let hatsModulesClient: HatsModulesClient;
   let anvil: Anvil;
   let deployerAccount: PrivateKeyAccount;
+  let registryModules: Registry;
 
   beforeAll(async () => {
     anvil = createAnvil({
@@ -44,7 +45,7 @@ describe("Client Tests With a Static Modules File", () => {
 
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
-    const registryModules: Registry = JSON.parse(data);
+    registryModules = JSON.parse(data);
 
     hatsModulesClient = new HatsModulesClient({
       publicClient,
@@ -57,6 +58,17 @@ describe("Client Tests With a Static Modules File", () => {
   afterAll(async () => {
     await anvil.stop();
   }, 30000);
+
+  test("Test get all active module", () => {
+    const activeModules = hatsModulesClient.getAllActiveModules();
+    const allModules = hatsModulesClient.getAllModules();
+    expect(activeModules["0x2bb30E1786a656EC6cD81e79EEf1A28607c9AE5A"]).toBe(
+      undefined
+    );
+    expect(
+      activeModules["0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"]
+    ).toStrictEqual(allModules["0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"]);
+  });
 
   test("Test create new jokerace instance and get instace parameters", async () => {
     const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";

@@ -861,6 +861,28 @@ export class HatsModulesClient {
   }
 
   /**
+   * Get all the available active modules (not deprecated).
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding active modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  getAllActiveModules(): { [id: string]: Module } {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    return Object.fromEntries(
+      Object.entries(this._modules).filter(
+        ([, module]) => module.deprecated !== true
+      )
+    );
+  }
+
+  /**
    * Get all the available eligibility modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding eligibility modules.
