@@ -5,6 +5,7 @@ import { goerli } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
+import { ModuleFunctionRevertedError } from "../src/errors";
 import type {
   PublicClient,
   WalletClient,
@@ -126,6 +127,12 @@ describe("Write Functions Client Tests", () => {
       account: account1,
     });
     hat1_2_1 = resHat1_2_1.hatId;
+
+    await hatsClient.mintHat({
+      account: account1,
+      hatId: hat1_1,
+      wearer: account2.address,
+    });
   }, 30000);
 
   describe("Allow List Eligibility Write Functions", () => {
@@ -152,6 +159,18 @@ describe("Write Functions Client Tests", () => {
       const module = hatsModulesClient.getModuleById(
         "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
       ) as Module;
+
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          instance: allowListInstance,
+          func: module?.writeFunctions[0],
+          args: [account2.address],
+        });
+      }).rejects.toThrow(
+        "Error: module function reverted with error name AllowlistEligibility_NotOwner"
+      );
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
@@ -194,6 +213,68 @@ describe("Write Functions Client Tests", () => {
 
       expect(res.status).toBe("success");
       expect(eligibilityRes[0]).toBe(false);
+    }, 30000);
+
+    test("Test addAccounts", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+      ) as Module;
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account1,
+        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        instance: allowListInstance,
+        func: module?.writeFunctions[1],
+        args: [[account1.address, account2.address]],
+      });
+
+      const eligibilityRes1 = (await publicClient.readContract({
+        address: allowListInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account1.address, hat1_1_1],
+      })) as boolean[];
+      const eligibilityRes2 = (await publicClient.readContract({
+        address: allowListInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account2.address, hat1_1_1],
+      })) as boolean[];
+
+      expect(res.status).toBe("success");
+      expect(eligibilityRes1[0]).toBe(true);
+      expect(eligibilityRes2[0]).toBe(true);
+    }, 30000);
+
+    test("Test removeAccounts", async () => {
+      const module = hatsModulesClient.getModuleById(
+        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+      ) as Module;
+
+      const res = await hatsModulesClient.callInstanceWriteFunction({
+        account: account1,
+        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        instance: allowListInstance,
+        func: module?.writeFunctions[4],
+        args: [[account1.address, account2.address]],
+      });
+
+      const eligibilityRes1 = (await publicClient.readContract({
+        address: allowListInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account1.address, hat1_1_1],
+      })) as boolean[];
+      const eligibilityRes2 = (await publicClient.readContract({
+        address: allowListInstance,
+        abi: module.abi,
+        functionName: "getWearerStatus",
+        args: [account2.address, hat1_1_1],
+      })) as boolean[];
+
+      expect(res.status).toBe("success");
+      expect(eligibilityRes1[0]).toBe(false);
+      expect(eligibilityRes2[0]).toBe(false);
     }, 30000);
   });
 
