@@ -62,12 +62,14 @@ describe("Client Tests With a Static Modules File", () => {
   test("Test get all active module", () => {
     const activeModules = hatsModulesClient.getAllActiveModules();
     const allModules = hatsModulesClient.getAllModules();
-    expect(activeModules["0x2bb30E1786a656EC6cD81e79EEf1A28607c9AE5A"]).toBe(
-      undefined
-    );
-    expect(
-      activeModules["0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"]
-    ).toStrictEqual(allModules["0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"]);
+
+    for (const [id, module] of Object.entries(allModules)) {
+      if (module.deprecated === true) {
+        expect(activeModules[id]).toBe(undefined);
+      } else {
+        expect(activeModules[id]).toStrictEqual(allModules[id]);
+      }
+    }
   });
 
   test("Test create new jokerace instance and get instace parameters", async () => {
