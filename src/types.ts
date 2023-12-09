@@ -39,7 +39,7 @@ export type Module = {
     block: string;
   }[];
   creationArgs: ModuleCreationArgs;
-  roles: Role[];
+  customRoles: Role[];
   writeFunctions: WriteFunction[];
   abi: Abi;
 };
