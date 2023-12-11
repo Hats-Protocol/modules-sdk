@@ -1,11 +1,4 @@
-import {
-  PublicClient,
-  WalletClient,
-  keccak256,
-  stringToBytes,
-  encodePacked,
-  decodeEventLog,
-} from "viem";
+import { PublicClient, WalletClient, encodePacked, decodeEventLog } from "viem";
 import {
   MissingPublicClientError,
   ChainIdMismatchError,
@@ -16,6 +9,7 @@ import {
   ClientNotPreparedError,
   ModulesRegistryFetchError,
   ModuleParameterError,
+  getModuleFunctionError,
 } from "./errors";
 import { verify } from "./schemas";
 import { HATS_MODULE_ABI } from "./constants";
@@ -24,19 +18,19 @@ import {
   checkAndEncodeArgs,
   checkImmutableArgs,
   getNewInstancesFromReceipt,
+  checkWriteFunctionArgs,
 } from "./utils";
-import type {
-  CreateInstanceResult,
-  BatchCreateInstancesResult,
-  Registry,
-} from "./types";
 import type { Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
   Factory,
-  FunctionInfo,
   ChainModule,
   ModuleParameter,
+  CreateInstanceResult,
+  BatchCreateInstancesResult,
+  CallInstanceWriteFunctionResult,
+  Registry,
+  WriteFunction,
 } from "./types";
 
 export class HatsModulesClient {
@@ -126,9 +120,7 @@ export class HatsModulesClient {
       });
 
       if (moduleSupportedInChain) {
-        const moduleId: string = keccak256(
-          stringToBytes(JSON.stringify(module))
-        );
+        const moduleId: string = module.implementationAddress;
 
         if (this._modules !== undefined) {
           this._modules[moduleId] = module;
@@ -693,60 +685,6 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get a module's functions.
-   *
-   * @param moduleId - The nodule ID.
-   * @returns A list of the moudle's functions. Each function's information includes its name, whether it's a "read" or "write" operation and an array
-   * of inputs to the function.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getFunctionsInModule(moduleId: string): FunctionInfo[] {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const functions: FunctionInfo[] = [];
-    const { abi } = this._modules[moduleId];
-
-    for (let i = 0; i < abi.length; i++) {
-      const abiItem = abi[i];
-      if (abiItem.type === "function") {
-        if (
-          abiItem.name === "IMPLEMENTATION" ||
-          abiItem.name === "HATS" ||
-          abiItem.name === "setUp" ||
-          abiItem.name === "version" ||
-          abiItem.name === "version_"
-        ) {
-          continue;
-        }
-
-        const functionType: "write" | "read" =
-          abiItem.stateMutability === "pure" ||
-          abiItem.stateMutability === "view"
-            ? "read"
-            : "write";
-
-        const functionInputs = abiItem.inputs.map((input) => {
-          return { name: input.name, type: input.type };
-        });
-
-        functions.push({
-          name: abiItem.name,
-          type: functionType,
-          inputs: functionInputs,
-        });
-      }
-    }
-
-    return functions;
-  }
-
-  /**
    * Get module instance's parameters.
    * The parameters to fetch are listed in the module's registry object. If the given address is not a registry module, returns 'undefined'.
    *
@@ -826,6 +764,10 @@ export class HatsModulesClient {
 
     return moduleParameters;
   }
+
+  /*//////////////////////////////////////////////////////////////
+                       Module Getters
+  //////////////////////////////////////////////////////////////*/
 
   /**
    * Get a module by its ID.
@@ -916,6 +858,28 @@ export class HatsModulesClient {
     }
 
     return this._modules;
+  }
+
+  /**
+   * Get all the available active modules (not deprecated).
+   *
+   * @returns An object which keys are module IDs and the values are the corresponding active modules.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  getAllActiveModules(): { [id: string]: Module } {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    return Object.fromEntries(
+      Object.entries(this._modules).filter(
+        ([, module]) => module.deprecated !== true
+      )
+    );
   }
 
   /**
@@ -1048,5 +1012,61 @@ export class HatsModulesClient {
     }
 
     return this._factory;
+  }
+
+  /*//////////////////////////////////////////////////////////////
+                    Module Write Functions
+  //////////////////////////////////////////////////////////////*/
+
+  async callInstanceWriteFunction({
+    account,
+    moduleId,
+    instance,
+    func,
+    args,
+  }: {
+    account: Account | Address;
+    moduleId: string;
+    instance: Address;
+    func: WriteFunction;
+    args: unknown[];
+  }): Promise<CallInstanceWriteFunctionResult> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
+    }
+
+    checkWriteFunctionArgs({ func, args });
+
+    try {
+      const { request } = await this._publicClient.simulateContract({
+        address: instance,
+        abi: module.abi,
+        functionName: func.functionName,
+        args: args,
+        account,
+      });
+
+      const hash = await this._walletClient.writeContract(request);
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+      };
+    } catch (err) {
+      getModuleFunctionError(err, moduleId);
+    }
   }
 }

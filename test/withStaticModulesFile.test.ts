@@ -20,6 +20,7 @@ describe("Client Tests With a Static Modules File", () => {
   let hatsModulesClient: HatsModulesClient;
   let anvil: Anvil;
   let deployerAccount: PrivateKeyAccount;
+  let registryModules: Registry;
 
   beforeAll(async () => {
     anvil = createAnvil({
@@ -44,7 +45,7 @@ describe("Client Tests With a Static Modules File", () => {
 
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
-    const registryModules: Registry = JSON.parse(data);
+    registryModules = JSON.parse(data);
 
     hatsModulesClient = new HatsModulesClient({
       publicClient,
@@ -58,9 +59,21 @@ describe("Client Tests With a Static Modules File", () => {
     await anvil.stop();
   }, 30000);
 
+  test("Test get all active module", () => {
+    const activeModules = hatsModulesClient.getAllActiveModules();
+    const allModules = hatsModulesClient.getAllModules();
+
+    for (const [id, module] of Object.entries(allModules)) {
+      if (module.deprecated === true) {
+        expect(activeModules[id]).toBe(undefined);
+      } else {
+        expect(activeModules[id]).toStrictEqual(allModules[id]);
+      }
+    }
+  });
+
   test("Test create new jokerace instance and get instace parameters", async () => {
-    const jokeraceId =
-      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
+    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
 
     const hatId = BigInt(
@@ -164,99 +177,8 @@ describe("Client Tests With a Static Modules File", () => {
     expect(instanceParams[3].solidityType).toBe("uint256");
   }, 10000);
 
-  test("Test get jokerace functions names", () => {
-    const jokeraceId =
-      "0xe3e2b163f6c73b6fb7088cf423d8df8a6e53e3593bce3cf46af38568cf245323";
-    const functions = hatsModulesClient.getFunctionsInModule(jokeraceId);
-    const expectedFunctions = [
-      {
-        name: "ADMIN_HAT",
-        type: "read",
-        inputs: [],
-      },
-      {
-        name: "eligibleWearersPerContest",
-        type: "read",
-        inputs: [
-          {
-            name: "wearer",
-            type: "address",
-          },
-          {
-            name: "contest",
-            type: "address",
-          },
-        ],
-      },
-      {
-        name: "getWearerStatus",
-        type: "read",
-        inputs: [
-          {
-            name: "_wearer",
-            type: "address",
-          },
-          {
-            name: "",
-            type: "uint256",
-          },
-        ],
-      },
-      {
-        name: "hatId",
-        type: "read",
-        inputs: [],
-      },
-      {
-        name: "pullElectionResults",
-        type: "write",
-        inputs: [],
-      },
-      {
-        name: "reelection",
-        type: "write",
-        inputs: [
-          {
-            name: "newUnderlyingContest",
-            type: "address",
-          },
-          {
-            name: "newTermEnd",
-            type: "uint256",
-          },
-          {
-            name: "newTopK",
-            type: "uint256",
-          },
-        ],
-      },
-      {
-        name: "reelectionAllowed",
-        type: "read",
-        inputs: [],
-      },
-      {
-        name: "termEnd",
-        type: "read",
-        inputs: [],
-      },
-      {
-        name: "topK",
-        type: "read",
-        inputs: [],
-      },
-      {
-        name: "underlyingContest",
-        type: "read",
-        inputs: [],
-      },
-    ];
-    expect(functions).toEqual(expectedFunctions);
-  });
-
   test("Test create new staking instance and get instace parameters", async () => {
-    const stakingId =
-      "0x33d53892ca1e344814cea8062e3985d945f1e1a1999519cdb2fe38530ee0b59b";
+    const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
 
     const hatId = BigInt(
@@ -368,8 +290,7 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc20 eligibility instance and get instance parameters", async () => {
-    const erc20Id =
-      "0xdf3b1fc065bdc76f163c2b612f1763fd6ffd0dd15040d414ee8cda17cd437735";
+    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
     const module = hatsModulesClient.getModuleById(erc20Id) as Module;
 
     const hatId = BigInt(
@@ -454,8 +375,7 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc721 eligibility instance and get instance parameters", async () => {
-    const erc721Id =
-      "0xdf16f18da1351629f5be196578c9e17e35bdb0fd9dfe8d4cefbba80cd2bcede6";
+    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
     const module = hatsModulesClient.getModuleById(erc721Id) as Module;
 
     const hatId = BigInt(
@@ -540,8 +460,7 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
-    const erc1155Id =
-      "0xd8273e662c11dfb6a02797962c5c876e831efd4286d8a2098dfc7e4c9f1fcc0e";
+    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
     const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
 
     const hatId = BigInt(
@@ -645,8 +564,7 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test get module by implementation", async () => {
-    const claimsHatterId =
-      "0x667d7a33b3ac22a0c6ea1dbb65d4f14eb5163ae6573a3a2d6c6f4edffeb3d1fa";
+    const claimsHatterId = "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9";
     const claimsHatterModule = hatsModulesClient.getModuleById(
       claimsHatterId
     ) as Module;

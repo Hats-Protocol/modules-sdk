@@ -1,9 +1,11 @@
-import type { Abi } from "abitype";
+import type { Abi } from "viem";
 
 export interface TransactionResult {
   status: "success" | "reverted";
   transactionHash: `0x${string}`;
 }
+
+export interface CallInstanceWriteFunctionResult extends TransactionResult {}
 
 export interface CreateInstanceResult extends TransactionResult {
   newInstance: `0x${string}`;
@@ -15,6 +17,7 @@ export interface BatchCreateInstancesResult extends TransactionResult {
 
 export type Module = {
   name: string;
+  deprecated?: boolean;
   details: string[];
   links: {
     label: string;
@@ -36,7 +39,33 @@ export type Module = {
     block: string;
   }[];
   creationArgs: ModuleCreationArgs;
+  customRoles: Role[];
+  writeFunctions: WriteFunction[];
   abi: Abi;
+};
+
+export type Role = {
+  id: string;
+  name: string;
+  criteria: string;
+  hatAdminsFallback?: boolean;
+};
+
+export type WriteFunction = {
+  roles: string[];
+  functionName: string;
+  label: string;
+  description: string;
+  primary?: boolean;
+  args: WriteFunctionArg[];
+};
+
+export type WriteFunctionArg = {
+  name: string;
+  description: string;
+  type: string;
+  displayType: string;
+  optional?: boolean;
 };
 
 export type Factory = {
@@ -67,12 +96,6 @@ export type ChainModule = {
     block: string;
   }[];
   abi: Abi;
-};
-
-export type FunctionInfo = {
-  name: string;
-  type: "write" | "read";
-  inputs: { name: string | undefined; type: string }[];
 };
 
 export type ModuleParameter = {
@@ -106,6 +129,7 @@ export type ModuleCreationArg = {
   type: string;
   example: unknown;
   displayType: string;
+  optional?: boolean;
 };
 
 export type ModuleCreationArgs = {

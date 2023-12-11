@@ -1,7 +1,7 @@
 import { ParametersLengthsMismatchError, InvalidParamError } from "./errors";
 import { verify } from "./schemas";
 import { encodePacked, encodeAbiParameters, decodeEventLog } from "viem";
-import type { Module } from "./types";
+import type { Module, WriteFunction } from "./types";
 import type { TransactionReceipt } from "viem";
 
 /**
@@ -73,7 +73,7 @@ export const checkImmutableArgs = ({
 }) => {
   if (immutableArgs.length !== module.creationArgs.immutable.length) {
     throw new ParametersLengthsMismatchError(
-      "Immutable args array length doesn't match the module's schema"
+      "Error: not all creation arguments were provided"
     );
   }
 
@@ -81,7 +81,9 @@ export const checkImmutableArgs = ({
     const val = immutableArgs[i];
     const type = module.creationArgs.immutable[i].type;
     if (!verify(val, type)) {
-      throw new InvalidParamError(`Invalid immutable argument at index ${i}`);
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${module.creationArgs.immutable[i].name}'`
+      );
     }
   }
 };
@@ -107,7 +109,7 @@ export const checkMutableArgs = ({
 }) => {
   if (mutableArgs.length !== module.creationArgs.mutable.length) {
     throw new ParametersLengthsMismatchError(
-      "Mutable args array length doesn't match the module's schema"
+      "Error: not all creation arguments were provided"
     );
   }
 
@@ -115,7 +117,33 @@ export const checkMutableArgs = ({
     const val = mutableArgs[i];
     const type = module.creationArgs.mutable[i].type;
     if (!verify(val, type)) {
-      throw new InvalidParamError(`Invalid mutable argument at index ${i}`);
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${module.creationArgs.mutable[i].name}'`
+      );
+    }
+  }
+};
+
+export const checkWriteFunctionArgs = ({
+  func,
+  args,
+}: {
+  func: WriteFunction;
+  args: unknown[];
+}) => {
+  if (args.length !== func.args.length) {
+    throw new ParametersLengthsMismatchError(
+      "Error: not all function arguments were provided"
+    );
+  }
+
+  for (let i = 0; i < args.length; i++) {
+    const val = args[i];
+    const type = func.args[i].type;
+    if (!verify(val, type)) {
+      throw new InvalidParamError(
+        `Error: received an invalid value for parameter '${func.args[i].name}'`
+      );
     }
   }
 };
