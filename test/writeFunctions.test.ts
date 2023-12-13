@@ -28,7 +28,6 @@ describe("Write Functions Client Tests", () => {
   let hat1_1: bigint;
   let hat1_1_1: bigint;
   let hat1_2: bigint;
-  let hat1_2_1: bigint;
 
   beforeAll(async () => {
     anvil = createAnvil({
@@ -114,18 +113,6 @@ describe("Write Functions Client Tests", () => {
       account: account1,
     });
     hat1_2 = resHat1_2.hatId;
-
-    const resHat1_2_1 = await hatsClient.createHat({
-      admin: hat1_2,
-      maxSupply: 3,
-      eligibility: account1.address,
-      toggle: account1.address,
-      mutable: true,
-      details: "1.1 details",
-      imageURI: "1.1 URI",
-      account: account1,
-    });
-    hat1_2_1 = resHat1_2_1.hatId;
 
     await hatsClient.mintHat({
       account: account1,
