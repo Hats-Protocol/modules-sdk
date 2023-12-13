@@ -843,6 +843,58 @@ export class HatsModulesClient {
   }
 
   /**
+   * Get the module objects of instances.
+   *
+   * @param addresses - Module Instances addresses.
+   * @returns The modules matching the provided instances addresses. For every address that is not an instance of a registry module, the corresponding
+   * return value in the array will be 'undefined'.
+   *
+   * @throws ClientNotPreparedError
+   * Thrown if the "prepare" function has not been called yet.
+   */
+  async getModulesByInstances(
+    addresses: Address[]
+  ): Promise<(Module | undefined)[]> {
+    if (this._modules === undefined || this._factory === undefined) {
+      throw new ClientNotPreparedError(
+        "Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const calls = addresses.map((address) => {
+      return {
+        address: address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      };
+    });
+
+    try {
+      const results = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      const modules: (Module | undefined)[] = [];
+      for (let i = 0; i < results.length; i++) {
+        if (results[i].status === "failure") {
+          modules.push(undefined);
+          continue;
+        }
+
+        const module = this.getModuleByImplementation(
+          results[i].result as Address
+        );
+
+        modules.push(module);
+      }
+
+      return modules;
+    } catch (err) {
+      throw new Error("Error: multicall unexpected error");
+    }
+  }
+
+  /**
    * Get all the available modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding modules.

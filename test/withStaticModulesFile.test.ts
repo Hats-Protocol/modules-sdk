@@ -22,6 +22,10 @@ describe("Client Tests With a Static Modules File", () => {
   let deployerAccount: PrivateKeyAccount;
   let registryModules: Registry;
 
+  let erc20EligibilityInstance: Address;
+  let erc721EligibilityInstance: Address;
+  let erc1155EligibilityInstance: Address;
+
   beforeAll(async () => {
     anvil = createAnvil({
       forkUrl: process.env.GOERLI_RPC,
@@ -337,6 +341,8 @@ describe("Client Tests With a Static Modules File", () => {
       mutableArgs: mutableArgs,
     });
 
+    erc20EligibilityInstance = res.newInstance;
+
     const hatIdResult = await publicClient.readContract({
       address: res.newInstance as Address,
       abi: module.abi,
@@ -421,6 +427,8 @@ describe("Client Tests With a Static Modules File", () => {
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
     });
+
+    erc721EligibilityInstance = res.newInstance;
 
     const hatIdResult = await publicClient.readContract({
       address: res.newInstance as Address,
@@ -508,6 +516,8 @@ describe("Client Tests With a Static Modules File", () => {
       mutableArgs: mutableArgs,
     });
 
+    erc1155EligibilityInstance = res.newInstance;
+
     const hatIdResult = await publicClient.readContract({
       address: res.newInstance as Address,
       abi: module.abi,
@@ -575,4 +585,54 @@ describe("Client Tests With a Static Modules File", () => {
       )
     ).toEqual(claimsHatterModule);
   });
+
+  test("Test getModulesByInstances scenario 1", async () => {
+    const modules = await hatsModulesClient.getModulesByInstances([
+      erc20EligibilityInstance,
+      erc721EligibilityInstance,
+      erc1155EligibilityInstance,
+    ]);
+
+    expect(modules[0]?.implementationAddress).toBe(
+      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
+    );
+    expect(modules[1]?.implementationAddress).toBe(
+      "0xF37cf12fB4493D29270806e826fDDf50dd722bab"
+    );
+    expect(modules[2]?.implementationAddress).toBe(
+      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
+    );
+  }, 30000);
+
+  test("Test getModulesByInstances scenario 2", async () => {
+    const modules = await hatsModulesClient.getModulesByInstances([
+      erc20EligibilityInstance,
+      "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      erc1155EligibilityInstance,
+    ]);
+
+    expect(modules[0]?.implementationAddress).toBe(
+      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
+    );
+    expect(modules[1]).toBe(undefined);
+    expect(modules[2]?.implementationAddress).toBe(
+      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
+    );
+  }, 30000);
+
+  test("Test getModulesByInstances scenario 3", async () => {
+    const modules = await hatsModulesClient.getModulesByInstances([
+      erc20EligibilityInstance,
+      "0x5790e25C58cAe56EB243F0bacE67C38284417771",
+      erc1155EligibilityInstance,
+    ]);
+
+    expect(modules[0]?.implementationAddress).toBe(
+      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
+    );
+    expect(modules[1]).toBe(undefined);
+    expect(modules[2]?.implementationAddress).toBe(
+      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
+    );
+  }, 30000);
 });
