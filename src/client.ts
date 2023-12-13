@@ -846,7 +846,7 @@ export class HatsModulesClient {
    * Get the module objects of instances.
    *
    * @param addresses - Module Instances addresses.
-   * @returns The modules matching the provided instances addresses. For every address that is not an insance of a registry module, the corrsponding
+   * @returns The modules matching the provided instances addresses. For every address that is not an instance of a registry module, the corresponding
    * return value in the array will be 'undefined'.
    *
    * @throws ClientNotPreparedError
