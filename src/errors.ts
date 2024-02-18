@@ -21,6 +21,20 @@ export class MissingWalletClientError extends Error {
   }
 }
 
+export class MissingWalletClientChainError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingWalletClientChainError";
+  }
+}
+
+export class MissingPublicClientChainError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingPublicClientChainError";
+  }
+}
+
 export class TransactionRevertedError extends Error {
   constructor(message: string) {
     super(message);
