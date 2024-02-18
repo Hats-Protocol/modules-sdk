@@ -51,15 +51,6 @@ export class HatsModulesClient {
    * @param publicClient - Viem Public Client.
    * @param walletClient - Viem Wallet Client.
    * @returns A HatsModulesClient instance.
-   *
-   * @throws MissingPublicClientError
-   * Thrown when a public client is not provided.
-   *
-   * @throws MissingWalletClientError
-   * Thrown when a wallet client is not provided.
-   *
-   * @throws ChainIdMismatchError
-   * Thrown when there is a chain ID mismatch between the Viem clients.
    */
   constructor({
     publicClient,
@@ -99,9 +90,6 @@ export class HatsModulesClient {
    * Fetches the modules registry and prepares the client for usage.
    *
    * @param registry - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
-   *
-   * @throws ModulesRegistryFetchError
-   * Thrown in case there was an error while fetching from the modules registry.
    */
   async prepare(registry?: Registry) {
     let registryToUse: Registry;
@@ -153,21 +141,6 @@ export class HatsModulesClient {
    * @param immutableArgs - The module's immutable arguments.
    * @param mutableArgs - The module's mutable arguments.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the creation args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if one of the creation args array's length doens't match the module's schema.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createNewInstance({
     account,
@@ -251,21 +224,6 @@ export class HatsModulesClient {
    * @param immutableArgsArray - Each module's immutable arguments.
    * @param mutableArgsArray - Each module's mutable arguments.
    * @returns An object containing the status of the call, the transaction hash and the new module instances addresses.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if one of the provided 'hatId' parameters or one of the creation args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if one of the creation args array's length doens't match the module's schema.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async batchCreateNewInstances({
     account,
@@ -356,12 +314,6 @@ export class HatsModulesClient {
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createEligibilitiesChain({
     account,
@@ -455,12 +407,6 @@ export class HatsModulesClient {
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createTogglesChain({
     account,
@@ -552,18 +498,6 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
    * @returns The module's predicted address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if immutable args array's length doens't match the module's schema.
    */
   async predictHatsModuleAddress({
     moduleId,
@@ -623,18 +557,6 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
    * @returns The module's predicted address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if immutable args array's length doens't match the module's schema.
    */
   async isModuleDeployed({
     moduleId,
@@ -694,12 +616,6 @@ export class HatsModulesClient {
    * @param instance - The module instace address.
    * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
    * the given address is not an instance of a registry module, then returns 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleParameterError
-   * Thrown if failed reading a module's parameter.
    */
   async getInstanceParameters(
     instance: Address
@@ -777,9 +693,6 @@ export class HatsModulesClient {
    *
    * @param moduleId - The module ID.
    * @returns The module matching the provided ID.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getModuleById(moduleId: string): Module | undefined {
     if (this._modules === undefined) {
@@ -796,9 +709,6 @@ export class HatsModulesClient {
    *
    * @param address - The implementation address.
    * @returns The module matching the provided implementation address. If no matching, returns 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getModuleByImplementation(address: Address): Module | undefined {
     if (this._modules === undefined) {
@@ -820,9 +730,6 @@ export class HatsModulesClient {
    * @param address - Instance address.
    * @returns The module matching the provided instance address. If the given address is not an insance of a registry module, then returns
    * 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   async getModuleByInstance(address: Address): Promise<Module | undefined> {
     if (this._modules === undefined) {
@@ -851,9 +758,6 @@ export class HatsModulesClient {
    * @param addresses - Module Instances addresses.
    * @returns The modules matching the provided instances addresses. For every address that is not an instance of a registry module, the corresponding
    * return value in the array will be 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   async getModulesByInstances(
     addresses: Address[]
@@ -901,9 +805,6 @@ export class HatsModulesClient {
    * Get all the available modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getAllModules(): { [id: string]: Module } {
     if (this._modules === undefined) {
@@ -919,9 +820,6 @@ export class HatsModulesClient {
    * Get all the available active modules (not deprecated).
    *
    * @returns An object which keys are module IDs and the values are the corresponding active modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getAllActiveModules(): { [id: string]: Module } {
     if (this._modules === undefined) {
@@ -941,9 +839,6 @@ export class HatsModulesClient {
    * Get all the available eligibility modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding eligibility modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getAllEligibilityModules(): { [id: string]: Module } {
     if (this._modules === undefined) {
@@ -967,9 +862,6 @@ export class HatsModulesClient {
    * Get all the available toggle modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding toggle modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getAllToggleModules(): { [id: string]: Module } {
     if (this._modules === undefined) {
@@ -993,9 +885,6 @@ export class HatsModulesClient {
    * Get all the available hatter modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding hatter modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getAllHatterModules(): { [id: string]: Module } {
     if (this._modules === undefined) {
@@ -1019,6 +908,16 @@ export class HatsModulesClient {
                     Module Write Functions
   //////////////////////////////////////////////////////////////*/
 
+  /**
+   * Call a module's instance write function.
+   *
+   * @param account - A Viem account.
+   * @param moduleId - Module's ID.
+   * @param instance - Module instance.
+   * @param func - Function to call.
+   * @param args - Function's input arguments.
+   * @returns An object containing the status of the call and the transaction hash.
+   */
   async callInstanceWriteFunction({
     account,
     moduleId,
