@@ -17,7 +17,6 @@ export interface BatchCreateInstancesResult extends TransactionResult {
 
 export type Module = {
   name: string;
-  deprecated?: boolean;
   details: string[];
   links: {
     label: string;
@@ -33,6 +32,11 @@ export type Module = {
     toggle: boolean;
     hatter: boolean;
   };
+  tags: {
+    description: string;
+    label: string;
+    value: string;
+  }[];
   implementationAddress: string;
   deployments: {
     chainId: string;

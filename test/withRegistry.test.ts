@@ -57,7 +57,7 @@ describe("Eligibility Client Tests", () => {
   }, 50000);
 
   test("Test create all modules", async () => {
-    const modules = hatsModulesClient.getAllModules();
+    const modules = hatsModulesClient.getModules();
     for (const [id, module] of Object.entries(modules)) {
       const hatId = module.creationArgs.useHatId
         ? BigInt(

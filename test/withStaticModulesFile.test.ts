@@ -64,16 +64,62 @@ describe("Client Tests With a Static Modules File", () => {
   }, 30000);
 
   test("Test get all active module", () => {
-    const activeModules = hatsModulesClient.getAllActiveModules();
-    const allModules = hatsModulesClient.getAllModules();
+    const filter = (module: Module) => {
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "deprecated") {
+          return false;
+        }
+      }
+      return true;
+    };
+    const activeModules = hatsModulesClient.getModules(filter);
+    const allModules = hatsModulesClient.getModules();
 
     for (const [id, module] of Object.entries(allModules)) {
-      if (module.deprecated === true) {
+      let deprecated = false;
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "deprecated") {
+          deprecated = true;
+        }
+      }
+
+      if (deprecated) {
         expect(activeModules[id]).toBe(undefined);
       } else {
         expect(activeModules[id]).toStrictEqual(allModules[id]);
       }
     }
+  });
+
+  test("Test get only meta modules", () => {
+    const filter = (module: Module) => {
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "meta") {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const metaModules = hatsModulesClient.getModules(filter);
+
+    let metaModulesCount = 0;
+    for (const [, module] of Object.entries(metaModules)) {
+      metaModulesCount += 1;
+      let isMeta = false;
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "meta") {
+          isMeta = true;
+        }
+      }
+
+      expect(isMeta).toBe(true);
+    }
+    expect(metaModulesCount).toBe(2);
   });
 
   test("Test create new jokerace instance and get instace parameters", async () => {

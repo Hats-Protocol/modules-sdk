@@ -806,102 +806,22 @@ export class HatsModulesClient {
    *
    * @returns An object which keys are module IDs and the values are the corresponding modules.
    */
-  getAllModules(): { [id: string]: Module } {
+  getModules(filter?: (module: Module) => boolean): { [id: string]: Module } {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    if (filter !== undefined) {
+      return Object.fromEntries(
+        Object.entries(this._modules).filter(([, module]) => {
+          return filter(module);
+        })
       );
     }
 
     return this._modules;
-  }
-
-  /**
-   * Get all the available active modules (not deprecated).
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding active modules.
-   */
-  getAllActiveModules(): { [id: string]: Module } {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    return Object.fromEntries(
-      Object.entries(this._modules).filter(
-        ([, module]) => module.deprecated !== true
-      )
-    );
-  }
-
-  /**
-   * Get all the available eligibility modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding eligibility modules.
-   */
-  getAllEligibilityModules(): { [id: string]: Module } {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.eligibility) {
-        res[id] = module;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Get all the available toggle modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding toggle modules.
-   */
-  getAllToggleModules(): { [id: string]: Module } {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.toggle) {
-        res[id] = module;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Get all the available hatter modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding hatter modules.
-   */
-  getAllHatterModules(): { [id: string]: Module } {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.hatter) {
-        res[id] = module;
-      }
-    }
-
-    return res;
   }
 
   /*//////////////////////////////////////////////////////////////
