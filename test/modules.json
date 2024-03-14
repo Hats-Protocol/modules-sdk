@@ -3754,7 +3754,7 @@
             "name": "JokeRace Contest",
             "description": "The JokeRace contest that facilitates the election",
             "type": "address",
-            "example": "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+            "example": "0xc5E226Caec417de53A38Fc63242291e474772274",
             "displayType": "jokerace"
           },
           {

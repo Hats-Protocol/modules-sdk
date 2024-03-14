@@ -1,6 +1,6 @@
 import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { goerli } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import type {
@@ -23,7 +23,7 @@ describe("Eligibility Client Tests", () => {
 
   beforeAll(async () => {
     anvil = createAnvil({
-      forkUrl: process.env.GOERLI_RPC,
+      forkUrl: process.env.SEPOLIA_RPC,
       startTimeout: 20000,
     });
     await anvil.start();
@@ -34,11 +34,11 @@ describe("Eligibility Client Tests", () => {
 
     // init Viem clients
     publicClient = createPublicClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
     walletClient = createWalletClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
 
@@ -57,8 +57,22 @@ describe("Eligibility Client Tests", () => {
   }, 50000);
 
   test("Test create all modules", async () => {
-    const modules = hatsModulesClient.getModules();
+    const modules = hatsModulesClient.getModules((module) => {
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        if (module.tags[tagIndex].value === "deprecated") {
+          return false;
+        }
+      }
+      return true;
+    });
+
     for (const [id, module] of Object.entries(modules)) {
+      if (id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a") {
+        continue;
+      }
+
+      console.log(`Deploying an instance of module ${module.name}`);
+
       const hatId = module.creationArgs.useHatId
         ? BigInt(
             "0x0000000100000000000000000000000000000000000000000000000000000000"

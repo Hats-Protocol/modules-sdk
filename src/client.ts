@@ -98,7 +98,7 @@ export class HatsModulesClient {
     } else {
       try {
         const result = await axios.get(
-          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/main/modules.json"
+          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/v1/modules.json"
         );
         registryToUse = result.data;
       } catch (err) {

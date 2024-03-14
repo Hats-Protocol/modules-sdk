@@ -1,7 +1,7 @@
 import { HatsModulesClient } from "../src/index";
 import { HatsClient } from "@hatsprotocol/sdk-v1-core";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { goerli } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
@@ -31,7 +31,7 @@ describe("Write Functions Client Tests", () => {
 
   beforeAll(async () => {
     anvil = createAnvil({
-      forkUrl: process.env.GOERLI_RPC,
+      forkUrl: process.env.SEPOLIA_RPC,
       startTimeout: 20000,
     });
     await anvil.start();
@@ -45,11 +45,11 @@ describe("Write Functions Client Tests", () => {
 
     // init Viem clients
     publicClient = createPublicClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
     walletClient = createWalletClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
 
@@ -65,7 +65,7 @@ describe("Write Functions Client Tests", () => {
     await hatsModulesClient.prepare(registryModules);
 
     hatsClient = new HatsClient({
-      chainId: goerli.id,
+      chainId: sepolia.id,
       publicClient: publicClient,
       walletClient: walletClient,
     });
@@ -357,7 +357,7 @@ describe("Write Functions Client Tests", () => {
       const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance(
         {
           account: account1,
-          moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+          moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
           hatId: hat1_1_1,
           immutableArgs: [hat1_1, hat1_2],
           mutableArgs: [electionsEndTime],
@@ -374,13 +374,13 @@ describe("Write Functions Client Tests", () => {
 
     test("Test elect", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0x99081d45920818557203CCD62eD36dC2FaD9a43E"
+        "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+          moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
           instance: hatElectionsInstance,
           func: module?.writeFunctions[1],
           args: [electionsEndTime, [account1.address]],
@@ -391,7 +391,7 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0x99081d45920818557203CCD62eD36dC2FaD9a43E",
+        moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
         instance: hatElectionsInstance,
         func: module?.writeFunctions[1],
         args: [electionsEndTime, [account1.address]],
@@ -423,7 +423,7 @@ describe("Write Functions Client Tests", () => {
         hatId: hat1_1_1,
         immutableArgs: [hat1_1],
         mutableArgs: [
-          "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+          "0xc5E226Caec417de53A38Fc63242291e474772274",
           electionsEndTime,
           3n,
         ],

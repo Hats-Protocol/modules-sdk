@@ -18,7 +18,7 @@
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
     "@typescript-eslint/parser": "^6.3.0",
-    "@viem/anvil": "^0.0.6",
+    "@viem/anvil": "0.0.9",
     "dotenv": "^16.3.1",
     "eslint": "^8.46.0",
     "eslint-config-prettier": "^9.0.0",
@@ -31,13 +31,13 @@
     "ts-node": "^10.9.1",
     "tslib": "^2.6.1",
     "typescript": "^5.1.6",
-    "viem": "^1.11.0"
+    "viem": "^2.0.0"
   },
   "dependencies": {
     "axios": "^1.5.0",
     "zod": "^3.21.4"
   },
   "peerDependencies": {
-    "viem": "^1.11.0"
+    "viem": "^2.0.0"
   }
 }
