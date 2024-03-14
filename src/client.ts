@@ -10,9 +10,17 @@ import {
   ModulesRegistryFetchError,
   ModuleParameterError,
   getModuleFunctionError,
+  MissingWalletClientChainError,
+  MissingPublicClientChainError,
 } from "./errors";
 import { verify } from "./schemas";
-import { HATS_MODULE_ABI } from "./constants";
+import {
+  HATS_MODULE_ABI,
+  HATS_MODULES_FACTORY_ABI,
+  HATS_MODULES_FACTORY_ADDRESS,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
+  HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
+} from "./constants";
 import axios from "axios";
 import {
   checkAndEncodeArgs,
@@ -23,8 +31,6 @@ import {
 import type { Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
-  Factory,
-  ChainModule,
   ModuleParameter,
   CreateInstanceResult,
   BatchCreateInstancesResult,
@@ -36,10 +42,8 @@ import type {
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
   private readonly _walletClient: WalletClient;
+  private readonly _chainId: number;
   private _modules: { [key: string]: Module } | undefined;
-  private _factory: Factory | undefined;
-  private _eligibilitiesChain: ChainModule | undefined;
-  private _togglesChain: ChainModule | undefined;
 
   /**
    * Initialize a HatsModulesClient.
@@ -47,15 +51,6 @@ export class HatsModulesClient {
    * @param publicClient - Viem Public Client.
    * @param walletClient - Viem Wallet Client.
    * @returns A HatsModulesClient instance.
-   *
-   * @throws MissingPublicClientError
-   * Thrown when a public client is not provided.
-   *
-   * @throws MissingWalletClientError
-   * Thrown when a wallet client is not provided.
-   *
-   * @throws ChainIdMismatchError
-   * Thrown when there is a chain ID mismatch between the Viem clients.
    */
   constructor({
     publicClient,
@@ -65,28 +60,36 @@ export class HatsModulesClient {
     walletClient: WalletClient;
   }) {
     if (publicClient === undefined) {
-      throw new MissingPublicClientError("Public client is required");
+      throw new MissingPublicClientError("Error: Public client is required");
     }
     if (walletClient === undefined) {
-      throw new MissingWalletClientError("Wallet client is required");
+      throw new MissingWalletClientError("Error: Wallet client is required");
     }
-    if (walletClient.chain?.id !== publicClient.chain?.id) {
+    if (walletClient.chain === undefined) {
+      throw new MissingWalletClientChainError(
+        "Error: Wallet client must be initialized with a chain"
+      );
+    }
+    if (publicClient.chain === undefined) {
+      throw new MissingPublicClientChainError(
+        "Error: Public client must be initialized with a chain"
+      );
+    }
+    if (walletClient.chain.id !== publicClient.chain.id) {
       throw new ChainIdMismatchError(
-        "Provided chain id should match the wallet client chain id"
+        "Error: Provided chain id should match the wallet client chain id"
       );
     }
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
+    this._chainId = walletClient.chain.id;
   }
 
   /**
    * Fetches the modules registry and prepares the client for usage.
    *
    * @param registry - Optional registry object. If provided, then these modules will be used instead of fetching from the registry.
-   *
-   * @throws ModulesRegistryFetchError
-   * Thrown in case there was an error while fetching from the modules registry.
    */
   async prepare(registry?: Registry) {
     let registryToUse: Registry;
@@ -95,12 +98,12 @@ export class HatsModulesClient {
     } else {
       try {
         const result = await axios.get(
-          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/main/modules.json"
+          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/v1/modules.json"
         );
         registryToUse = result.data;
       } catch (err) {
         throw new ModulesRegistryFetchError(
-          "Could not fetch modules from the registry"
+          "Error: Could not fetch modules from the registry"
         );
       }
     }
@@ -127,10 +130,6 @@ export class HatsModulesClient {
         }
       }
     }
-
-    this._factory = registryToUse.factory;
-    this._eligibilitiesChain = registryToUse.eligibilitiesChain;
-    this._togglesChain = registryToUse.togglesChain;
   }
 
   /**
@@ -142,21 +141,6 @@ export class HatsModulesClient {
    * @param immutableArgs - The module's immutable arguments.
    * @param mutableArgs - The module's mutable arguments.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the creation args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if one of the creation args array's length doens't match the module's schema.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createNewInstance({
     account,
@@ -171,22 +155,22 @@ export class HatsModulesClient {
     immutableArgs: unknown[];
     mutableArgs: unknown[];
   }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
-        `Module with id ${moduleId} does not exist`
+        `Error: Module with id ${moduleId} does not exist`
       );
     }
 
     // verify hat ID
     if (!verify(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
+      throw new InvalidParamError(`Error: Invalid hat ID parameter`);
     }
 
     const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
@@ -197,8 +181,8 @@ export class HatsModulesClient {
 
     try {
       const hash = await this._walletClient.writeContract({
-        address: this._factory.implementationAddress as `0x${string}`,
-        abi: this._factory.abi,
+        address: HATS_MODULES_FACTORY_ADDRESS,
+        abi: HATS_MODULES_FACTORY_ABI,
         functionName: "createHatsModule",
         account,
         args: [
@@ -227,7 +211,7 @@ export class HatsModulesClient {
       };
     } catch (err) {
       console.log(err);
-      throw new TransactionRevertedError("Transaction reverted");
+      throw new TransactionRevertedError("Error: Transaction reverted");
     }
   }
 
@@ -240,21 +224,6 @@ export class HatsModulesClient {
    * @param immutableArgsArray - Each module's immutable arguments.
    * @param mutableArgsArray - Each module's mutable arguments.
    * @returns An object containing the status of the call, the transaction hash and the new module instances addresses.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if one of the provided 'hatId' parameters or one of the creation args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if one of the creation args array's length doens't match the module's schema.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async batchCreateNewInstances({
     account,
@@ -269,27 +238,27 @@ export class HatsModulesClient {
     immutableArgsArray: unknown[][];
     mutableArgsArray: unknown[][];
   }): Promise<BatchCreateInstancesResult> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
     const implementations: Array<string> = [];
-    const encodedImmutableArgsArray: Array<`0x${string}` | ""> = [];
-    const encodedMutableArgsArray: Array<`0x${string}` | ""> = [];
+    const encodedImmutableArgsArray: Array<`0x${string}`> = [];
+    const encodedMutableArgsArray: Array<`0x${string}`> = [];
 
     for (let i = 0; i < moduleIds.length; i++) {
       const module = this.getModuleById(moduleIds[i]);
       if (module === undefined) {
         throw new ModuleNotAvailableError(
-          `Module with id ${moduleIds[i]} does not exist`
+          `Error: Module with id ${moduleIds[i]} does not exist`
         );
       }
 
       // verify hat ID
       if (!verify(hatIds[i], "uint256")) {
-        throw new InvalidParamError(`Invalid hat ID parameter`);
+        throw new InvalidParamError(`Error: Invalid hat ID parameter`);
       }
 
       const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
@@ -306,8 +275,8 @@ export class HatsModulesClient {
     let receipt: TransactionReceipt;
     try {
       const hash = await this._walletClient.writeContract({
-        address: this._factory.implementationAddress as `0x${string}`,
-        abi: this._factory.abi,
+        address: HATS_MODULES_FACTORY_ADDRESS as `0x${string}`,
+        abi: HATS_MODULES_FACTORY_ABI,
         functionName: "batchCreateHatsModule",
         account,
         args: [
@@ -324,7 +293,7 @@ export class HatsModulesClient {
       });
     } catch (err) {
       console.log(err);
-      throw new TransactionRevertedError("Transaction reverted");
+      throw new TransactionRevertedError("Error: Transaction reverted");
     }
 
     const instances = getNewInstancesFromReceipt(receipt);
@@ -345,12 +314,6 @@ export class HatsModulesClient {
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createEligibilitiesChain({
     account,
@@ -365,13 +328,9 @@ export class HatsModulesClient {
     clausesLengths: number[];
     modules: `0x${string}`[];
   }): Promise<CreateInstanceResult> {
-    if (
-      this._modules === undefined ||
-      this._factory === undefined ||
-      this._eligibilitiesChain === undefined
-    ) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -386,7 +345,7 @@ export class HatsModulesClient {
       immutableArgs.push(modules[i]);
     }
 
-    const mutableArgsEncoded = "";
+    const mutableArgsEncoded = "0x";
     const immutableArgsEncoded = encodePacked(
       immutableArgsTypes,
       immutableArgs
@@ -394,12 +353,12 @@ export class HatsModulesClient {
 
     try {
       const hash = await this._walletClient.writeContract({
-        address: this._factory.implementationAddress as `0x${string}`,
-        abi: this._factory.abi,
+        address: HATS_MODULES_FACTORY_ADDRESS,
+        abi: HATS_MODULES_FACTORY_ABI,
         functionName: "createHatsModule",
         account,
         args: [
-          this._eligibilitiesChain.implementationAddress,
+          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId],
           hatId,
           immutableArgsEncoded,
           mutableArgsEncoded,
@@ -415,7 +374,7 @@ export class HatsModulesClient {
       for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
         try {
           const event: any = decodeEventLog({
-            abi: this._factory.abi,
+            abi: HATS_MODULES_FACTORY_ABI,
             eventName: "HatsModuleFactory_ModuleDeployed",
             data: receipt.logs[eventIndex].data,
             topics: receipt.logs[eventIndex].topics,
@@ -435,7 +394,7 @@ export class HatsModulesClient {
       };
     } catch (err) {
       console.log(err);
-      throw new TransactionRevertedError("Transaction reverted");
+      throw new TransactionRevertedError("Error: Transaction reverted");
     }
   }
 
@@ -448,12 +407,6 @@ export class HatsModulesClient {
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws TransactionRevertedError
-   * Thrown if the transaction reverted.
    */
   async createTogglesChain({
     account,
@@ -468,13 +421,9 @@ export class HatsModulesClient {
     clausesLengths: number[];
     modules: `0x${string}`[];
   }): Promise<CreateInstanceResult> {
-    if (
-      this._modules === undefined ||
-      this._factory === undefined ||
-      this._togglesChain === undefined
-    ) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -489,7 +438,7 @@ export class HatsModulesClient {
       immutableArgs.push(modules[i]);
     }
 
-    const mutableArgsEncoded = "";
+    const mutableArgsEncoded = "0x";
     const immutableArgsEncoded = encodePacked(
       immutableArgsTypes,
       immutableArgs
@@ -497,12 +446,12 @@ export class HatsModulesClient {
 
     try {
       const hash = await this._walletClient.writeContract({
-        address: this._factory.implementationAddress as `0x${string}`,
-        abi: this._factory.abi,
+        address: HATS_MODULES_FACTORY_ADDRESS,
+        abi: HATS_MODULES_FACTORY_ABI,
         functionName: "createHatsModule",
         account,
         args: [
-          this._togglesChain.implementationAddress,
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId],
           hatId,
           immutableArgsEncoded,
           mutableArgsEncoded,
@@ -518,7 +467,7 @@ export class HatsModulesClient {
       for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
         try {
           const event: any = decodeEventLog({
-            abi: this._factory.abi,
+            abi: HATS_MODULES_FACTORY_ABI,
             eventName: "HatsModuleFactory_ModuleDeployed",
             data: receipt.logs[eventIndex].data,
             topics: receipt.logs[eventIndex].topics,
@@ -538,7 +487,7 @@ export class HatsModulesClient {
       };
     } catch (err) {
       console.log(err);
-      throw new TransactionRevertedError("Transaction reverted");
+      throw new TransactionRevertedError("Error: Transaction reverted");
     }
   }
 
@@ -549,18 +498,6 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
    * @returns The module's predicted address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if immutable args array's length doens't match the module's schema.
    */
   async predictHatsModuleAddress({
     moduleId,
@@ -571,9 +508,9 @@ export class HatsModulesClient {
     hatId: bigint;
     immutableArgs: unknown[];
   }): Promise<Address> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -597,11 +534,11 @@ export class HatsModulesClient {
     const immutableArgsEncoded =
       immutableArgs.length > 0
         ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "";
+        : "0x";
 
     const predictedAddress: Address = (await this._publicClient.readContract({
-      address: this._factory.implementationAddress as Address,
-      abi: this._factory.abi,
+      address: HATS_MODULES_FACTORY_ADDRESS,
+      abi: HATS_MODULES_FACTORY_ABI,
       functionName: "getHatsModuleAddress",
       args: [
         module.implementationAddress as Address,
@@ -620,18 +557,6 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
    * @returns The module's predicted address.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleNotAvailableError
-   * Thrown if there is no module that matches the provided module ID.
-   *
-   * @throws InvalidParamError
-   * Thrown if the provided 'hatId' parameter or one of the immutable args is invalid.
-   *
-   * @throws ParametersLengthsMismatchError
-   * Thrown if immutable args array's length doens't match the module's schema.
    */
   async isModuleDeployed({
     moduleId,
@@ -642,16 +567,16 @@ export class HatsModulesClient {
     hatId: bigint;
     immutableArgs: unknown[];
   }): Promise<boolean> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
-        `Module with id ${moduleId} does not exist`
+        `Error: Module with id ${moduleId} does not exist`
       );
     }
 
@@ -668,11 +593,11 @@ export class HatsModulesClient {
     const immutableArgsEncoded =
       immutableArgs.length > 0
         ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "";
+        : "0x";
 
     const deployed: boolean = (await this._publicClient.readContract({
-      address: this._factory.implementationAddress as Address,
-      abi: this._factory.abi,
+      address: HATS_MODULES_FACTORY_ADDRESS,
+      abi: HATS_MODULES_FACTORY_ABI,
       functionName: "deployed",
       args: [
         module.implementationAddress as Address,
@@ -691,19 +616,13 @@ export class HatsModulesClient {
    * @param instance - The module instace address.
    * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
    * the given address is not an instance of a registry module, then returns 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   *
-   * @throws ModuleParameterError
-   * Thrown if failed reading a module's parameter.
    */
   async getInstanceParameters(
     instance: Address
   ): Promise<ModuleParameter[] | undefined> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -746,7 +665,7 @@ export class HatsModulesClient {
             });
           } catch (err) {
             throw new ModuleParameterError(
-              `Failed reading function ${param.functionName} from the module instance`
+              `Error: Failed reading function ${param.functionName} from the module instance`
             );
           }
 
@@ -774,14 +693,11 @@ export class HatsModulesClient {
    *
    * @param moduleId - The module ID.
    * @returns The module matching the provided ID.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getModuleById(moduleId: string): Module | undefined {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -793,14 +709,11 @@ export class HatsModulesClient {
    *
    * @param address - The implementation address.
    * @returns The module matching the provided implementation address. If no matching, returns 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   getModuleByImplementation(address: Address): Module | undefined {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -817,14 +730,11 @@ export class HatsModulesClient {
    * @param address - Instance address.
    * @returns The module matching the provided instance address. If the given address is not an insance of a registry module, then returns
    * 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   async getModuleByInstance(address: Address): Promise<Module | undefined> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -848,16 +758,13 @@ export class HatsModulesClient {
    * @param addresses - Module Instances addresses.
    * @returns The modules matching the provided instances addresses. For every address that is not an instance of a registry module, the corresponding
    * return value in the array will be 'undefined'.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
   async getModulesByInstances(
     addresses: Address[]
   ): Promise<(Module | undefined)[]> {
-    if (this._modules === undefined || this._factory === undefined) {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
@@ -898,178 +805,39 @@ export class HatsModulesClient {
    * Get all the available modules.
    *
    * @returns An object which keys are module IDs and the values are the corresponding modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
    */
-  getAllModules(): { [id: string]: Module } {
-    if (this._modules === undefined || this._factory === undefined) {
+  getModules(filter?: (module: Module) => boolean): { [id: string]: Module } {
+    if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    if (filter !== undefined) {
+      return Object.fromEntries(
+        Object.entries(this._modules).filter(([, module]) => {
+          return filter(module);
+        })
       );
     }
 
     return this._modules;
   }
 
-  /**
-   * Get all the available active modules (not deprecated).
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding active modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getAllActiveModules(): { [id: string]: Module } {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    return Object.fromEntries(
-      Object.entries(this._modules).filter(
-        ([, module]) => module.deprecated !== true
-      )
-    );
-  }
-
-  /**
-   * Get all the available eligibility modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding eligibility modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getAllEligibilityModules(): { [id: string]: Module } {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.eligibility) {
-        res[id] = module;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Get all the available toggle modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding toggle modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getAllToggleModules(): { [id: string]: Module } {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.toggle) {
-        res[id] = module;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Get all the available hatter modules.
-   *
-   * @returns An object which keys are module IDs and the values are the corresponding hatter modules.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getAllHatterModules(): { [id: string]: Module } {
-    if (this._modules === undefined || this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const res: { [id: string]: Module } = {};
-    for (const id of Object.keys(this._modules)) {
-      const module = this._modules[id];
-      if (module.type.hatter) {
-        res[id] = module;
-      }
-    }
-
-    return res;
-  }
-
-  /**
-   * Get eligibilities chain module.
-   *
-   * @returns the eligibilities chain module.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getElibilitiesChainModule(): ChainModule {
-    if (this._eligibilitiesChain === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    return this._eligibilitiesChain;
-  }
-
-  /**
-   * Get toggles chain module.
-   *
-   * @returns the toggles chain module.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getTogglesChainModule(): ChainModule {
-    if (this._togglesChain === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    return this._togglesChain;
-  }
-
-  /**
-   * Get the Hats Module Factory from the registry.
-   *
-   * @returns the factory.
-   *
-   * @throws ClientNotPreparedError
-   * Thrown if the "prepare" function has not been called yet.
-   */
-  getFactory(): Factory {
-    if (this._factory === undefined) {
-      throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    return this._factory;
-  }
-
   /*//////////////////////////////////////////////////////////////
                     Module Write Functions
   //////////////////////////////////////////////////////////////*/
 
+  /**
+   * Call a module's instance write function.
+   *
+   * @param account - A Viem account.
+   * @param moduleId - Module's ID.
+   * @param instance - Module instance.
+   * @param func - Function to call.
+   * @param args - Function's input arguments.
+   * @returns An object containing the status of the call and the transaction hash.
+   */
   async callInstanceWriteFunction({
     account,
     moduleId,
@@ -1085,14 +853,14 @@ export class HatsModulesClient {
   }): Promise<CallInstanceWriteFunctionResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
-        `Module with id ${moduleId} does not exist`
+        `Error: Module with id ${moduleId} does not exist`
       );
     }
 

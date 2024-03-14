@@ -27,8 +27,8 @@ export const checkAndEncodeArgs = ({
   immutableArgs: unknown[];
   mutableArgs: unknown[];
 }): {
-  encodedImmutableArgs: "" | `0x${string}`;
-  encodedMutableArgs: "" | `0x${string}`;
+  encodedImmutableArgs: `0x${string}`;
+  encodedMutableArgs: `0x${string}`;
 } => {
   checkImmutableArgs({ module, immutableArgs });
   checkMutableArgs({ module, mutableArgs });
@@ -43,11 +43,11 @@ export const checkAndEncodeArgs = ({
   const encodedMutableArgs =
     mutableArgs.length > 0
       ? encodeAbiParameters(mutableArgsTypes, mutableArgs)
-      : "";
+      : "0x";
   const encodedImmutableArgs =
     immutableArgs.length > 0
       ? encodePacked(immutableArgsTypes, immutableArgs)
-      : "";
+      : "0x";
 
   return { encodedImmutableArgs, encodedMutableArgs };
 };

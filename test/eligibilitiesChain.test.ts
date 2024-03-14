@@ -1,6 +1,10 @@
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import {
+  HatsModulesClient,
+  solidityToTypescriptType,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+} from "../src/index";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { goerli } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
@@ -13,7 +17,6 @@ import type {
 import type { Anvil } from "@viem/anvil";
 import type { Module, Registry } from "../src/types";
 import "dotenv/config";
-import { Abi } from "abitype";
 
 describe("Batch Create Client Tests", () => {
   let publicClient: PublicClient;
@@ -28,14 +31,12 @@ describe("Batch Create Client Tests", () => {
   let erc721Instance: `0x${string}`;
   let erc1155Instance: `0x${string}`;
 
-  let eligibilitesChainAbi: Abi;
-
   let immutableArgs: unknown[][];
   let mutableArgs: unknown[][];
 
   beforeAll(async () => {
     anvil = createAnvil({
-      forkUrl: process.env.GOERLI_RPC,
+      forkUrl: process.env.SEPOLIA_RPC,
       startTimeout: 20000,
     });
     await anvil.start();
@@ -46,11 +47,11 @@ describe("Batch Create Client Tests", () => {
 
     // init Viem clients
     publicClient = createPublicClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
     walletClient = createWalletClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
 
@@ -169,10 +170,6 @@ describe("Batch Create Client Tests", () => {
     erc20Instance = res.newInstances[2];
     erc721Instance = res.newInstances[3];
     erc1155Instance = res.newInstances[4];
-
-    const eligibilitesChainModule =
-      hatsModulesClient.getElibilitiesChainModule();
-    eligibilitesChainAbi = eligibilitesChainModule.abi;
   }, 35000);
 
   afterAll(async () => {
@@ -198,23 +195,20 @@ describe("Batch Create Client Tests", () => {
 
     const numClausesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "NUM_CONJUNCTION_CLAUSES",
-      args: [],
     });
 
     const clauseLengthsResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-      args: [],
     });
 
     const modulesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "MODULES",
-      args: [],
     });
 
     expect(numClausesResult).toBe(2n);
@@ -247,23 +241,20 @@ describe("Batch Create Client Tests", () => {
 
     const numClausesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "NUM_CONJUNCTION_CLAUSES",
-      args: [],
     });
 
     const clauseLengthsResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-      args: [],
     });
 
     const modulesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "MODULES",
-      args: [],
     });
 
     expect(numClausesResult).toBe(1n);
@@ -296,23 +287,20 @@ describe("Batch Create Client Tests", () => {
 
     const numClausesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "NUM_CONJUNCTION_CLAUSES",
-      args: [],
     });
 
     const clauseLengthsResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-      args: [],
     });
 
     const modulesResult = await publicClient.readContract({
       address: res.newInstance as Address,
-      abi: eligibilitesChainAbi,
+      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
       functionName: "MODULES",
-      args: [],
     });
 
     expect(numClausesResult).toBe(5n);

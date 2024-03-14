@@ -17,7 +17,6 @@ export interface BatchCreateInstancesResult extends TransactionResult {
 
 export type Module = {
   name: string;
-  deprecated?: boolean;
   details: string[];
   links: {
     label: string;
@@ -33,6 +32,11 @@ export type Module = {
     toggle: boolean;
     hatter: boolean;
   };
+  tags: {
+    description: string;
+    label: string;
+    value: string;
+  }[];
   implementationAddress: string;
   deployments: {
     chainId: string;
@@ -68,36 +72,6 @@ export type WriteFunctionArg = {
   optional?: boolean;
 };
 
-export type Factory = {
-  name: string;
-  details: string;
-  links: {
-    label: string;
-    link: string;
-  }[];
-  implementationAddress: string;
-  deployments: {
-    chainId: string;
-    block: string;
-  }[];
-  abi: Abi;
-};
-
-export type ChainModule = {
-  name: string;
-  details: string;
-  links: {
-    label: string;
-    link: string;
-  }[];
-  implementationAddress: string;
-  deployments: {
-    chainId: string;
-    block: string;
-  }[];
-  abi: Abi;
-};
-
 export type ModuleParameter = {
   label: string;
   value: unknown;
@@ -106,9 +80,6 @@ export type ModuleParameter = {
 };
 
 export type Registry = {
-  factory: Factory;
-  eligibilitiesChain: ChainModule;
-  togglesChain: ChainModule;
   modules: Module[];
 };
 

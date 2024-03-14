@@ -21,6 +21,20 @@ export class MissingWalletClientError extends Error {
   }
 }
 
+export class MissingWalletClientChainError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingWalletClientChainError";
+  }
+}
+
+export class MissingPublicClientChainError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "MissingPublicClientChainError";
+  }
+}
+
 export class TransactionRevertedError extends Error {
   constructor(message: string) {
     super(message);
@@ -346,7 +360,7 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // Hat Elections Eligibility error
-      if (moduleId === "0x99081d45920818557203CCD62eD36dC2FaD9a43E") {
+      if (moduleId === "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E") {
         switch (errorName) {
           case "NotBallotBox": {
             throw new HatsElectionEligibility_NotBallotBoxError(

@@ -1,6 +1,6 @@
 import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
 import { createPublicClient, createWalletClient, http } from "viem";
-import { goerli } from "viem/chains";
+import { sepolia } from "viem/chains";
 import { createAnvil } from "@viem/anvil";
 import { privateKeyToAccount } from "viem/accounts";
 import * as fs from "fs";
@@ -28,7 +28,7 @@ describe("Client Tests With a Static Modules File", () => {
 
   beforeAll(async () => {
     anvil = createAnvil({
-      forkUrl: process.env.GOERLI_RPC,
+      forkUrl: process.env.SEPOLIA_RPC,
       startTimeout: 20000,
     });
     await anvil.start();
@@ -39,11 +39,11 @@ describe("Client Tests With a Static Modules File", () => {
 
     // init Viem clients
     publicClient = createPublicClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
     walletClient = createWalletClient({
-      chain: goerli,
+      chain: sepolia,
       transport: http("http://127.0.0.1:8545"),
     });
 
@@ -64,16 +64,62 @@ describe("Client Tests With a Static Modules File", () => {
   }, 30000);
 
   test("Test get all active module", () => {
-    const activeModules = hatsModulesClient.getAllActiveModules();
-    const allModules = hatsModulesClient.getAllModules();
+    const filter = (module: Module) => {
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "deprecated") {
+          return false;
+        }
+      }
+      return true;
+    };
+    const activeModules = hatsModulesClient.getModules(filter);
+    const allModules = hatsModulesClient.getModules();
 
     for (const [id, module] of Object.entries(allModules)) {
-      if (module.deprecated === true) {
+      let deprecated = false;
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "deprecated") {
+          deprecated = true;
+        }
+      }
+
+      if (deprecated) {
         expect(activeModules[id]).toBe(undefined);
       } else {
         expect(activeModules[id]).toStrictEqual(allModules[id]);
       }
     }
+  });
+
+  test("Test get only meta modules", () => {
+    const filter = (module: Module) => {
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "meta") {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    const metaModules = hatsModulesClient.getModules(filter);
+
+    let metaModulesCount = 0;
+    for (const [, module] of Object.entries(metaModules)) {
+      metaModulesCount += 1;
+      let isMeta = false;
+      for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
+        const tag = module.tags[tagIndex];
+        if (tag.value === "meta") {
+          isMeta = true;
+        }
+      }
+
+      expect(isMeta).toBe(true);
+    }
+    expect(metaModulesCount).toBe(2);
   });
 
   test("Test create new jokerace instance and get instace parameters", async () => {
