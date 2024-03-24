@@ -194,6 +194,12 @@ export const getNewInstancesFromReceipt = (
                 name: "initData",
                 type: "bytes",
               },
+              {
+                indexed: false,
+                internalType: "uint256",
+                name: "saltNonce",
+                type: "uint256",
+              },
             ],
             name: "HatsModuleFactory_ModuleDeployed",
             type: "event",

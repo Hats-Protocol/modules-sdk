@@ -21,6 +21,8 @@ describe("Eligibility Client Tests", () => {
 
   let instances: { implementation: Address; instance: Address }[];
 
+  const saltNonce = 123456789n;
+
   beforeAll(async () => {
     anvil = createAnvil({
       forkUrl: process.env.SEPOLIA_RPC,
@@ -120,6 +122,7 @@ describe("Eligibility Client Tests", () => {
         moduleId: id,
         hatId: hatId,
         immutableArgs: immutableArgs,
+        saltNonce,
       });
       expect(isDeployedPrev).toBe(false);
 
@@ -130,6 +133,7 @@ describe("Eligibility Client Tests", () => {
         hatId: hatId,
         immutableArgs: immutableArgs,
         mutableArgs: mutableArgs,
+        saltNonce,
       });
       instances.push({
         implementation: module.implementationAddress as Address,
@@ -151,6 +155,7 @@ describe("Eligibility Client Tests", () => {
           moduleId: id,
           hatId: hatId,
           immutableArgs: immutableArgs,
+          saltNonce,
         }
       );
       expect(predictedAddress).toBe(res.newInstance);
@@ -160,6 +165,7 @@ describe("Eligibility Client Tests", () => {
         moduleId: id,
         hatId: hatId,
         immutableArgs: immutableArgs,
+        saltNonce,
       });
       expect(isDeployedAfter).toBe(true);
     }

@@ -1,5 +1,5 @@
 export const HATS_MODULES_FACTORY_ADDRESS: `0x${string}` =
-  "0xfE661c01891172046feE16D3a57c3Cf456729efA";
+  "0x0a3f85fa597B6a967271286aA0724811acDF5CD9";
 
 export const HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS: {
   [chainId: number]: `0x${string}`;
@@ -209,6 +209,7 @@ export const HATS_MODULES_FACTORY_ABI = [
       { internalType: "address", name: "implementation", type: "address" },
       { internalType: "uint256", name: "hatId", type: "uint256" },
       { internalType: "bytes", name: "otherImmutableArgs", type: "bytes" },
+      { internalType: "uint256", name: "saltNonce", type: "uint256" },
     ],
     name: "HatsModuleFactory_ModuleAlreadyDeployed",
     type: "error",
@@ -246,6 +247,12 @@ export const HATS_MODULES_FACTORY_ABI = [
         name: "initData",
         type: "bytes",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "saltNonce",
+        type: "uint256",
+      },
     ],
     name: "HatsModuleFactory_ModuleDeployed",
     type: "event",
@@ -271,6 +278,7 @@ export const HATS_MODULES_FACTORY_ABI = [
         type: "bytes[]",
       },
       { internalType: "bytes[]", name: "_initDataArray", type: "bytes[]" },
+      { internalType: "uint256[]", name: "_saltNonces", type: "uint256[]" },
     ],
     name: "batchCreateHatsModule",
     outputs: [{ internalType: "bool", name: "success", type: "bool" }],
@@ -283,6 +291,7 @@ export const HATS_MODULES_FACTORY_ABI = [
       { internalType: "uint256", name: "_hatId", type: "uint256" },
       { internalType: "bytes", name: "_otherImmutableArgs", type: "bytes" },
       { internalType: "bytes", name: "_initData", type: "bytes" },
+      { internalType: "uint256", name: "_saltNonce", type: "uint256" },
     ],
     name: "createHatsModule",
     outputs: [{ internalType: "address", name: "_instance", type: "address" }],
@@ -294,6 +303,7 @@ export const HATS_MODULES_FACTORY_ABI = [
       { internalType: "address", name: "_implementation", type: "address" },
       { internalType: "uint256", name: "_hatId", type: "uint256" },
       { internalType: "bytes", name: "_otherImmutableArgs", type: "bytes" },
+      { internalType: "uint256", name: "_saltNonce", type: "uint256" },
     ],
     name: "deployed",
     outputs: [{ internalType: "bool", name: "", type: "bool" }],
@@ -305,6 +315,7 @@ export const HATS_MODULES_FACTORY_ABI = [
       { internalType: "address", name: "_implementation", type: "address" },
       { internalType: "uint256", name: "_hatId", type: "uint256" },
       { internalType: "bytes", name: "_otherImmutableArgs", type: "bytes" },
+      { internalType: "uint256", name: "_saltNonce", type: "uint256" },
     ],
     name: "getHatsModuleAddress",
     outputs: [{ internalType: "address", name: "", type: "address" }],

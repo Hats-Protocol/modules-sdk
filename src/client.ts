@@ -140,6 +140,7 @@ export class HatsModulesClient {
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
    * @param mutableArgs - The module's mutable arguments.
+   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
    */
   async createNewInstance({
@@ -148,12 +149,14 @@ export class HatsModulesClient {
     hatId,
     immutableArgs,
     mutableArgs,
+    saltNonce,
   }: {
     account: Account | Address;
     moduleId: string;
     hatId: bigint;
     immutableArgs: unknown[];
     mutableArgs: unknown[];
+    saltNonce?: bigint;
   }): Promise<CreateInstanceResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -179,6 +182,19 @@ export class HatsModulesClient {
       mutableArgs,
     });
 
+    let saltNonceToUse: bigint;
+    if (saltNonce !== undefined) {
+      // verify salt nonce
+      if (!verify(saltNonce, "uint256")) {
+        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+      }
+      saltNonceToUse = saltNonce;
+    } else {
+      saltNonceToUse = BigInt(
+        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+      );
+    }
+
     try {
       const hash = await this._walletClient.writeContract({
         address: HATS_MODULES_FACTORY_ADDRESS,
@@ -190,6 +206,7 @@ export class HatsModulesClient {
           hatId,
           encodedImmutableArgs,
           encodedMutableArgs,
+          saltNonceToUse,
         ],
         chain: this._walletClient.chain,
       });
@@ -223,6 +240,7 @@ export class HatsModulesClient {
    * @param hatIds - The hat IDs for which the modules are created.
    * @param immutableArgsArray - Each module's immutable arguments.
    * @param mutableArgsArray - Each module's mutable arguments.
+   * @param saltNonces - Optional salt nonces to use. If not provided, will be randomly generated.
    * @returns An object containing the status of the call, the transaction hash and the new module instances addresses.
    */
   async batchCreateNewInstances({
@@ -231,12 +249,14 @@ export class HatsModulesClient {
     hatIds,
     immutableArgsArray,
     mutableArgsArray,
+    saltNonces,
   }: {
     account: Account | Address;
     moduleIds: string[];
     hatIds: bigint[];
     immutableArgsArray: unknown[][];
     mutableArgsArray: unknown[][];
+    saltNonces?: bigint[];
   }): Promise<BatchCreateInstancesResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -247,6 +267,7 @@ export class HatsModulesClient {
     const implementations: Array<string> = [];
     const encodedImmutableArgsArray: Array<`0x${string}`> = [];
     const encodedMutableArgsArray: Array<`0x${string}`> = [];
+    const saltNoncesToUse: Array<bigint> = [];
 
     for (let i = 0; i < moduleIds.length; i++) {
       const module = this.getModuleById(moduleIds[i]);
@@ -259,6 +280,18 @@ export class HatsModulesClient {
       // verify hat ID
       if (!verify(hatIds[i], "uint256")) {
         throw new InvalidParamError(`Error: Invalid hat ID parameter`);
+      }
+
+      if (saltNonces !== undefined) {
+        // verify salt nonce
+        if (!verify(saltNonces[i], "uint256")) {
+          throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+        }
+        saltNoncesToUse.push(saltNonces[i]);
+      } else {
+        saltNoncesToUse.push(
+          BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER))
+        );
       }
 
       const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
@@ -284,6 +317,7 @@ export class HatsModulesClient {
           hatIds,
           encodedImmutableArgsArray,
           encodedMutableArgsArray,
+          saltNoncesToUse,
         ],
         chain: this._walletClient.chain,
       });
@@ -313,6 +347,7 @@ export class HatsModulesClient {
    * @param numClauses - Number of conjunction clauses.
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
+   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
    */
   async createEligibilitiesChain({
@@ -321,12 +356,14 @@ export class HatsModulesClient {
     numClauses,
     clausesLengths,
     modules,
+    saltNonce,
   }: {
     account: Account | Address;
     hatId: bigint;
     numClauses: number;
     clausesLengths: number[];
     modules: `0x${string}`[];
+    saltNonce?: bigint;
   }): Promise<CreateInstanceResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -351,6 +388,19 @@ export class HatsModulesClient {
       immutableArgs
     );
 
+    let saltNonceToUse: bigint;
+    if (saltNonce !== undefined) {
+      // verify salt nonce
+      if (!verify(saltNonce, "uint256")) {
+        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+      }
+      saltNonceToUse = saltNonce;
+    } else {
+      saltNonceToUse = BigInt(
+        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+      );
+    }
+
     try {
       const hash = await this._walletClient.writeContract({
         address: HATS_MODULES_FACTORY_ADDRESS,
@@ -362,6 +412,7 @@ export class HatsModulesClient {
           hatId,
           immutableArgsEncoded,
           mutableArgsEncoded,
+          saltNonceToUse,
         ],
         chain: this._walletClient.chain,
       });
@@ -406,6 +457,7 @@ export class HatsModulesClient {
    * @param numClauses - Number of conjunction clauses.
    * @param clausesLengths - Lengths of each clause.
    * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
+   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
    * @returns An object containing the status of the call, the transaction hash and the new module instance address.
    */
   async createTogglesChain({
@@ -414,12 +466,14 @@ export class HatsModulesClient {
     numClauses,
     clausesLengths,
     modules,
+    saltNonce,
   }: {
     account: Account | Address;
     hatId: bigint;
     numClauses: number;
     clausesLengths: number[];
     modules: `0x${string}`[];
+    saltNonce?: bigint;
   }): Promise<CreateInstanceResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -444,6 +498,19 @@ export class HatsModulesClient {
       immutableArgs
     );
 
+    let saltNonceToUse: bigint;
+    if (saltNonce !== undefined) {
+      // verify salt nonce
+      if (!verify(saltNonce, "uint256")) {
+        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+      }
+      saltNonceToUse = saltNonce;
+    } else {
+      saltNonceToUse = BigInt(
+        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+      );
+    }
+
     try {
       const hash = await this._walletClient.writeContract({
         address: HATS_MODULES_FACTORY_ADDRESS,
@@ -455,6 +522,7 @@ export class HatsModulesClient {
           hatId,
           immutableArgsEncoded,
           mutableArgsEncoded,
+          saltNonceToUse,
         ],
         chain: this._walletClient.chain,
       });
@@ -497,16 +565,19 @@ export class HatsModulesClient {
    * @param moduleId - The module ID.
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
+   * @param saltNonce - Salt nonce to use.
    * @returns The module's predicted address.
    */
   async predictHatsModuleAddress({
     moduleId,
     hatId,
     immutableArgs,
+    saltNonce,
   }: {
     moduleId: string;
     hatId: bigint;
     immutableArgs: unknown[];
+    saltNonce: bigint;
   }): Promise<Address> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -544,6 +615,7 @@ export class HatsModulesClient {
         module.implementationAddress as Address,
         hatId,
         immutableArgsEncoded,
+        saltNonce,
       ],
     })) as Address;
 
@@ -556,16 +628,19 @@ export class HatsModulesClient {
    * @param moduleId - The module ID.
    * @param hatId - The hat ID for which the module is created.
    * @param immutableArgs - The module's immutable arguments.
+   * @param saltNonce - Salt nonce to use.
    * @returns The module's predicted address.
    */
   async isModuleDeployed({
     moduleId,
     hatId,
     immutableArgs,
+    saltNonce,
   }: {
     moduleId: string;
     hatId: bigint;
     immutableArgs: unknown[];
+    saltNonce: bigint;
   }): Promise<boolean> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
@@ -603,6 +678,7 @@ export class HatsModulesClient {
         module.implementationAddress as Address,
         hatId,
         immutableArgsEncoded,
+        saltNonce,
       ],
     })) as boolean;
 
