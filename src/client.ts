@@ -878,8 +878,9 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get all the available modules.
+   * Get all available modules, optionally use a filter function.
    *
+   * @param filter Optional filter function
    * @returns An object which keys are module IDs and the values are the corresponding modules.
    */
   getModules(filter?: (module: Module) => boolean): { [id: string]: Module } {
