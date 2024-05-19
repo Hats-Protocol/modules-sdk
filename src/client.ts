@@ -20,6 +20,8 @@ import {
   HATS_MODULES_FACTORY_ADDRESS,
   HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+  HATS_TOGGLES_CHAIN_MODULE_ABI,
 } from "./constants";
 import axios from "axios";
 import {
@@ -37,6 +39,7 @@ import type {
   CallInstanceWriteFunctionResult,
   Registry,
   WriteFunction,
+  Ruleset,
 } from "./types";
 
 export class HatsModulesClient {
@@ -340,6 +343,211 @@ export class HatsModulesClient {
   }
 
   /**
+   * Predict a module's address.
+   *
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @param saltNonce - Salt nonce to use.
+   * @returns The module's predicted address.
+   */
+  async predictHatsModuleAddress({
+    moduleId,
+    hatId,
+    immutableArgs,
+    saltNonce,
+  }: {
+    moduleId: string;
+    hatId: bigint;
+    immutableArgs: unknown[];
+    saltNonce: bigint;
+  }): Promise<Address> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Module with id ${moduleId} does not exist`
+      );
+    }
+
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    checkImmutableArgs({ module, immutableArgs });
+
+    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
+      return arg.type;
+    });
+    const immutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodePacked(immutableArgsTypes, immutableArgs)
+        : "0x";
+
+    const predictedAddress: Address = (await this._publicClient.readContract({
+      address: HATS_MODULES_FACTORY_ADDRESS,
+      abi: HATS_MODULES_FACTORY_ABI,
+      functionName: "getHatsModuleAddress",
+      args: [
+        module.implementationAddress as Address,
+        hatId,
+        immutableArgsEncoded,
+        saltNonce,
+      ],
+    })) as Address;
+
+    return predictedAddress;
+  }
+
+  /**
+   * Check if a module is already deployed.
+   *
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @param saltNonce - Salt nonce to use.
+   * @returns The module's predicted address.
+   */
+  async isModuleDeployed({
+    moduleId,
+    hatId,
+    immutableArgs,
+    saltNonce,
+  }: {
+    moduleId: string;
+    hatId: bigint;
+    immutableArgs: unknown[];
+    saltNonce: bigint;
+  }): Promise<boolean> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(
+        `Error: Module with id ${moduleId} does not exist`
+      );
+    }
+
+    // verify hat ID
+    if (!verify(hatId, "uint256")) {
+      throw new InvalidParamError(`Invalid hat ID parameter`);
+    }
+
+    checkImmutableArgs({ module, immutableArgs });
+
+    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
+      return arg.type;
+    });
+    const immutableArgsEncoded =
+      immutableArgs.length > 0
+        ? encodePacked(immutableArgsTypes, immutableArgs)
+        : "0x";
+
+    const deployed: boolean = (await this._publicClient.readContract({
+      address: HATS_MODULES_FACTORY_ADDRESS,
+      abi: HATS_MODULES_FACTORY_ABI,
+      functionName: "deployed",
+      args: [
+        module.implementationAddress as Address,
+        hatId,
+        immutableArgsEncoded,
+        saltNonce,
+      ],
+    })) as boolean;
+
+    return deployed;
+  }
+
+  /**
+   * Get module instance's parameters.
+   * The parameters to fetch are listed in the module's registry object. If the given address is not a registry module, returns 'undefined'.
+   *
+   * @param instance - The module instace address.
+   * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
+   * the given address is not an instance of a registry module, then returns 'undefined'.
+   */
+  async getInstanceParameters(
+    instance: Address
+  ): Promise<ModuleParameter[] | undefined> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const moduleParameters: ModuleParameter[] = [];
+    const module = await this.getModuleByInstance(instance);
+
+    // check if instance is a registry module
+    if (module === undefined) {
+      return undefined;
+    }
+
+    for (
+      let paramIndex = 0;
+      paramIndex < module.parameters.length;
+      paramIndex++
+    ) {
+      const param = module.parameters[paramIndex];
+
+      for (
+        let abiItemIndex = 0;
+        abiItemIndex < module.abi.length;
+        abiItemIndex++
+      ) {
+        const abiItem = module.abi[abiItemIndex];
+
+        if (
+          abiItem.type === "function" &&
+          abiItem.name === param.functionName
+        ) {
+          if (abiItem.inputs.length > 0 || abiItem.outputs.length !== 1) {
+            break;
+          }
+
+          let parameterValue: unknown;
+          try {
+            parameterValue = await this._publicClient.readContract({
+              address: instance,
+              abi: module.abi,
+              functionName: param.functionName,
+            });
+          } catch (err) {
+            throw new ModuleParameterError(
+              `Error: Failed reading function ${param.functionName} from the module instance`
+            );
+          }
+
+          const solidityType = abiItem.outputs[0].type;
+
+          moduleParameters.push({
+            label: param.label,
+            value: parameterValue,
+            solidityType: solidityType,
+            displayType: param.displayType,
+          });
+        }
+      }
+    }
+
+    return moduleParameters;
+  }
+
+  /*//////////////////////////////////////////////////////////////
+                       Chain Modules
+  //////////////////////////////////////////////////////////////*/
+
+  /**
    * Create a new eligibilities chain module.
    *
    * @param account - A Viem account.
@@ -560,204 +768,263 @@ export class HatsModulesClient {
   }
 
   /**
-   * Predict a module's address.
+   * Check whether a module instance is an eligibilities chain.
    *
-   * @param moduleId - The module ID.
-   * @param hatId - The hat ID for which the module is created.
-   * @param immutableArgs - The module's immutable arguments.
-   * @param saltNonce - Salt nonce to use.
-   * @returns The module's predicted address.
+   * @param address - Instance address.
+   * @returns 'true' if the instance is an eligibilities chain, 'false' otherwise.
    */
-  async predictHatsModuleAddress({
-    moduleId,
-    hatId,
-    immutableArgs,
-    saltNonce,
-  }: {
-    moduleId: string;
-    hatId: bigint;
-    immutableArgs: unknown[];
-    saltNonce: bigint;
-  }): Promise<Address> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
+  async isEligibilitiesChain(address: Address): Promise<boolean> {
+    try {
+      const implementationAddress = await this._publicClient.readContract({
+        address: address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+
+      if (
+        implementationAddress.toLowerCase() ===
+        HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId]
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      // not a module
+      return false;
     }
-
-    const module = this.getModuleById(moduleId);
-    if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Module with id ${moduleId} does not exist`
-      );
-    }
-
-    // verify hat ID
-    if (!verify(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
-    }
-
-    checkImmutableArgs({ module, immutableArgs });
-
-    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
-      return arg.type;
-    });
-    const immutableArgsEncoded =
-      immutableArgs.length > 0
-        ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "0x";
-
-    const predictedAddress: Address = (await this._publicClient.readContract({
-      address: HATS_MODULES_FACTORY_ADDRESS,
-      abi: HATS_MODULES_FACTORY_ABI,
-      functionName: "getHatsModuleAddress",
-      args: [
-        module.implementationAddress as Address,
-        hatId,
-        immutableArgsEncoded,
-        saltNonce,
-      ],
-    })) as Address;
-
-    return predictedAddress;
   }
 
   /**
-   * Check if a module is already deployed.
+   * Check whether a module instance is a toggles chain.
    *
-   * @param moduleId - The module ID.
-   * @param hatId - The hat ID for which the module is created.
-   * @param immutableArgs - The module's immutable arguments.
-   * @param saltNonce - Salt nonce to use.
-   * @returns The module's predicted address.
+   * @param address - Instance address.
+   * @returns 'true' if the instance is a toggles chain, 'false' otherwise.
    */
-  async isModuleDeployed({
-    moduleId,
-    hatId,
-    immutableArgs,
-    saltNonce,
-  }: {
-    moduleId: string;
-    hatId: bigint;
-    immutableArgs: unknown[];
-    saltNonce: bigint;
-  }): Promise<boolean> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
+  async isTogglesChain(address: Address): Promise<boolean> {
+    try {
+      const implementationAddress = await this._publicClient.readContract({
+        address: address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+
+      if (
+        implementationAddress.toLowerCase() ===
+        HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      // not a module
+      return false;
     }
-
-    const module = this.getModuleById(moduleId);
-    if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Error: Module with id ${moduleId} does not exist`
-      );
-    }
-
-    // verify hat ID
-    if (!verify(hatId, "uint256")) {
-      throw new InvalidParamError(`Invalid hat ID parameter`);
-    }
-
-    checkImmutableArgs({ module, immutableArgs });
-
-    const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
-      return arg.type;
-    });
-    const immutableArgsEncoded =
-      immutableArgs.length > 0
-        ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "0x";
-
-    const deployed: boolean = (await this._publicClient.readContract({
-      address: HATS_MODULES_FACTORY_ADDRESS,
-      abi: HATS_MODULES_FACTORY_ABI,
-      functionName: "deployed",
-      args: [
-        module.implementationAddress as Address,
-        hatId,
-        immutableArgsEncoded,
-        saltNonce,
-      ],
-    })) as boolean;
-
-    return deployed;
   }
 
   /**
-   * Get module instance's parameters.
-   * The parameters to fetch are listed in the module's registry object. If the given address is not a registry module, returns 'undefined'.
+   * Get the rulesets of a chain eligibility module instance.
    *
-   * @param instance - The module instace address.
-   * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
-   * the given address is not an instance of a registry module, then returns 'undefined'.
+   * @param address - Instance address.
+   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
    */
-  async getInstanceParameters(
-    instance: Address
-  ): Promise<ModuleParameter[] | undefined> {
+  async getEligibilitiesChain(
+    address: Address
+  ): Promise<Ruleset[] | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
-    const moduleParameters: ModuleParameter[] = [];
-    const module = await this.getModuleByInstance(instance);
-
-    // check if instance is a registry module
-    if (module === undefined) {
+    // check if the address is an eligibilities chain
+    let isEligibilitiesChain = false;
+    try {
+      isEligibilitiesChain = await this.isEligibilitiesChain(address);
+    } catch (err) {
+      // not a chain
+      return undefined;
+    }
+    if (!isEligibilitiesChain) {
       return undefined;
     }
 
-    for (
-      let paramIndex = 0;
-      paramIndex < module.parameters.length;
-      paramIndex++
-    ) {
-      const param = module.parameters[paramIndex];
+    const calls = [
+      {
+        address: address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      },
+      {
+        address: address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      },
+      {
+        address: address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "MODULES",
+      },
+    ];
 
-      for (
-        let abiItemIndex = 0;
-        abiItemIndex < module.abi.length;
-        abiItemIndex++
+    try {
+      const results = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      if (
+        results[0].status === "failure" ||
+        results[1].status === "failure" ||
+        results[2].status === "failure"
       ) {
-        const abiItem = module.abi[abiItemIndex];
+        return undefined;
+      }
 
-        if (
-          abiItem.type === "function" &&
-          abiItem.name === param.functionName
+      const numRulesets = results[0].result as bigint;
+      const rulesetsLengths: bigint[] = results[1].result as bigint[];
+      const modulesAddresses: `0x${string}`[] = results[2]
+        .result as `0x${string}`[];
+
+      // get the module types
+      const moduleTypes = await this.getModulesByInstances(modulesAddresses);
+      if (
+        moduleTypes.includes(undefined) ||
+        modulesAddresses.length !== moduleTypes.length
+      ) {
+        return undefined;
+      }
+
+      const res: Ruleset[] = [];
+      let rulesetModulesOffset = 0;
+      for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
+        const rulesset: Ruleset = [];
+
+        for (
+          let rulesetModuleIndex = 0;
+          rulesetModuleIndex < rulesetsLengths[rulesetIndex];
+          rulesetModuleIndex++
         ) {
-          if (abiItem.inputs.length > 0 || abiItem.outputs.length !== 1) {
-            break;
-          }
+          const rulesetModuleAddress =
+            modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+          const rulesetModuleType =
+            moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
 
-          let parameterValue: unknown;
-          try {
-            parameterValue = await this._publicClient.readContract({
-              address: instance,
-              abi: module.abi,
-              functionName: param.functionName,
-            });
-          } catch (err) {
-            throw new ModuleParameterError(
-              `Error: Failed reading function ${param.functionName} from the module instance`
-            );
-          }
-
-          const solidityType = abiItem.outputs[0].type;
-
-          moduleParameters.push({
-            label: param.label,
-            value: parameterValue,
-            solidityType: solidityType,
-            displayType: param.displayType,
+          rulesset.push({
+            moduleType: rulesetModuleType as Module,
+            moduleAddress: rulesetModuleAddress,
           });
         }
+
+        res.push(rulesset);
+        rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
       }
+
+      return res;
+    } catch (err) {
+      undefined;
+    }
+  }
+
+  /**
+   * Get the rulesets of a chain toggles module instance.
+   *
+   * @param address - Instance address.
+   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
+   */
+  async getTogglesChain(address: Address): Promise<Ruleset[] | undefined> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
     }
 
-    return moduleParameters;
+    // check if the address is an toggles chain
+    let isTogglesChain = false;
+    try {
+      isTogglesChain = await this.isTogglesChain(address);
+    } catch (err) {
+      // not a chain
+      return undefined;
+    }
+    if (!isTogglesChain) {
+      return undefined;
+    }
+
+    const calls = [
+      {
+        address: address,
+        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      },
+      {
+        address: address,
+        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      },
+      {
+        address: HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId],
+        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
+        functionName: "MODULES",
+      },
+    ];
+
+    try {
+      const results = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      if (
+        results[0].status === "failure" ||
+        results[1].status === "failure" ||
+        results[2].status === "failure"
+      ) {
+        return undefined;
+      }
+
+      const numRulesets = results[0].result as bigint;
+      const rulesetsLengths: bigint[] = results[1].result as bigint[];
+      const modulesAddresses: `0x${string}`[] = results[2]
+        .result as `0x${string}`[];
+
+      // get the module types
+      const moduleTypes = await this.getModulesByInstances(modulesAddresses);
+      if (
+        moduleTypes.includes(undefined) ||
+        modulesAddresses.length !== moduleTypes.length
+      ) {
+        return undefined;
+      }
+
+      const res: Ruleset[] = [];
+      let rulesetModulesOffset = 0;
+      for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
+        const rulesset: Ruleset = [];
+
+        for (
+          let rulesetModuleIndex = 0;
+          rulesetModuleIndex < rulesetsLengths[rulesetIndex];
+          rulesetModuleIndex++
+        ) {
+          const rulesetModuleAddress =
+            modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+          const rulesetModuleType =
+            moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+
+          rulesset.push({
+            moduleType: rulesetModuleType as Module,
+            moduleAddress: rulesetModuleAddress,
+          });
+        }
+
+        res.push(rulesset);
+        rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
+      }
+
+      return res;
+    } catch (err) {
+      undefined;
+    }
   }
 
   /*//////////////////////////////////////////////////////////////

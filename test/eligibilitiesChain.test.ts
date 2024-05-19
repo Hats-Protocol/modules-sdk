@@ -31,6 +31,10 @@ describe("Batch Create Client Tests", () => {
   let erc721Instance: `0x${string}`;
   let erc1155Instance: `0x${string}`;
 
+  let chain1: `0x${string}`;
+  let chain2: `0x${string}`;
+  let chain3: `0x${string}`;
+
   let immutableArgs: unknown[][];
   let mutableArgs: unknown[][];
 
@@ -176,141 +180,237 @@ describe("Batch Create Client Tests", () => {
     await anvil.stop();
   }, 30000);
 
-  test("Test scenario 1", async () => {
-    const res = await hatsModulesClient.createEligibilitiesChain({
-      account: deployerAccount,
-      hatId: BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      numClauses: 2,
-      clausesLengths: [2, 3],
-      modules: [
+  describe("Chain creation tests", () => {
+    test("Test scenario 1", async () => {
+      const res = await hatsModulesClient.createEligibilitiesChain({
+        account: deployerAccount,
+        hatId: BigInt(
+          "0x0000000100000000000000000000000000000000000000000000000000000000"
+        ),
+        numClauses: 2,
+        clausesLengths: [2, 3],
+        modules: [
+          jokeraceInstance,
+          stakingInstance,
+          erc20Instance,
+          erc721Instance,
+          erc1155Instance,
+        ],
+      });
+
+      chain1 = res.newInstance;
+
+      const numClausesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      });
+
+      const clauseLengthsResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      });
+
+      const modulesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "MODULES",
+      });
+
+      expect(numClausesResult).toBe(2n);
+      expect(clauseLengthsResult).toStrictEqual([2n, 3n]);
+      expect(modulesResult).toStrictEqual([
         jokeraceInstance,
         stakingInstance,
         erc20Instance,
         erc721Instance,
         erc1155Instance,
-      ],
+      ]);
     });
 
-    const numClausesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "NUM_CONJUNCTION_CLAUSES",
+    test("Test scenario 2", async () => {
+      const res = await hatsModulesClient.createEligibilitiesChain({
+        account: deployerAccount,
+        hatId: BigInt(
+          "0x0000000100000000000000000000000000000000000000000000000000000000"
+        ),
+        numClauses: 1,
+        clausesLengths: [5],
+        modules: [
+          jokeraceInstance,
+          stakingInstance,
+          erc20Instance,
+          erc721Instance,
+          erc1155Instance,
+        ],
+      });
+
+      chain2 = res.newInstance;
+
+      const numClausesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      });
+
+      const clauseLengthsResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      });
+
+      const modulesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "MODULES",
+      });
+
+      expect(numClausesResult).toBe(1n);
+      expect(clauseLengthsResult).toStrictEqual([5n]);
+      expect(modulesResult).toStrictEqual([
+        jokeraceInstance,
+        stakingInstance,
+        erc20Instance,
+        erc721Instance,
+        erc1155Instance,
+      ]);
     });
 
-    const clauseLengthsResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-    });
+    test("Test scenario 3", async () => {
+      const res = await hatsModulesClient.createEligibilitiesChain({
+        account: deployerAccount,
+        hatId: BigInt(
+          "0x0000000100000000000000000000000000000000000000000000000000000000"
+        ),
+        numClauses: 5,
+        clausesLengths: [1, 1, 1, 1, 1],
+        modules: [
+          jokeraceInstance,
+          stakingInstance,
+          erc20Instance,
+          erc721Instance,
+          erc1155Instance,
+        ],
+      });
 
-    const modulesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "MODULES",
-    });
+      chain3 = res.newInstance;
 
-    expect(numClausesResult).toBe(2n);
-    expect(clauseLengthsResult).toStrictEqual([2n, 3n]);
-    expect(modulesResult).toStrictEqual([
-      jokeraceInstance,
-      stakingInstance,
-      erc20Instance,
-      erc721Instance,
-      erc1155Instance,
-    ]);
+      const numClausesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      });
+
+      const clauseLengthsResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      });
+
+      const modulesResult = await publicClient.readContract({
+        address: res.newInstance as Address,
+        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        functionName: "MODULES",
+      });
+
+      expect(numClausesResult).toBe(5n);
+      expect(clauseLengthsResult).toStrictEqual([1n, 1n, 1n, 1n, 1n]);
+      expect(modulesResult).toStrictEqual([
+        jokeraceInstance,
+        stakingInstance,
+        erc20Instance,
+        erc721Instance,
+        erc1155Instance,
+      ]);
+    });
   });
 
-  test("Test scenario 2", async () => {
-    const res = await hatsModulesClient.createEligibilitiesChain({
-      account: deployerAccount,
-      hatId: BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      numClauses: 1,
-      clausesLengths: [5],
-      modules: [
-        jokeraceInstance,
-        stakingInstance,
-        erc20Instance,
-        erc721Instance,
-        erc1155Instance,
-      ],
+  describe("Chain getter tests", () => {
+    test("Scenario 1", async () => {
+      const rulesets = await hatsModulesClient.getEligibilitiesChain(chain1);
+      expect(rulesets).toBeDefined();
+      if (rulesets !== undefined) {
+        expect(rulesets.length).toBe(2);
+
+        // check first ruleset
+        const ruleset1 = rulesets[0];
+        expect(ruleset1.length).toBe(2);
+        expect(ruleset1[0].moduleAddress).toBe(jokeraceInstance);
+        expect(ruleset1[0].moduleType.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].moduleAddress).toBe(stakingInstance);
+        expect(ruleset1[1].moduleType.name).toBe("Staking Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets[1];
+        expect(ruleset2.length).toBe(3);
+        expect(ruleset2[0].moduleAddress).toBe(erc20Instance);
+        expect(ruleset2[0].moduleType.name).toBe("ERC20 Eligibility");
+        expect(ruleset2[1].moduleAddress).toBe(erc721Instance);
+        expect(ruleset2[1].moduleType.name).toBe("ERC721 Eligibility");
+        expect(ruleset2[2].moduleAddress).toBe(erc1155Instance);
+        expect(ruleset2[2].moduleType.name).toBe("ERC1155 Eligibility");
+      }
     });
 
-    const numClausesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "NUM_CONJUNCTION_CLAUSES",
+    test("Scenario 2", async () => {
+      const rulesets = await hatsModulesClient.getEligibilitiesChain(chain2);
+      expect(rulesets).toBeDefined();
+      if (rulesets !== undefined) {
+        expect(rulesets.length).toBe(1);
+
+        // check first ruleset
+        const ruleset1 = rulesets[0];
+        expect(ruleset1.length).toBe(5);
+        expect(ruleset1[0].moduleAddress).toBe(jokeraceInstance);
+        expect(ruleset1[0].moduleType.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].moduleAddress).toBe(stakingInstance);
+        expect(ruleset1[1].moduleType.name).toBe("Staking Eligibility");
+        expect(ruleset1[2].moduleAddress).toBe(erc20Instance);
+        expect(ruleset1[2].moduleType.name).toBe("ERC20 Eligibility");
+        expect(ruleset1[3].moduleAddress).toBe(erc721Instance);
+        expect(ruleset1[3].moduleType.name).toBe("ERC721 Eligibility");
+        expect(ruleset1[4].moduleAddress).toBe(erc1155Instance);
+        expect(ruleset1[4].moduleType.name).toBe("ERC1155 Eligibility");
+      }
     });
 
-    const clauseLengthsResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+    test("Scenario 3", async () => {
+      const rulesets = await hatsModulesClient.getEligibilitiesChain(chain3);
+      expect(rulesets).toBeDefined();
+      if (rulesets !== undefined) {
+        expect(rulesets.length).toBe(5);
+
+        // check first ruleset
+        const ruleset1 = rulesets[0];
+        expect(ruleset1.length).toBe(1);
+        expect(ruleset1[0].moduleAddress).toBe(jokeraceInstance);
+        expect(ruleset1[0].moduleType.name).toBe("JokeRace Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets[1];
+        expect(ruleset2.length).toBe(1);
+        expect(ruleset2[0].moduleAddress).toBe(stakingInstance);
+        expect(ruleset2[0].moduleType.name).toBe("Staking Eligibility");
+
+        // check third ruleset
+        const ruleset3 = rulesets[2];
+        expect(ruleset3.length).toBe(1);
+        expect(ruleset3[0].moduleAddress).toBe(erc20Instance);
+        expect(ruleset3[0].moduleType.name).toBe("ERC20 Eligibility");
+
+        // check fourth ruleset
+        const ruleset4 = rulesets[3];
+        expect(ruleset4.length).toBe(1);
+        expect(ruleset4[0].moduleAddress).toBe(erc721Instance);
+        expect(ruleset4[0].moduleType.name).toBe("ERC721 Eligibility");
+
+        // check fifth ruleset
+        const ruleset5 = rulesets[4];
+        expect(ruleset5.length).toBe(1);
+        expect(ruleset5[0].moduleAddress).toBe(erc1155Instance);
+        expect(ruleset5[0].moduleType.name).toBe("ERC1155 Eligibility");
+      }
     });
-
-    const modulesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "MODULES",
-    });
-
-    expect(numClausesResult).toBe(1n);
-    expect(clauseLengthsResult).toStrictEqual([5n]);
-    expect(modulesResult).toStrictEqual([
-      jokeraceInstance,
-      stakingInstance,
-      erc20Instance,
-      erc721Instance,
-      erc1155Instance,
-    ]);
-  });
-
-  test("Test scenario 3", async () => {
-    const res = await hatsModulesClient.createEligibilitiesChain({
-      account: deployerAccount,
-      hatId: BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      numClauses: 5,
-      clausesLengths: [1, 1, 1, 1, 1],
-      modules: [
-        jokeraceInstance,
-        stakingInstance,
-        erc20Instance,
-        erc721Instance,
-        erc1155Instance,
-      ],
-    });
-
-    const numClausesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "NUM_CONJUNCTION_CLAUSES",
-    });
-
-    const clauseLengthsResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-    });
-
-    const modulesResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-      functionName: "MODULES",
-    });
-
-    expect(numClausesResult).toBe(5n);
-    expect(clauseLengthsResult).toStrictEqual([1n, 1n, 1n, 1n, 1n]);
-    expect(modulesResult).toStrictEqual([
-      jokeraceInstance,
-      stakingInstance,
-      erc20Instance,
-      erc721Instance,
-      erc1155Instance,
-    ]);
   });
 });

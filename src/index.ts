@@ -25,6 +25,7 @@ import type {
   Role,
   WriteFunction,
   WriteFunctionArg,
+  Ruleset,
 } from "./types";
 
 export {
@@ -54,4 +55,5 @@ export type {
   Role,
   WriteFunction,
   WriteFunctionArg,
+  Ruleset,
 };
