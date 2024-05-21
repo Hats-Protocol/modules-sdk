@@ -44,7 +44,7 @@ import type {
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
-  private readonly _walletClient: WalletClient;
+  private readonly _walletClient: WalletClient | undefined;
   private readonly _chainId: number;
   private _modules: { [key: string]: Module } | undefined;
 
@@ -60,33 +60,31 @@ export class HatsModulesClient {
     walletClient,
   }: {
     publicClient: PublicClient;
-    walletClient: WalletClient;
+    walletClient?: WalletClient;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Error: Public client is required");
-    }
-    if (walletClient === undefined) {
-      throw new MissingWalletClientError("Error: Wallet client is required");
-    }
-    if (walletClient.chain === undefined) {
-      throw new MissingWalletClientChainError(
-        "Error: Wallet client must be initialized with a chain"
-      );
     }
     if (publicClient.chain === undefined) {
       throw new MissingPublicClientChainError(
         "Error: Public client must be initialized with a chain"
       );
     }
-    if (walletClient.chain.id !== publicClient.chain.id) {
-      throw new ChainIdMismatchError(
-        "Error: Provided chain id should match the wallet client chain id"
-      );
+    if (walletClient !== undefined) {
+      if (walletClient.chain === undefined) {
+        throw new MissingWalletClientChainError(
+          "Error: Wallet client must be initialized with a chain"
+        );
+      } else if (walletClient.chain.id !== publicClient.chain.id) {
+        throw new ChainIdMismatchError(
+          "Error: Provided chain id should match the wallet client chain id"
+        );
+      }
     }
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
-    this._chainId = walletClient.chain.id;
+    this._chainId = publicClient.chain.id;
   }
 
   /**
@@ -164,6 +162,11 @@ export class HatsModulesClient {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
@@ -264,6 +267,11 @@ export class HatsModulesClient {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
@@ -573,9 +581,9 @@ export class HatsModulesClient {
     modules: `0x${string}`[];
     saltNonce?: bigint;
   }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
@@ -683,9 +691,9 @@ export class HatsModulesClient {
     modules: `0x${string}`[];
     saltNonce?: bigint;
   }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
@@ -1198,6 +1206,11 @@ export class HatsModulesClient {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
