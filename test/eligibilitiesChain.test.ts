@@ -529,4 +529,347 @@ describe("Batch Create Client Tests", () => {
       expect(rulesets).toBeUndefined();
     });
   });
+
+  describe("Test get chains batched", () => {
+    test("scenario 1", async () => {
+      const res = await hatsModulesClient.getChains([chain1, chain2, chain3]);
+
+      // check first chain
+      const rulesets1 = res[0];
+      expect(rulesets1).toBeDefined();
+      if (rulesets1 !== undefined) {
+        expect(rulesets1.length).toBe(2);
+
+        // check first ruleset
+        const ruleset1 = rulesets1[0];
+        expect(ruleset1.length).toBe(2);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets1[1];
+        expect(ruleset2.length).toBe(3);
+        expect(ruleset2[0].address).toBe(erc20Instance);
+        expect(ruleset2[0].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset2[1].address).toBe(erc721Instance);
+        expect(ruleset2[1].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset2[2].address).toBe(erc1155Instance);
+        expect(ruleset2[2].module.name).toBe("ERC1155 Eligibility");
+      }
+
+      // check second chain
+      const rulesets2 = res[1];
+      expect(rulesets2).toBeDefined();
+      if (rulesets2 !== undefined) {
+        expect(rulesets2.length).toBe(1);
+
+        // check first ruleset
+        const ruleset1 = rulesets2[0];
+        expect(ruleset1.length).toBe(5);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+        expect(ruleset1[2].address).toBe(erc20Instance);
+        expect(ruleset1[2].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset1[3].address).toBe(erc721Instance);
+        expect(ruleset1[3].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset1[4].address).toBe(erc1155Instance);
+        expect(ruleset1[4].module.name).toBe("ERC1155 Eligibility");
+      }
+
+      // check third cahin
+      const rulesets3 = res[2];
+      expect(rulesets3).toBeDefined();
+      if (rulesets3 !== undefined) {
+        expect(rulesets3.length).toBe(5);
+
+        // check first ruleset
+        const ruleset1 = rulesets3[0];
+        expect(ruleset1.length).toBe(1);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets3[1];
+        expect(ruleset2.length).toBe(1);
+        expect(ruleset2[0].address).toBe(stakingInstance);
+        expect(ruleset2[0].module.name).toBe("Staking Eligibility");
+
+        // check third ruleset
+        const ruleset3 = rulesets3[2];
+        expect(ruleset3.length).toBe(1);
+        expect(ruleset3[0].address).toBe(erc20Instance);
+        expect(ruleset3[0].module.name).toBe("ERC20 Eligibility");
+
+        // check fourth ruleset
+        const ruleset4 = rulesets3[3];
+        expect(ruleset4.length).toBe(1);
+        expect(ruleset4[0].address).toBe(erc721Instance);
+        expect(ruleset4[0].module.name).toBe("ERC721 Eligibility");
+
+        // check fifth ruleset
+        const ruleset5 = rulesets3[4];
+        expect(ruleset5.length).toBe(1);
+        expect(ruleset5[0].address).toBe(erc1155Instance);
+        expect(ruleset5[0].module.name).toBe("ERC1155 Eligibility");
+      }
+    });
+
+    test("scenario 2", async () => {
+      const res = await hatsModulesClient.getChains([
+        erc20Instance,
+        chain2,
+        chain3,
+      ]);
+
+      // check first chain
+      const rulesets1 = res[0];
+      expect(rulesets1).toBeUndefined();
+
+      // check second chain
+      const rulesets2 = res[1];
+      expect(rulesets2).toBeDefined();
+      if (rulesets2 !== undefined) {
+        expect(rulesets2.length).toBe(1);
+
+        // check first ruleset
+        const ruleset1 = rulesets2[0];
+        expect(ruleset1.length).toBe(5);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+        expect(ruleset1[2].address).toBe(erc20Instance);
+        expect(ruleset1[2].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset1[3].address).toBe(erc721Instance);
+        expect(ruleset1[3].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset1[4].address).toBe(erc1155Instance);
+        expect(ruleset1[4].module.name).toBe("ERC1155 Eligibility");
+      }
+
+      // check third cahin
+      const rulesets3 = res[2];
+      expect(rulesets3).toBeDefined();
+      if (rulesets3 !== undefined) {
+        expect(rulesets3.length).toBe(5);
+
+        // check first ruleset
+        const ruleset1 = rulesets3[0];
+        expect(ruleset1.length).toBe(1);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets3[1];
+        expect(ruleset2.length).toBe(1);
+        expect(ruleset2[0].address).toBe(stakingInstance);
+        expect(ruleset2[0].module.name).toBe("Staking Eligibility");
+
+        // check third ruleset
+        const ruleset3 = rulesets3[2];
+        expect(ruleset3.length).toBe(1);
+        expect(ruleset3[0].address).toBe(erc20Instance);
+        expect(ruleset3[0].module.name).toBe("ERC20 Eligibility");
+
+        // check fourth ruleset
+        const ruleset4 = rulesets3[3];
+        expect(ruleset4.length).toBe(1);
+        expect(ruleset4[0].address).toBe(erc721Instance);
+        expect(ruleset4[0].module.name).toBe("ERC721 Eligibility");
+
+        // check fifth ruleset
+        const ruleset5 = rulesets3[4];
+        expect(ruleset5.length).toBe(1);
+        expect(ruleset5[0].address).toBe(erc1155Instance);
+        expect(ruleset5[0].module.name).toBe("ERC1155 Eligibility");
+      }
+    });
+
+    test("scenario 3", async () => {
+      const res = await hatsModulesClient.getChains([erc20Instance]);
+
+      // check first chain
+      const rulesets1 = res[0];
+      expect(rulesets1).toBeUndefined();
+    });
+  });
+
+  describe("Is chains tests", () => {
+    test("Scenario 1", async () => {
+      const res = await hatsModulesClient.isChains([chain1]);
+      expect(res.length).toBe(1);
+      expect(res[0]).toBe(true);
+    });
+
+    test("Scenario 2", async () => {
+      const res = await hatsModulesClient.isChains([chain1, chain2]);
+      expect(res.length).toBe(2);
+      expect(res[0]).toBe(true);
+      expect(res[1]).toBe(true);
+    });
+
+    test("Scenario 3", async () => {
+      const res = await hatsModulesClient.isChains([erc20Instance, chain2]);
+      expect(res.length).toBe(2);
+      expect(res[0]).toBe(false);
+      expect(res[1]).toBe(true);
+    });
+
+    test("Scenario 4", async () => {
+      const res = await hatsModulesClient.isChains([]);
+      expect(res.length).toBe(0);
+    });
+  });
+
+  describe("get rulesets batched tests", () => {
+    test("Scenario 1", async () => {
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
+        chain1,
+        chain2,
+      ]);
+
+      expect(rulesetsArray.length).toBe(2);
+
+      const rulesets1 = rulesetsArray[0];
+      expect(rulesets1).toBeDefined();
+      if (rulesets1 !== undefined) {
+        expect(rulesets1.length).toBe(2);
+
+        // check first ruleset
+        const ruleset1 = rulesets1[0];
+        expect(ruleset1.length).toBe(2);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets1[1];
+        expect(ruleset2.length).toBe(3);
+        expect(ruleset2[0].address).toBe(erc20Instance);
+        expect(ruleset2[0].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset2[1].address).toBe(erc721Instance);
+        expect(ruleset2[1].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset2[2].address).toBe(erc1155Instance);
+        expect(ruleset2[2].module.name).toBe("ERC1155 Eligibility");
+      }
+
+      const rulesets2 = rulesetsArray[1];
+      expect(rulesets2).toBeDefined();
+      if (rulesets2 !== undefined) {
+        expect(rulesets2.length).toBe(1);
+
+        // check first ruleset
+        const ruleset1 = rulesets2[0];
+        expect(ruleset1.length).toBe(5);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+        expect(ruleset1[2].address).toBe(erc20Instance);
+        expect(ruleset1[2].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset1[3].address).toBe(erc721Instance);
+        expect(ruleset1[3].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset1[4].address).toBe(erc1155Instance);
+        expect(ruleset1[4].module.name).toBe("ERC1155 Eligibility");
+      }
+    });
+
+    test("Scenario 2", async () => {
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
+        chain1,
+        erc20Instance,
+      ]);
+
+      expect(rulesetsArray.length).toBe(2);
+
+      const rulesets1 = rulesetsArray[0];
+      expect(rulesets1).toBeDefined();
+      if (rulesets1 !== undefined) {
+        expect(rulesets1.length).toBe(2);
+
+        // check first ruleset
+        const ruleset1 = rulesets1[0];
+        expect(ruleset1.length).toBe(2);
+        expect(ruleset1[0].address).toBe(jokeraceInstance);
+        expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[1].address).toBe(stakingInstance);
+        expect(ruleset1[1].module.name).toBe("Staking Eligibility");
+
+        // check second ruleset
+        const ruleset2 = rulesets1[1];
+        expect(ruleset2.length).toBe(3);
+        expect(ruleset2[0].address).toBe(erc20Instance);
+        expect(ruleset2[0].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset2[1].address).toBe(erc721Instance);
+        expect(ruleset2[1].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset2[2].address).toBe(erc1155Instance);
+        expect(ruleset2[2].module.name).toBe("ERC1155 Eligibility");
+      }
+
+      const rulesets2 = rulesetsArray[1];
+      expect(rulesets2).toBeDefined();
+      if (rulesets2 !== undefined) {
+        expect(rulesets2.length).toBe(1);
+        const ruleset = rulesets2[0];
+        expect(ruleset.length).toBe(1);
+        expect(ruleset[0].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset[0].address).toBe(erc20Instance);
+      }
+    });
+
+    test("Scenario 3", async () => {
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
+        erc721Instance,
+        erc20Instance,
+      ]);
+
+      expect(rulesetsArray.length).toBe(2);
+
+      const rulesets1 = rulesetsArray[0];
+      expect(rulesets1).toBeDefined();
+      if (rulesets1 !== undefined) {
+        expect(rulesets1.length).toBe(1);
+        const ruleset = rulesets1[0];
+        expect(ruleset.length).toBe(1);
+        expect(ruleset[0].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset[0].address).toBe(erc721Instance);
+      }
+
+      const rulesets2 = rulesetsArray[1];
+      expect(rulesets2).toBeDefined();
+      if (rulesets2 !== undefined) {
+        expect(rulesets2.length).toBe(1);
+        const ruleset = rulesets2[0];
+        expect(ruleset.length).toBe(1);
+        expect(ruleset[0].module.name).toBe("ERC20 Eligibility");
+        expect(ruleset[0].address).toBe(erc20Instance);
+      }
+    });
+
+    test("Scenario 4", async () => {
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
+        erc721Instance,
+        deployerAccount.address,
+      ]);
+
+      expect(rulesetsArray.length).toBe(2);
+
+      const rulesets1 = rulesetsArray[0];
+      expect(rulesets1).toBeDefined();
+      if (rulesets1 !== undefined) {
+        expect(rulesets1.length).toBe(1);
+        const ruleset = rulesets1[0];
+        expect(ruleset.length).toBe(1);
+        expect(ruleset[0].module.name).toBe("ERC721 Eligibility");
+        expect(ruleset[0].address).toBe(erc721Instance);
+      }
+
+      const rulesets2 = rulesetsArray[1];
+      expect(rulesets2).toBeUndefined();
+    });
+  });
 });

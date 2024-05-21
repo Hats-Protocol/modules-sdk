@@ -20,8 +20,6 @@ import {
   HATS_MODULES_FACTORY_ADDRESS,
   HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
-  HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-  HATS_TOGGLES_CHAIN_MODULE_ABI,
   CHAIN_ABI,
 } from "./constants";
 import axios from "axios";
@@ -31,7 +29,7 @@ import {
   getNewInstancesFromReceipt,
   checkWriteFunctionArgs,
 } from "./utils";
-import type { Account, Address, TransactionReceipt } from "viem";
+import type { Abi, Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
   ModuleParameter,
@@ -791,6 +789,69 @@ export class HatsModulesClient {
     }
   }
 
+  async getRulesetsBatched(
+    addresses: Address[]
+  ): Promise<(Ruleset[] | undefined)[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    const res: (Ruleset[] | undefined)[] = new Array<Ruleset[] | undefined>(
+      addresses.length
+    );
+
+    const isChains = await this.isChains(addresses);
+
+    const chainAddressesAndPos: { pos: number; address: Address }[] = [];
+    const nonChainAddressesAndPos: { pos: number; address: Address }[] = [];
+    for (let i = 0; i < addresses.length; i++) {
+      if (isChains[i]) {
+        chainAddressesAndPos.push({ pos: i, address: addresses[i] });
+      } else {
+        nonChainAddressesAndPos.push({ pos: i, address: addresses[i] });
+      }
+    }
+
+    // handle chains
+    const chains = await this.getChains(
+      chainAddressesAndPos.map((elem) => elem.address)
+    );
+    for (
+      let chainIndex = 0;
+      chainIndex < chainAddressesAndPos.length;
+      chainIndex++
+    ) {
+      const rulesets = chains[chainIndex];
+      res[chainAddressesAndPos[chainIndex].pos] = rulesets;
+    }
+
+    // handle non chains
+    const modules = await this.getModulesByInstances(
+      nonChainAddressesAndPos.map((elem) => elem.address)
+    );
+    for (
+      let nonChainIndex = 0;
+      nonChainIndex < nonChainAddressesAndPos.length;
+      nonChainIndex++
+    ) {
+      const module = modules[nonChainIndex];
+      if (module === undefined) {
+        res[nonChainAddressesAndPos[nonChainIndex].pos] = undefined;
+      } else {
+        res[nonChainAddressesAndPos[nonChainIndex].pos] = [
+          [
+            {
+              module: module,
+              address: nonChainAddressesAndPos[nonChainIndex].address,
+            },
+          ],
+        ];
+      }
+    }
+
+    return res;
+  }
+
   /**
    * Check whether a module instance is a modules chain.
    *
@@ -818,6 +879,72 @@ export class HatsModulesClient {
     } catch (err) {
       // not a module
       return false;
+    }
+  }
+
+  /**
+   * Check whether a module instance is a modules chain.
+   *
+   * @param address - instance address.
+   * @returns 'true' if the instance is a chain, 'false' otherwise.
+   */
+  async isChains(addresses: Address[]): Promise<boolean[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    const calls: {
+      address: `0x${string}`;
+      abi: Abi;
+      functionName: string;
+      args?: readonly unknown[] | undefined;
+    }[] = [];
+
+    addresses.forEach((address) => {
+      calls.push({
+        address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+    });
+
+    try {
+      const res: boolean[] = [];
+
+      const multicallResults = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      for (
+        let addressIndex = 0;
+        addressIndex < addresses.length;
+        addressIndex++
+      ) {
+        if (multicallResults[addressIndex].status == "failure") {
+          // not a module
+          res.push(false);
+          continue;
+        } else {
+          const implementationAddress = multicallResults[addressIndex]
+            .result as `0x${string}`;
+          if (
+            implementationAddress.toLowerCase() ===
+              HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+            implementationAddress.toLowerCase() ===
+              HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+          ) {
+            res.push(true);
+            continue;
+          } else {
+            res.push(false);
+            continue;
+          }
+        }
+      }
+
+      return res;
+    } catch (err) {
+      throw new Error("Error: multicall failed");
     }
   }
 
@@ -907,6 +1034,122 @@ export class HatsModulesClient {
       return res;
     } catch (err) {
       undefined;
+    }
+  }
+
+  /**
+   * Get the rulesets of a chain eligibility module instance.
+   *
+   * @param address - Instance address.
+   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
+   */
+  async getChains(addresses: Address[]): Promise<(Ruleset[] | undefined)[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const calls: {
+      address: `0x${string}`;
+      abi: Abi;
+      functionName: string;
+      args?: readonly unknown[] | undefined;
+    }[] = [];
+
+    addresses.forEach((address) => {
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      });
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      });
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "MODULES",
+      });
+    });
+
+    try {
+      const res: (Ruleset[] | undefined)[] = [];
+
+      const multicallResults = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      for (
+        let addressIndex = 0;
+        addressIndex < addresses.length;
+        addressIndex++
+      ) {
+        const multicallPos = addressIndex * 3;
+
+        if (
+          multicallResults[multicallPos].status === "failure" ||
+          multicallResults[multicallPos + 1].status === "failure" ||
+          multicallResults[multicallPos + 2].status === "failure"
+        ) {
+          res.push(undefined);
+          continue;
+        }
+
+        const numRulesets = multicallResults[multicallPos].result as bigint;
+        const rulesetsLengths: bigint[] = multicallResults[multicallPos + 1]
+          .result as bigint[];
+        const modulesAddresses: `0x${string}`[] = multicallResults[
+          multicallPos + 2
+        ].result as `0x${string}`[];
+
+        // get the module types
+        const moduleTypes = await this.getModulesByInstances(modulesAddresses);
+        if (
+          moduleTypes.includes(undefined) ||
+          modulesAddresses.length !== moduleTypes.length
+        ) {
+          res.push(undefined);
+          continue;
+        }
+
+        const rulesets: Ruleset[] = [];
+        let rulesetModulesOffset = 0;
+        for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
+          const rulesset: Ruleset = [];
+
+          for (
+            let rulesetModuleIndex = 0;
+            rulesetModuleIndex < rulesetsLengths[rulesetIndex];
+            rulesetModuleIndex++
+          ) {
+            const rulesetModuleAddress =
+              modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+            const rulesetModuleType =
+              moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+
+            rulesset.push({
+              module: rulesetModuleType as Module,
+              address: rulesetModuleAddress,
+            });
+          }
+
+          rulesets.push(rulesset);
+          rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
+        }
+
+        res.push(rulesets);
+      }
+
+      return res;
+    } catch (err) {
+      throw new Error("Error: multicall failed");
     }
   }
 
