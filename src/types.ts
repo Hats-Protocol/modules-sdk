@@ -110,6 +110,6 @@ export type ModuleCreationArgs = {
 };
 
 export type Ruleset = {
-  moduleType: Module;
-  moduleAddress: `0x${string}`;
+  module: Module;
+  address: `0x${string}`;
 }[];

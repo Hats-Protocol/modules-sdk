@@ -22,6 +22,7 @@ import {
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
   HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
   HATS_TOGGLES_CHAIN_MODULE_ABI,
+  CHAIN_ABI,
 } from "./constants";
 import axios from "axios";
 import {
@@ -775,41 +776,28 @@ export class HatsModulesClient {
     }
   }
 
-  /**
-   * Check whether a module instance is an eligibilities chain.
-   *
-   * @param address - Instance address.
-   * @returns 'true' if the instance is an eligibilities chain, 'false' otherwise.
-   */
-  async isEligibilitiesChain(address: Address): Promise<boolean> {
-    try {
-      const implementationAddress = await this._publicClient.readContract({
-        address: address,
-        abi: HATS_MODULE_ABI,
-        functionName: "IMPLEMENTATION",
-      });
-
-      if (
-        implementationAddress.toLowerCase() ===
-        HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId]
-      ) {
-        return true;
+  async getRulesets(address: Address): Promise<Ruleset[] | undefined> {
+    const isChain = await this.isChain(address);
+    if (isChain) {
+      const rulesets = this.getChain(address);
+      return rulesets;
+    } else {
+      const module = await this.getModuleByInstance(address);
+      if (module === undefined) {
+        return module;
       } else {
-        return false;
+        return [[{ module: module, address: address }]];
       }
-    } catch (err) {
-      // not a module
-      return false;
     }
   }
 
   /**
-   * Check whether a module instance is a toggles chain.
+   * Check whether a module instance is a modules chain.
    *
-   * @param address - Instance address.
-   * @returns 'true' if the instance is a toggles chain, 'false' otherwise.
+   * @param address - instance address.
+   * @returns 'true' if the instance is a chain, 'false' otherwise.
    */
-  async isTogglesChain(address: Address): Promise<boolean> {
+  async isChain(address: Address): Promise<boolean> {
     try {
       const implementationAddress = await this._publicClient.readContract({
         address: address,
@@ -819,7 +807,9 @@ export class HatsModulesClient {
 
       if (
         implementationAddress.toLowerCase() ===
-        HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+        implementationAddress.toLowerCase() ===
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
       ) {
         return true;
       } else {
@@ -837,41 +827,27 @@ export class HatsModulesClient {
    * @param address - Instance address.
    * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
    */
-  async getEligibilitiesChain(
-    address: Address
-  ): Promise<Ruleset[] | undefined> {
+  async getChain(address: Address): Promise<Ruleset[] | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
-    // check if the address is an eligibilities chain
-    let isEligibilitiesChain = false;
-    try {
-      isEligibilitiesChain = await this.isEligibilitiesChain(address);
-    } catch (err) {
-      // not a chain
-      return undefined;
-    }
-    if (!isEligibilitiesChain) {
-      return undefined;
-    }
-
     const calls = [
       {
         address: address,
-        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        abi: CHAIN_ABI,
         functionName: "NUM_CONJUNCTION_CLAUSES",
       },
       {
         address: address,
-        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        abi: CHAIN_ABI,
         functionName: "CONJUNCTION_CLAUSE_LENGTHS",
       },
       {
         address: address,
-        abi: HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
+        abi: CHAIN_ABI,
         functionName: "MODULES",
       },
     ];
@@ -919,109 +895,8 @@ export class HatsModulesClient {
             moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
 
           rulesset.push({
-            moduleType: rulesetModuleType as Module,
-            moduleAddress: rulesetModuleAddress,
-          });
-        }
-
-        res.push(rulesset);
-        rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
-      }
-
-      return res;
-    } catch (err) {
-      undefined;
-    }
-  }
-
-  /**
-   * Get the rulesets of a chain toggles module instance.
-   *
-   * @param address - Instance address.
-   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
-   */
-  async getTogglesChain(address: Address): Promise<Ruleset[] | undefined> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    // check if the address is an toggles chain
-    let isTogglesChain = false;
-    try {
-      isTogglesChain = await this.isTogglesChain(address);
-    } catch (err) {
-      // not a chain
-      return undefined;
-    }
-    if (!isTogglesChain) {
-      return undefined;
-    }
-
-    const calls = [
-      {
-        address: address,
-        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
-        functionName: "NUM_CONJUNCTION_CLAUSES",
-      },
-      {
-        address: address,
-        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
-        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
-      },
-      {
-        address: HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId],
-        abi: HATS_TOGGLES_CHAIN_MODULE_ABI,
-        functionName: "MODULES",
-      },
-    ];
-
-    try {
-      const results = await this._publicClient.multicall({
-        contracts: calls,
-      });
-
-      if (
-        results[0].status === "failure" ||
-        results[1].status === "failure" ||
-        results[2].status === "failure"
-      ) {
-        return undefined;
-      }
-
-      const numRulesets = results[0].result as bigint;
-      const rulesetsLengths: bigint[] = results[1].result as bigint[];
-      const modulesAddresses: `0x${string}`[] = results[2]
-        .result as `0x${string}`[];
-
-      // get the module types
-      const moduleTypes = await this.getModulesByInstances(modulesAddresses);
-      if (
-        moduleTypes.includes(undefined) ||
-        modulesAddresses.length !== moduleTypes.length
-      ) {
-        return undefined;
-      }
-
-      const res: Ruleset[] = [];
-      let rulesetModulesOffset = 0;
-      for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
-        const rulesset: Ruleset = [];
-
-        for (
-          let rulesetModuleIndex = 0;
-          rulesetModuleIndex < rulesetsLengths[rulesetIndex];
-          rulesetModuleIndex++
-        ) {
-          const rulesetModuleAddress =
-            modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
-          const rulesetModuleType =
-            moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
-
-          rulesset.push({
-            moduleType: rulesetModuleType as Module,
-            moduleAddress: rulesetModuleAddress,
+            module: rulesetModuleType as Module,
+            address: rulesetModuleAddress,
           });
         }
 
