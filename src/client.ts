@@ -20,6 +20,7 @@ import {
   HATS_MODULES_FACTORY_ADDRESS,
   HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
+  CHAIN_ABI,
 } from "./constants";
 import axios from "axios";
 import {
@@ -28,7 +29,7 @@ import {
   getNewInstancesFromReceipt,
   checkWriteFunctionArgs,
 } from "./utils";
-import type { Account, Address, TransactionReceipt } from "viem";
+import type { Abi, Account, Address, TransactionReceipt } from "viem";
 import type {
   Module,
   ModuleParameter,
@@ -37,11 +38,12 @@ import type {
   CallInstanceWriteFunctionResult,
   Registry,
   WriteFunction,
+  Ruleset,
 } from "./types";
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
-  private readonly _walletClient: WalletClient;
+  private readonly _walletClient: WalletClient | undefined;
   private readonly _chainId: number;
   private _modules: { [key: string]: Module } | undefined;
 
@@ -57,33 +59,31 @@ export class HatsModulesClient {
     walletClient,
   }: {
     publicClient: PublicClient;
-    walletClient: WalletClient;
+    walletClient?: WalletClient;
   }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Error: Public client is required");
-    }
-    if (walletClient === undefined) {
-      throw new MissingWalletClientError("Error: Wallet client is required");
-    }
-    if (walletClient.chain === undefined) {
-      throw new MissingWalletClientChainError(
-        "Error: Wallet client must be initialized with a chain"
-      );
     }
     if (publicClient.chain === undefined) {
       throw new MissingPublicClientChainError(
         "Error: Public client must be initialized with a chain"
       );
     }
-    if (walletClient.chain.id !== publicClient.chain.id) {
-      throw new ChainIdMismatchError(
-        "Error: Provided chain id should match the wallet client chain id"
-      );
+    if (walletClient !== undefined) {
+      if (walletClient.chain === undefined) {
+        throw new MissingWalletClientChainError(
+          "Error: Wallet client must be initialized with a chain"
+        );
+      } else if (walletClient.chain.id !== publicClient.chain.id) {
+        throw new ChainIdMismatchError(
+          "Error: Provided chain id should match the wallet client chain id"
+        );
+      }
     }
 
     this._publicClient = publicClient;
     this._walletClient = walletClient;
-    this._chainId = walletClient.chain.id;
+    this._chainId = publicClient.chain.id;
   }
 
   /**
@@ -161,6 +161,11 @@ export class HatsModulesClient {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 
@@ -263,6 +268,11 @@ export class HatsModulesClient {
         "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
+      );
+    }
 
     const implementations: Array<string> = [];
     const encodedImmutableArgsArray: Array<`0x${string}`> = [];
@@ -337,226 +347,6 @@ export class HatsModulesClient {
       transactionHash: receipt.transactionHash,
       newInstances: instances,
     };
-  }
-
-  /**
-   * Create a new eligibilities chain module.
-   *
-   * @param account - A Viem account.
-   * @param hatId - The hat ID for which the module is created.
-   * @param numClauses - Number of conjunction clauses.
-   * @param clausesLengths - Lengths of each clause.
-   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
-   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
-   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   */
-  async createEligibilitiesChain({
-    account,
-    hatId,
-    numClauses,
-    clausesLengths,
-    modules,
-    saltNonce,
-  }: {
-    account: Account | Address;
-    hatId: bigint;
-    numClauses: number;
-    clausesLengths: number[];
-    modules: `0x${string}`[];
-    saltNonce?: bigint;
-  }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const numModules = clausesLengths.reduce(
-      (partialSum, len) => partialSum + len,
-      0
-    );
-    const immutableArgsTypes = ["uint256", "uint256[]"];
-    const immutableArgs: unknown[] = [numClauses, clausesLengths];
-    for (let i = 0; i < numModules; i++) {
-      immutableArgsTypes.push("address");
-      immutableArgs.push(modules[i]);
-    }
-
-    const mutableArgsEncoded = "0x";
-    const immutableArgsEncoded = encodePacked(
-      immutableArgsTypes,
-      immutableArgs
-    );
-
-    let saltNonceToUse: bigint;
-    if (saltNonce !== undefined) {
-      // verify salt nonce
-      if (!verify(saltNonce, "uint256")) {
-        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
-      }
-      saltNonceToUse = saltNonce;
-    } else {
-      saltNonceToUse = BigInt(
-        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-      );
-    }
-
-    try {
-      const hash = await this._walletClient.writeContract({
-        address: HATS_MODULES_FACTORY_ADDRESS,
-        abi: HATS_MODULES_FACTORY_ABI,
-        functionName: "createHatsModule",
-        account,
-        args: [
-          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId],
-          hatId,
-          immutableArgsEncoded,
-          mutableArgsEncoded,
-          saltNonceToUse,
-        ],
-        chain: this._walletClient.chain,
-      });
-
-      const receipt = await this._publicClient.waitForTransactionReceipt({
-        hash,
-      });
-
-      let instance: `0x${string}` = "0x";
-      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
-        try {
-          const event: any = decodeEventLog({
-            abi: HATS_MODULES_FACTORY_ABI,
-            eventName: "HatsModuleFactory_ModuleDeployed",
-            data: receipt.logs[eventIndex].data,
-            topics: receipt.logs[eventIndex].topics,
-          });
-
-          instance = event.args.instance;
-          break;
-        } catch (err) {
-          // continue
-        }
-      }
-
-      return {
-        status: receipt.status,
-        transactionHash: receipt.transactionHash,
-        newInstance: instance,
-      };
-    } catch (err) {
-      console.log(err);
-      throw new TransactionRevertedError("Error: Transaction reverted");
-    }
-  }
-
-  /**
-   * Create a new toggles chain module.
-   *
-   * @param account - A Viem account.
-   * @param hatId - The hat ID for which the module is created.
-   * @param numClauses - Number of conjunction clauses.
-   * @param clausesLengths - Lengths of each clause.
-   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
-   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
-   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
-   */
-  async createTogglesChain({
-    account,
-    hatId,
-    numClauses,
-    clausesLengths,
-    modules,
-    saltNonce,
-  }: {
-    account: Account | Address;
-    hatId: bigint;
-    numClauses: number;
-    clausesLengths: number[];
-    modules: `0x${string}`[];
-    saltNonce?: bigint;
-  }): Promise<CreateInstanceResult> {
-    if (this._modules === undefined) {
-      throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
-      );
-    }
-
-    const numModules = clausesLengths.reduce(
-      (partialSum, len) => partialSum + len,
-      0
-    );
-    const immutableArgsTypes = ["uint256", "uint256[]"];
-    const immutableArgs: unknown[] = [numClauses, clausesLengths];
-    for (let i = 0; i < numModules; i++) {
-      immutableArgsTypes.push("address");
-      immutableArgs.push(modules[i]);
-    }
-
-    const mutableArgsEncoded = "0x";
-    const immutableArgsEncoded = encodePacked(
-      immutableArgsTypes,
-      immutableArgs
-    );
-
-    let saltNonceToUse: bigint;
-    if (saltNonce !== undefined) {
-      // verify salt nonce
-      if (!verify(saltNonce, "uint256")) {
-        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
-      }
-      saltNonceToUse = saltNonce;
-    } else {
-      saltNonceToUse = BigInt(
-        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-      );
-    }
-
-    try {
-      const hash = await this._walletClient.writeContract({
-        address: HATS_MODULES_FACTORY_ADDRESS,
-        abi: HATS_MODULES_FACTORY_ABI,
-        functionName: "createHatsModule",
-        account,
-        args: [
-          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId],
-          hatId,
-          immutableArgsEncoded,
-          mutableArgsEncoded,
-          saltNonceToUse,
-        ],
-        chain: this._walletClient.chain,
-      });
-
-      const receipt = await this._publicClient.waitForTransactionReceipt({
-        hash,
-      });
-
-      let instance: `0x${string}` = "0x";
-      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
-        try {
-          const event: any = decodeEventLog({
-            abi: HATS_MODULES_FACTORY_ABI,
-            eventName: "HatsModuleFactory_ModuleDeployed",
-            data: receipt.logs[eventIndex].data,
-            topics: receipt.logs[eventIndex].topics,
-          });
-
-          instance = event.args.instance;
-          break;
-        } catch (err) {
-          // continue
-        }
-      }
-
-      return {
-        status: receipt.status,
-        transactionHash: receipt.transactionHash,
-        newInstance: instance,
-      };
-    } catch (err) {
-      console.log(err);
-      throw new TransactionRevertedError("Error: Transaction reverted");
-    }
   }
 
   /**
@@ -761,6 +551,623 @@ export class HatsModulesClient {
   }
 
   /*//////////////////////////////////////////////////////////////
+                       Chain Modules
+  //////////////////////////////////////////////////////////////*/
+
+  /**
+   * Create a new eligibilities chain module.
+   *
+   * @param account - A Viem account.
+   * @param hatId - The hat ID for which the module is created.
+   * @param numClauses - Number of conjunction clauses.
+   * @param clausesLengths - Lengths of each clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
+   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
+   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
+   */
+  async createEligibilitiesChain({
+    account,
+    hatId,
+    numClauses,
+    clausesLengths,
+    modules,
+    saltNonce,
+  }: {
+    account: Account | Address;
+    hatId: bigint;
+    numClauses: number;
+    clausesLengths: number[];
+    modules: `0x${string}`[];
+    saltNonce?: bigint;
+  }): Promise<CreateInstanceResult> {
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
+      );
+    }
+
+    const numModules = clausesLengths.reduce(
+      (partialSum, len) => partialSum + len,
+      0
+    );
+    const immutableArgsTypes = ["uint256", "uint256[]"];
+    const immutableArgs: unknown[] = [numClauses, clausesLengths];
+    for (let i = 0; i < numModules; i++) {
+      immutableArgsTypes.push("address");
+      immutableArgs.push(modules[i]);
+    }
+
+    const mutableArgsEncoded = "0x";
+    const immutableArgsEncoded = encodePacked(
+      immutableArgsTypes,
+      immutableArgs
+    );
+
+    let saltNonceToUse: bigint;
+    if (saltNonce !== undefined) {
+      // verify salt nonce
+      if (!verify(saltNonce, "uint256")) {
+        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+      }
+      saltNonceToUse = saltNonce;
+    } else {
+      saltNonceToUse = BigInt(
+        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+      );
+    }
+
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: HATS_MODULES_FACTORY_ADDRESS,
+        abi: HATS_MODULES_FACTORY_ABI,
+        functionName: "createHatsModule",
+        account,
+        args: [
+          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId],
+          hatId,
+          immutableArgsEncoded,
+          mutableArgsEncoded,
+          saltNonceToUse,
+        ],
+        chain: this._walletClient.chain,
+      });
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      let instance: `0x${string}` = "0x";
+      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+        try {
+          const event: any = decodeEventLog({
+            abi: HATS_MODULES_FACTORY_ABI,
+            eventName: "HatsModuleFactory_ModuleDeployed",
+            data: receipt.logs[eventIndex].data,
+            topics: receipt.logs[eventIndex].topics,
+          });
+
+          instance = event.args.instance;
+          break;
+        } catch (err) {
+          // continue
+        }
+      }
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+        newInstance: instance,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Error: Transaction reverted");
+    }
+  }
+
+  /**
+   * Create a new toggles chain module.
+   *
+   * @param account - A Viem account.
+   * @param hatId - The hat ID for which the module is created.
+   * @param numClauses - Number of conjunction clauses.
+   * @param clausesLengths - Lengths of each clause.
+   * @param modules - Array of module instances to chain, at the order corresponding to the provided clauses.
+   * @param saltNonce - Optional salt nonce to use. If not provided, will be randomly generated.
+   * @returns An object containing the status of the call, the transaction hash and the new module instance address.
+   */
+  async createTogglesChain({
+    account,
+    hatId,
+    numClauses,
+    clausesLengths,
+    modules,
+    saltNonce,
+  }: {
+    account: Account | Address;
+    hatId: bigint;
+    numClauses: number;
+    clausesLengths: number[];
+    modules: `0x${string}`[];
+    saltNonce?: bigint;
+  }): Promise<CreateInstanceResult> {
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
+      );
+    }
+
+    const numModules = clausesLengths.reduce(
+      (partialSum, len) => partialSum + len,
+      0
+    );
+    const immutableArgsTypes = ["uint256", "uint256[]"];
+    const immutableArgs: unknown[] = [numClauses, clausesLengths];
+    for (let i = 0; i < numModules; i++) {
+      immutableArgsTypes.push("address");
+      immutableArgs.push(modules[i]);
+    }
+
+    const mutableArgsEncoded = "0x";
+    const immutableArgsEncoded = encodePacked(
+      immutableArgsTypes,
+      immutableArgs
+    );
+
+    let saltNonceToUse: bigint;
+    if (saltNonce !== undefined) {
+      // verify salt nonce
+      if (!verify(saltNonce, "uint256")) {
+        throw new InvalidParamError(`Error: Invalid salt nonce parameter`);
+      }
+      saltNonceToUse = saltNonce;
+    } else {
+      saltNonceToUse = BigInt(
+        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
+      );
+    }
+
+    try {
+      const hash = await this._walletClient.writeContract({
+        address: HATS_MODULES_FACTORY_ADDRESS,
+        abi: HATS_MODULES_FACTORY_ABI,
+        functionName: "createHatsModule",
+        account,
+        args: [
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId],
+          hatId,
+          immutableArgsEncoded,
+          mutableArgsEncoded,
+          saltNonceToUse,
+        ],
+        chain: this._walletClient.chain,
+      });
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      let instance: `0x${string}` = "0x";
+      for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
+        try {
+          const event: any = decodeEventLog({
+            abi: HATS_MODULES_FACTORY_ABI,
+            eventName: "HatsModuleFactory_ModuleDeployed",
+            data: receipt.logs[eventIndex].data,
+            topics: receipt.logs[eventIndex].topics,
+          });
+
+          instance = event.args.instance;
+          break;
+        } catch (err) {
+          // continue
+        }
+      }
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+        newInstance: instance,
+      };
+    } catch (err) {
+      console.log(err);
+      throw new TransactionRevertedError("Error: Transaction reverted");
+    }
+  }
+
+  /**
+   * Get the rulesets of a module instance.
+   *
+   * @param address - instance address.
+   * @returns the module's rulesets, or 'undefined' if the provided address is not a module.
+   */
+  async getRulesets(address: Address): Promise<Ruleset[] | undefined> {
+    const isChain = await this.isChain(address);
+    if (isChain) {
+      const rulesets = this.getChain(address);
+      return rulesets;
+    } else {
+      const module = await this.getModuleByInstance(address);
+      if (module === undefined) {
+        return module;
+      } else {
+        return [[{ module: module, address: address }]];
+      }
+    }
+  }
+
+  /**
+   * Get the rulesets of multiple module instances.
+   *
+   * @param addresses - instances addresses.
+   * @returns for each instance, returns the module's rulesets, or 'undefined' if the provided address is not a module.
+   */
+  async getRulesetsBatched(
+    addresses: Address[]
+  ): Promise<(Ruleset[] | undefined)[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    const res: (Ruleset[] | undefined)[] = new Array<Ruleset[] | undefined>(
+      addresses.length
+    );
+
+    const isChains = await this.isChainBatched(addresses);
+
+    const chainAddressesAndPos: { pos: number; address: Address }[] = [];
+    const nonChainAddressesAndPos: { pos: number; address: Address }[] = [];
+    for (let i = 0; i < addresses.length; i++) {
+      if (isChains[i]) {
+        chainAddressesAndPos.push({ pos: i, address: addresses[i] });
+      } else {
+        nonChainAddressesAndPos.push({ pos: i, address: addresses[i] });
+      }
+    }
+
+    // handle chains
+    const chains = await this.getChainBatched(
+      chainAddressesAndPos.map((elem) => elem.address)
+    );
+    for (
+      let chainIndex = 0;
+      chainIndex < chainAddressesAndPos.length;
+      chainIndex++
+    ) {
+      const rulesets = chains[chainIndex];
+      res[chainAddressesAndPos[chainIndex].pos] = rulesets;
+    }
+
+    // handle non chains
+    const modules = await this.getModulesByInstances(
+      nonChainAddressesAndPos.map((elem) => elem.address)
+    );
+    for (
+      let nonChainIndex = 0;
+      nonChainIndex < nonChainAddressesAndPos.length;
+      nonChainIndex++
+    ) {
+      const module = modules[nonChainIndex];
+      if (module === undefined) {
+        res[nonChainAddressesAndPos[nonChainIndex].pos] = undefined;
+      } else {
+        res[nonChainAddressesAndPos[nonChainIndex].pos] = [
+          [
+            {
+              module: module,
+              address: nonChainAddressesAndPos[nonChainIndex].address,
+            },
+          ],
+        ];
+      }
+    }
+
+    return res;
+  }
+
+  /**
+   * Check whether a module instance is a modules chain.
+   *
+   * @param address - instance address.
+   * @returns 'true' if the instance is a chain, 'false' otherwise.
+   */
+  async isChain(address: Address): Promise<boolean> {
+    try {
+      const implementationAddress = await this._publicClient.readContract({
+        address: address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+
+      if (
+        implementationAddress.toLowerCase() ===
+          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+        implementationAddress.toLowerCase() ===
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+      ) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      // not a module
+      return false;
+    }
+  }
+
+  /**
+   * Check whether multiple module instances are modules chains.
+   *
+   * @param addresses - instances addresses.
+   * @returns for each instance, 'true' if the instance is a chain, 'false' otherwise.
+   */
+  async isChainBatched(addresses: Address[]): Promise<boolean[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    const calls: {
+      address: `0x${string}`;
+      abi: Abi;
+      functionName: string;
+      args?: readonly unknown[] | undefined;
+    }[] = [];
+
+    addresses.forEach((address) => {
+      calls.push({
+        address,
+        abi: HATS_MODULE_ABI,
+        functionName: "IMPLEMENTATION",
+      });
+    });
+
+    try {
+      const res: boolean[] = [];
+
+      const multicallResults = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      for (
+        let addressIndex = 0;
+        addressIndex < addresses.length;
+        addressIndex++
+      ) {
+        if (multicallResults[addressIndex].status == "failure") {
+          // not a module
+          res.push(false);
+          continue;
+        } else {
+          const implementationAddress = multicallResults[addressIndex]
+            .result as `0x${string}`;
+          if (
+            implementationAddress.toLowerCase() ===
+              HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+            implementationAddress.toLowerCase() ===
+              HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+          ) {
+            res.push(true);
+            continue;
+          } else {
+            res.push(false);
+            continue;
+          }
+        }
+      }
+
+      return res;
+    } catch (err) {
+      throw new Error("Error: multicall failed");
+    }
+  }
+
+  /**
+   * Get the rulesets of a chain module instance.
+   *
+   * @param address - instance address.
+   * @returns the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
+   */
+  async getChain(address: Address): Promise<Ruleset[] | undefined> {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const calls = [
+      {
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      },
+      {
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      },
+      {
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "MODULES",
+      },
+    ];
+
+    try {
+      const results = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      if (
+        results[0].status === "failure" ||
+        results[1].status === "failure" ||
+        results[2].status === "failure"
+      ) {
+        return undefined;
+      }
+
+      const numRulesets = results[0].result as bigint;
+      const rulesetsLengths: bigint[] = results[1].result as bigint[];
+      const modulesAddresses: `0x${string}`[] = results[2]
+        .result as `0x${string}`[];
+
+      // get the module types
+      const moduleTypes = await this.getModulesByInstances(modulesAddresses);
+      if (
+        moduleTypes.includes(undefined) ||
+        modulesAddresses.length !== moduleTypes.length
+      ) {
+        return undefined;
+      }
+
+      const res: Ruleset[] = [];
+      let rulesetModulesOffset = 0;
+      for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
+        const rulesset: Ruleset = [];
+
+        for (
+          let rulesetModuleIndex = 0;
+          rulesetModuleIndex < rulesetsLengths[rulesetIndex];
+          rulesetModuleIndex++
+        ) {
+          const rulesetModuleAddress =
+            modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+          const rulesetModuleType =
+            moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+
+          rulesset.push({
+            module: rulesetModuleType as Module,
+            address: rulesetModuleAddress,
+          });
+        }
+
+        res.push(rulesset);
+        rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
+      }
+
+      return res;
+    } catch (err) {
+      undefined;
+    }
+  }
+
+  /**
+   * Get the rulesets of multiple chain module instances.
+   *
+   * @param addresses - instances addresses.
+   * @returns for each instance, the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
+   */
+  async getChainBatched(
+    addresses: Address[]
+  ): Promise<(Ruleset[] | undefined)[]> {
+    if (addresses.length === 0) {
+      return [];
+    }
+
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+
+    const calls: {
+      address: `0x${string}`;
+      abi: Abi;
+      functionName: string;
+      args?: readonly unknown[] | undefined;
+    }[] = [];
+
+    addresses.forEach((address) => {
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "NUM_CONJUNCTION_CLAUSES",
+      });
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "CONJUNCTION_CLAUSE_LENGTHS",
+      });
+      calls.push({
+        address: address,
+        abi: CHAIN_ABI,
+        functionName: "MODULES",
+      });
+    });
+
+    try {
+      const res: (Ruleset[] | undefined)[] = [];
+
+      const multicallResults = await this._publicClient.multicall({
+        contracts: calls,
+      });
+
+      for (
+        let addressIndex = 0;
+        addressIndex < addresses.length;
+        addressIndex++
+      ) {
+        const multicallPos = addressIndex * 3;
+
+        if (
+          multicallResults[multicallPos].status === "failure" ||
+          multicallResults[multicallPos + 1].status === "failure" ||
+          multicallResults[multicallPos + 2].status === "failure"
+        ) {
+          res.push(undefined);
+          continue;
+        }
+
+        const numRulesets = multicallResults[multicallPos].result as bigint;
+        const rulesetsLengths: bigint[] = multicallResults[multicallPos + 1]
+          .result as bigint[];
+        const modulesAddresses: `0x${string}`[] = multicallResults[
+          multicallPos + 2
+        ].result as `0x${string}`[];
+
+        // get the module types
+        const moduleTypes = await this.getModulesByInstances(modulesAddresses);
+        if (
+          moduleTypes.includes(undefined) ||
+          modulesAddresses.length !== moduleTypes.length
+        ) {
+          res.push(undefined);
+          continue;
+        }
+
+        const rulesets: Ruleset[] = [];
+        let rulesetModulesOffset = 0;
+        for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
+          const rulesset: Ruleset = [];
+
+          for (
+            let rulesetModuleIndex = 0;
+            rulesetModuleIndex < rulesetsLengths[rulesetIndex];
+            rulesetModuleIndex++
+          ) {
+            const rulesetModuleAddress =
+              modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+            const rulesetModuleType =
+              moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+
+            rulesset.push({
+              module: rulesetModuleType as Module,
+              address: rulesetModuleAddress,
+            });
+          }
+
+          rulesets.push(rulesset);
+          rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
+        }
+
+        res.push(rulesets);
+      }
+
+      return res;
+    } catch (err) {
+      throw new Error("Error: multicall failed");
+    }
+  }
+
+  /*//////////////////////////////////////////////////////////////
                        Module Getters
   //////////////////////////////////////////////////////////////*/
 
@@ -931,6 +1338,11 @@ export class HatsModulesClient {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function"
       );
     }
 

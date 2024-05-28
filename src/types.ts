@@ -108,3 +108,8 @@ export type ModuleCreationArgs = {
   immutable: ModuleCreationArg[];
   mutable: ModuleCreationArg[];
 };
+
+export type Ruleset = {
+  module: Module;
+  address: `0x${string}`;
+}[];

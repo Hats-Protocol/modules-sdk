@@ -446,3 +446,27 @@ export const HATS_MODULE_ABI = [
     type: "function",
   },
 ] as const;
+
+export const CHAIN_ABI = [
+  {
+    inputs: [],
+    name: "CONJUNCTION_CLAUSE_LENGTHS",
+    outputs: [{ internalType: "uint256[]", name: "", type: "uint256[]" }],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "MODULES",
+    outputs: [{ internalType: "address[]", name: "", type: "address[]" }],
+    stateMutability: "pure",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "NUM_CONJUNCTION_CLAUSES",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "pure",
+    type: "function",
+  },
+] as const;
