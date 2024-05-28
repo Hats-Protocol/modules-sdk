@@ -532,7 +532,11 @@ describe("Batch Create Client Tests", () => {
 
   describe("Test get chains batched", () => {
     test("scenario 1", async () => {
-      const res = await hatsModulesClient.getChains([chain1, chain2, chain3]);
+      const res = await hatsModulesClient.getChainBatched([
+        chain1,
+        chain2,
+        chain3,
+      ]);
 
       // check first chain
       const rulesets1 = res[0];
@@ -619,7 +623,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("scenario 2", async () => {
-      const res = await hatsModulesClient.getChains([
+      const res = await hatsModulesClient.getChainBatched([
         erc20Instance,
         chain2,
         chain3,
@@ -689,7 +693,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("scenario 3", async () => {
-      const res = await hatsModulesClient.getChains([erc20Instance]);
+      const res = await hatsModulesClient.getChainBatched([erc20Instance]);
 
       // check first chain
       const rulesets1 = res[0];
@@ -699,27 +703,30 @@ describe("Batch Create Client Tests", () => {
 
   describe("Is chains tests", () => {
     test("Scenario 1", async () => {
-      const res = await hatsModulesClient.isChains([chain1]);
+      const res = await hatsModulesClient.isChainBatched([chain1]);
       expect(res.length).toBe(1);
       expect(res[0]).toBe(true);
     });
 
     test("Scenario 2", async () => {
-      const res = await hatsModulesClient.isChains([chain1, chain2]);
+      const res = await hatsModulesClient.isChainBatched([chain1, chain2]);
       expect(res.length).toBe(2);
       expect(res[0]).toBe(true);
       expect(res[1]).toBe(true);
     });
 
     test("Scenario 3", async () => {
-      const res = await hatsModulesClient.isChains([erc20Instance, chain2]);
+      const res = await hatsModulesClient.isChainBatched([
+        erc20Instance,
+        chain2,
+      ]);
       expect(res.length).toBe(2);
       expect(res[0]).toBe(false);
       expect(res[1]).toBe(true);
     });
 
     test("Scenario 4", async () => {
-      const res = await hatsModulesClient.isChains([]);
+      const res = await hatsModulesClient.isChainBatched([]);
       expect(res.length).toBe(0);
     });
   });

@@ -774,6 +774,12 @@ export class HatsModulesClient {
     }
   }
 
+  /**
+   * Get the rulesets of a module instance.
+   *
+   * @param address - instance address.
+   * @returns the module's rulesets, or 'undefined' if the provided address is not a module.
+   */
   async getRulesets(address: Address): Promise<Ruleset[] | undefined> {
     const isChain = await this.isChain(address);
     if (isChain) {
@@ -789,6 +795,12 @@ export class HatsModulesClient {
     }
   }
 
+  /**
+   * Get the rulesets of multiple module instances.
+   *
+   * @param addresses - instances addresses.
+   * @returns for each instance, returns the module's rulesets, or 'undefined' if the provided address is not a module.
+   */
   async getRulesetsBatched(
     addresses: Address[]
   ): Promise<(Ruleset[] | undefined)[]> {
@@ -800,7 +812,7 @@ export class HatsModulesClient {
       addresses.length
     );
 
-    const isChains = await this.isChains(addresses);
+    const isChains = await this.isChainBatched(addresses);
 
     const chainAddressesAndPos: { pos: number; address: Address }[] = [];
     const nonChainAddressesAndPos: { pos: number; address: Address }[] = [];
@@ -813,7 +825,7 @@ export class HatsModulesClient {
     }
 
     // handle chains
-    const chains = await this.getChains(
+    const chains = await this.getChainBatched(
       chainAddressesAndPos.map((elem) => elem.address)
     );
     for (
@@ -883,12 +895,12 @@ export class HatsModulesClient {
   }
 
   /**
-   * Check whether a module instance is a modules chain.
+   * Check whether multiple module instances are modules chains.
    *
-   * @param address - instance address.
-   * @returns 'true' if the instance is a chain, 'false' otherwise.
+   * @param addresses - instances addresses.
+   * @returns for each instance, 'true' if the instance is a chain, 'false' otherwise.
    */
-  async isChains(addresses: Address[]): Promise<boolean[]> {
+  async isChainBatched(addresses: Address[]): Promise<boolean[]> {
     if (addresses.length === 0) {
       return [];
     }
@@ -949,10 +961,10 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get the rulesets of a chain eligibility module instance.
+   * Get the rulesets of a chain module instance.
    *
-   * @param address - Instance address.
-   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
+   * @param address - instance address.
+   * @returns the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
   async getChain(address: Address): Promise<Ruleset[] | undefined> {
     if (this._modules === undefined) {
@@ -1038,12 +1050,14 @@ export class HatsModulesClient {
   }
 
   /**
-   * Get the rulesets of a chain eligibility module instance.
+   * Get the rulesets of multiple chain module instances.
    *
-   * @param address - Instance address.
-   * @returns The array of ruleset in the chain, or 'undefined' if provided address is not a valid chain.
+   * @param addresses - instances addresses.
+   * @returns for each instance, the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
-  async getChains(addresses: Address[]): Promise<(Ruleset[] | undefined)[]> {
+  async getChainBatched(
+    addresses: Address[]
+  ): Promise<(Ruleset[] | undefined)[]> {
     if (addresses.length === 0) {
       return [];
     }
