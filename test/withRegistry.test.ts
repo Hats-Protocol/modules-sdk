@@ -69,7 +69,11 @@ describe("Eligibility Client Tests", () => {
     });
 
     for (const [id, module] of Object.entries(modules)) {
-      if (id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a") {
+      // jokerace and baal staking eligibilities deployment falis due to dependency on external contracts
+      if (
+        id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a" ||
+        id === "0xa1E79f78630F77436C001Af44893A2720180E19F"
+      ) {
         continue;
       }
 

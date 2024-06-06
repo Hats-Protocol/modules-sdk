@@ -211,6 +211,58 @@ export const getNewInstancesFromReceipt = (
       });
 
       instances.push(event.args.instance);
+      continue;
+    } catch (err) {
+      // continue
+    }
+
+    try {
+      const event: any = decodeEventLog({
+        abi: [
+          {
+            anonymous: false,
+            inputs: [
+              {
+                indexed: false,
+                internalType: "address",
+                name: "implementation",
+                type: "address",
+              },
+              {
+                indexed: false,
+                internalType: "address",
+                name: "instance",
+                type: "address",
+              },
+              {
+                indexed: false,
+                internalType: "uint256",
+                name: "hatId",
+                type: "uint256",
+              },
+              {
+                indexed: false,
+                internalType: "bytes",
+                name: "otherImmutableArgs",
+                type: "bytes",
+              },
+              {
+                indexed: false,
+                internalType: "bytes",
+                name: "initData",
+                type: "bytes",
+              },
+            ],
+            name: "HatsModuleFactory_ModuleDeployed",
+            type: "event",
+          },
+        ],
+        eventName: "HatsModuleFactory_ModuleDeployed",
+        data: receipt.logs[eventIndex].data,
+        topics: receipt.logs[eventIndex].topics,
+      });
+
+      instances.push(event.args.instance);
     } catch (err) {
       // continue
     }
