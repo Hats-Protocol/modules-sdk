@@ -1,7 +1,6 @@
 import { PublicClient, WalletClient, encodePacked, decodeEventLog } from "viem";
 import {
   MissingPublicClientError,
-  ChainIdMismatchError,
   MissingWalletClientError,
   ModuleNotAvailableError,
   TransactionRevertedError,
@@ -10,7 +9,6 @@ import {
   ModulesRegistryFetchError,
   ModuleParameterError,
   getModuleFunctionError,
-  MissingWalletClientChainError,
   MissingPublicClientChainError,
 } from "./errors";
 import { verify } from "./schemas";
@@ -68,17 +66,6 @@ export class HatsModulesClient {
       throw new MissingPublicClientChainError(
         "Error: Public client must be initialized with a chain"
       );
-    }
-    if (walletClient !== undefined) {
-      if (walletClient.chain === undefined) {
-        throw new MissingWalletClientChainError(
-          "Error: Wallet client must be initialized with a chain"
-        );
-      } else if (walletClient.chain.id !== publicClient.chain.id) {
-        throw new ChainIdMismatchError(
-          "Error: Provided chain id should match the wallet client chain id"
-        );
-      }
     }
 
     this._publicClient = publicClient;
