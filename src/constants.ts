@@ -27,6 +27,12 @@ export const HATS_TOGGLES_CHAIN_MODULE_ADDRESS: {
   8453: "0x841Bc396ad88A9C6b78F05b7754a9d22E3fB264b",
 };
 
+export const HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL =
+  "0x83200f1633cdb6c8f28f202cea1b6a9105862d83";
+
+export const HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL =
+  "0x2f1388e095bec051db9f1b226faf222ef5c33f16";
+
 export const HATS_TOGGLES_CHAIN_MODULE_ABI = [
   {
     inputs: [{ internalType: "string", name: "_version", type: "string" }],

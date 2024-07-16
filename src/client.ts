@@ -19,6 +19,8 @@ import {
   HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
   CHAIN_ABI,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL,
+  HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL,
 } from "./constants";
 import axios from "axios";
 import {
@@ -869,7 +871,11 @@ export class HatsModulesClient {
         implementationAddress.toLowerCase() ===
           HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
         implementationAddress.toLowerCase() ===
-          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+        implementationAddress.toLowerCase() ===
+          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
+        implementationAddress.toLowerCase() ===
+          HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
       ) {
         return true;
       } else {
@@ -930,7 +936,11 @@ export class HatsModulesClient {
             implementationAddress.toLowerCase() ===
               HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
             implementationAddress.toLowerCase() ===
-              HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId]
+              HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+            implementationAddress.toLowerCase() ===
+              HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
+            implementationAddress.toLowerCase() ===
+              HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
           ) {
             res.push(true);
             continue;
