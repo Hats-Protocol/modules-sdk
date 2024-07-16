@@ -1,6 +1,6 @@
 {
   "name": "@hatsprotocol/modules-sdk",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "author": "Haberdasher Labs",
   "license": "MIT",
   "main": "dist/modules-sdk.cjs.js",
