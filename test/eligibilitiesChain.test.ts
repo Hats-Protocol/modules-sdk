@@ -425,7 +425,9 @@ describe("Batch Create Client Tests", () => {
 
   describe("get rulesets tests", () => {
     test("Scenario 1", async () => {
-      const rulesets = await hatsModulesClient.getRulesets(chain1);
+      const rulesets = await hatsModulesClient.getRulesets(chain1, {
+        includeLiveParams: true,
+      });
       expect(rulesets).toBeDefined();
       if (rulesets !== undefined) {
         expect(rulesets.length).toBe(2);
@@ -435,6 +437,13 @@ describe("Batch Create Client Tests", () => {
         expect(ruleset1.length).toBe(2);
         expect(ruleset1[0].address).toBe(jokeraceInstance);
         expect(ruleset1[0].module.name).toBe("JokeRace Eligibility");
+        expect(ruleset1[0].liveParams).toBeDefined();
+        expect(ruleset1[0].liveParams?.length).toBe(4);
+        if (ruleset1[0].liveParams !== undefined) {
+          expect(ruleset1[0].liveParams[0].value).toBe(
+            26959946667150639794667015087019630673637144422540572481103610249216n
+          );
+        }
         expect(ruleset1[1].address).toBe(stakingInstance);
         expect(ruleset1[1].module.name).toBe("Staking Eligibility");
 
