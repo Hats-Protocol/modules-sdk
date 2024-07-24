@@ -39,6 +39,7 @@ import type {
   Registry,
   WriteFunction,
   Ruleset,
+  GetRulesetsConfig,
 } from "./types";
 
 export class HatsModulesClient {
@@ -520,7 +521,7 @@ export class HatsModulesClient {
             });
           } catch (err) {
             throw new ModuleParameterError(
-              `Error: Failed reading function ${param.functionName} from the module instance`
+              `Error: Failed reading function ${param.functionName} from the module instance ${instance}`
             );
           }
 
@@ -769,17 +770,29 @@ export class HatsModulesClient {
    * @param address - instance address.
    * @returns the module's rulesets, or 'undefined' if the provided address is not a module.
    */
-  async getRulesets(address: Address): Promise<Ruleset[] | undefined> {
+  async getRulesets(
+    address: Address,
+    config?: GetRulesetsConfig
+  ): Promise<Ruleset[] | undefined> {
     const isChain = await this.isChain(address);
     if (isChain) {
-      const rulesets = this.getChain(address);
+      const rulesets = this.getChain(address, config?.includeLiveParams);
       return rulesets;
     } else {
       const module = await this.getModuleByInstance(address);
       if (module === undefined) {
         return module;
       } else {
-        return [[{ module: module, address: address }]];
+        if (config?.includeLiveParams) {
+          const liveParams = (await this.getInstanceParameters(
+            address
+          )) as ModuleParameter[];
+          return [
+            [{ module: module, address: address, liveParams: liveParams }],
+          ];
+        } else {
+          return [[{ module: module, address: address }]];
+        }
       }
     }
   }
@@ -963,7 +976,10 @@ export class HatsModulesClient {
    * @param address - instance address.
    * @returns the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
-  async getChain(address: Address): Promise<Ruleset[] | undefined> {
+  async getChain(
+    address: Address,
+    includeLiveParams?: boolean
+  ): Promise<Ruleset[] | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
@@ -1015,6 +1031,16 @@ export class HatsModulesClient {
         return undefined;
       }
 
+      let liveParams: ModuleParameter[][] = [];
+      if (includeLiveParams) {
+        const liveParamsCalls = modulesAddresses.map((moduleAddress) => {
+          return this.getInstanceParameters(moduleAddress);
+        });
+        liveParams = (await Promise.all(
+          liveParamsCalls
+        )) as ModuleParameter[][];
+      }
+
       const res: Ruleset[] = [];
       let rulesetModulesOffset = 0;
       for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
@@ -1029,10 +1055,14 @@ export class HatsModulesClient {
             modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
           const rulesetModuleType =
             moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+          const rulesetModuleLiveParams = includeLiveParams
+            ? liveParams[rulesetModulesOffset + rulesetModuleIndex]
+            : undefined;
 
           rulesset.push({
             module: rulesetModuleType as Module,
             address: rulesetModuleAddress,
+            liveParams: rulesetModuleLiveParams,
           });
         }
 

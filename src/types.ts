@@ -112,4 +112,9 @@ export type ModuleCreationArgs = {
 export type Ruleset = {
   module: Module;
   address: `0x${string}`;
+  liveParams?: ModuleParameter[];
 }[];
+
+export type GetRulesetsConfig = {
+  includeLiveParams?: boolean;
+};
