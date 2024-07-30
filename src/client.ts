@@ -804,7 +804,8 @@ export class HatsModulesClient {
    * @returns for each instance, returns the module's rulesets, or 'undefined' if the provided address is not a module.
    */
   async getRulesetsBatched(
-    addresses: Address[]
+    addresses: Address[],
+    config?: GetRulesetsConfig
   ): Promise<(Ruleset[] | undefined)[]> {
     if (addresses.length === 0) {
       return [];
@@ -828,7 +829,8 @@ export class HatsModulesClient {
 
     // handle chains
     const chains = await this.getChainBatched(
-      chainAddressesAndPos.map((elem) => elem.address)
+      chainAddressesAndPos.map((elem) => elem.address),
+      config?.includeLiveParams
     );
     for (
       let chainIndex = 0;
@@ -848,15 +850,23 @@ export class HatsModulesClient {
       nonChainIndex < nonChainAddressesAndPos.length;
       nonChainIndex++
     ) {
+      const address = nonChainAddressesAndPos[nonChainIndex].address;
       const module = modules[nonChainIndex];
       if (module === undefined) {
         res[nonChainAddressesAndPos[nonChainIndex].pos] = undefined;
       } else {
+        let liveParams: ModuleParameter[] = [];
+        if (config?.includeLiveParams) {
+          liveParams = (await this.getInstanceParameters(
+            address
+          )) as ModuleParameter[];
+        }
         res[nonChainAddressesAndPos[nonChainIndex].pos] = [
           [
             {
               module: module,
               address: nonChainAddressesAndPos[nonChainIndex].address,
+              liveParams: config?.includeLiveParams ? liveParams : undefined,
             },
           ],
         ];
@@ -1083,7 +1093,8 @@ export class HatsModulesClient {
    * @returns for each instance, the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
   async getChainBatched(
-    addresses: Address[]
+    addresses: Address[],
+    includeLiveParams?: boolean
   ): Promise<(Ruleset[] | undefined)[]> {
     if (addresses.length === 0) {
       return [];
@@ -1150,6 +1161,16 @@ export class HatsModulesClient {
           multicallPos + 2
         ].result as `0x${string}`[];
 
+        let liveParams: ModuleParameter[][] = [];
+        if (includeLiveParams) {
+          const liveParamsCalls = modulesAddresses.map((moduleAddress) => {
+            return this.getInstanceParameters(moduleAddress);
+          });
+          liveParams = (await Promise.all(
+            liveParamsCalls
+          )) as ModuleParameter[][];
+        }
+
         // get the module types
         const moduleTypes = await this.getModulesByInstances(modulesAddresses);
         if (
@@ -1174,10 +1195,14 @@ export class HatsModulesClient {
               modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
             const rulesetModuleType =
               moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+            const rulesetModuleLiveParams = includeLiveParams
+              ? liveParams[rulesetModulesOffset + rulesetModuleIndex]
+              : undefined;
 
             rulesset.push({
               module: rulesetModuleType as Module,
               address: rulesetModuleAddress,
+              liveParams: rulesetModuleLiveParams,
             });
           }
 
