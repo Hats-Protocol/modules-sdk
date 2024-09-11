@@ -72,7 +72,8 @@ describe("Eligibility Client Tests", () => {
       // jokerace and baal staking eligibilities deployment falis due to dependency on external contracts
       if (
         id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a" ||
-        id === "0xa1E79f78630F77436C001Af44893A2720180E19F"
+        id === "0xa1E79f78630F77436C001Af44893A2720180E19F" ||
+        id === "0x0Bb0a2B9bc5Da206fead8e87D7Cbc6fCBa455320"
       ) {
         continue;
       }

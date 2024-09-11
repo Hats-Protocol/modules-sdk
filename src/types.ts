@@ -16,6 +16,8 @@ export interface BatchCreateInstancesResult extends TransactionResult {
 }
 
 export type Module = {
+  id: string;
+  version: string;
   name: string;
   details: string[];
   links: {

@@ -119,7 +119,7 @@ describe("Client Tests With a Static Modules File", () => {
 
       expect(isMeta).toBe(true);
     }
-    expect(metaModulesCount).toBe(2);
+    expect(metaModulesCount).toBe(4);
   });
 
   test("Test create new jokerace instance and get instace parameters", async () => {
