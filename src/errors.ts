@@ -322,7 +322,11 @@ export class StakingEligibility_NotSlashedError extends Error {
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-export function getModuleFunctionError(err: unknown, moduleId: string): never {
+export function getModuleFunctionError(
+  err: unknown,
+  moduleId: string,
+  moduleVersion: string
+): never {
   if (err instanceof BaseError) {
     const revertError = err.walk(
       (err) => err instanceof ContractFunctionRevertedError
@@ -331,7 +335,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       const errorName = revertError.data?.errorName ?? "";
 
       // AllowList Eligibility error
-      if (moduleId === "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5") {
+      if (
+        moduleId === "haberdasher-labs_allowlist-eligibility" &&
+        moduleVersion === "v0.1.0"
+      ) {
         switch (errorName) {
           case "AllowlistEligibility_NotOwner": {
             throw new AllowlistEligibility_NotOwnerError(
@@ -360,7 +367,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // Hat Elections Eligibility error
-      if (moduleId === "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E") {
+      if (
+        moduleId === "haberdasher-labs_hats-election-eligibility" &&
+        moduleVersion === "v0.2.0"
+      ) {
         switch (errorName) {
           case "NotBallotBox": {
             throw new HatsElectionEligibility_NotBallotBoxError(
@@ -404,7 +414,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // JokeRace Eligibility error
-      if (moduleId === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a") {
+      if (
+        moduleId === "haberdasher-labs_jokerace-eligibility" &&
+        moduleVersion === "v0.2.0"
+      ) {
         switch (errorName) {
           case "JokeraceEligibility_ContestNotCompleted": {
             throw new JokeraceEligibility_ContestNotCompletedError(
@@ -438,7 +451,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // Passthrough Eligibility error
-      if (moduleId === "0x050079a8fbFCE76818C62481BA015b89567D2d35") {
+      if (
+        moduleId === "haberdasher-labs_passthrough-module" &&
+        moduleVersion === "v0.1.0"
+      ) {
         switch (errorName) {
           case "NotAuthorized": {
             throw new PassthroughEligibility_NotAuthorizedError(
@@ -452,7 +468,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // Season Toggle error
-      if (moduleId === "0xFb6bD2e96B123d0854064823f6cb59420A285C00") {
+      if (
+        moduleId === "haberdasher-labs_season-toggle" &&
+        moduleVersion === "v0.1.0"
+      ) {
         switch (errorName) {
           case "SeasonToggle_NotBranchAdmin": {
             throw new SeasonToggle_NotBranchAdminError(
@@ -481,7 +500,10 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       }
 
       // Staking Eligibility error
-      if (moduleId === "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7") {
+      if (
+        moduleId === "haberdasher-labs_staking-eligibility" &&
+        moduleVersion === "v0.1.0"
+      ) {
         switch (errorName) {
           case "StakingEligibility_InsufficientStake": {
             throw new StakingEligibility_InsufficientStakeError(
@@ -549,6 +571,7 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
         `Error: module function reverted with error name ${errorName}`
       );
     }
+    throw err;
   } else {
     if (err instanceof Error) {
       throw err;
