@@ -113,7 +113,7 @@ export class HatsModulesClient {
       });
 
       if (moduleSupportedInChain) {
-        const moduleId: string = module.implementationAddress;
+        const moduleId: string = `${module.id}-${module.version}`;
 
         if (this._modules !== undefined) {
           this._modules[moduleId] = module;
@@ -136,6 +136,7 @@ export class HatsModulesClient {
   async createNewInstance({
     account,
     moduleId,
+    moduleVersion,
     hatId,
     immutableArgs,
     mutableArgs,
@@ -143,6 +144,7 @@ export class HatsModulesClient {
   }: {
     account: Account | Address;
     moduleId: string;
+    moduleVersion: string;
     hatId: bigint;
     immutableArgs: unknown[];
     mutableArgs: unknown[];
@@ -159,7 +161,7 @@ export class HatsModulesClient {
       );
     }
 
-    const module = this.getModuleById(moduleId);
+    const module = this.getModuleById(moduleId, moduleVersion);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
         `Error: Module with id ${moduleId} does not exist`
@@ -240,14 +242,14 @@ export class HatsModulesClient {
    */
   async batchCreateNewInstances({
     account,
-    moduleIds,
+    moduleIdsAndVersions,
     hatIds,
     immutableArgsArray,
     mutableArgsArray,
     saltNonces,
   }: {
     account: Account | Address;
-    moduleIds: string[];
+    moduleIdsAndVersions: { id: string; version: string }[];
     hatIds: bigint[];
     immutableArgsArray: unknown[][];
     mutableArgsArray: unknown[][];
@@ -269,11 +271,14 @@ export class HatsModulesClient {
     const encodedMutableArgsArray: Array<`0x${string}`> = [];
     const saltNoncesToUse: Array<bigint> = [];
 
-    for (let i = 0; i < moduleIds.length; i++) {
-      const module = this.getModuleById(moduleIds[i]);
+    for (let i = 0; i < moduleIdsAndVersions.length; i++) {
+      const module = this.getModuleById(
+        moduleIdsAndVersions[i].id,
+        moduleIdsAndVersions[i].version
+      );
       if (module === undefined) {
         throw new ModuleNotAvailableError(
-          `Error: Module with id ${moduleIds[i]} does not exist`
+          `Error: Module with id ${moduleIdsAndVersions[i].id}-${moduleIdsAndVersions[i].version} does not exist`
         );
       }
 
@@ -350,11 +355,13 @@ export class HatsModulesClient {
    */
   async predictHatsModuleAddress({
     moduleId,
+    moduleVersion,
     hatId,
     immutableArgs,
     saltNonce,
   }: {
     moduleId: string;
+    moduleVersion: string;
     hatId: bigint;
     immutableArgs: unknown[];
     saltNonce: bigint;
@@ -365,7 +372,7 @@ export class HatsModulesClient {
       );
     }
 
-    const module = this.getModuleById(moduleId);
+    const module = this.getModuleById(moduleId, moduleVersion);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
         `Module with id ${moduleId} does not exist`
@@ -413,11 +420,13 @@ export class HatsModulesClient {
    */
   async isModuleDeployed({
     moduleId,
+    moduleVersion,
     hatId,
     immutableArgs,
     saltNonce,
   }: {
     moduleId: string;
+    moduleVersion: string;
     hatId: bigint;
     immutableArgs: unknown[];
     saltNonce: bigint;
@@ -428,7 +437,7 @@ export class HatsModulesClient {
       );
     }
 
-    const module = this.getModuleById(moduleId);
+    const module = this.getModuleById(moduleId, moduleVersion);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
         `Error: Module with id ${moduleId} does not exist`
@@ -1229,14 +1238,14 @@ export class HatsModulesClient {
    * @param moduleId - The module ID.
    * @returns The module matching the provided ID.
    */
-  getModuleById(moduleId: string): Module | undefined {
+  getModuleById(moduleId: string, moduleVersion: string): Module | undefined {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
         "Error: Client has not been initialized, requires a call to the prepare function"
       );
     }
 
-    return this._modules[moduleId];
+    return this._modules[`${moduleId}-${moduleVersion}`];
   }
 
   /**
@@ -1377,12 +1386,14 @@ export class HatsModulesClient {
   async callInstanceWriteFunction({
     account,
     moduleId,
+    moduleVersion,
     instance,
     func,
     args,
   }: {
     account: Account | Address;
     moduleId: string;
+    moduleVersion: string;
     instance: Address;
     func: WriteFunction;
     args: unknown[];
@@ -1398,7 +1409,7 @@ export class HatsModulesClient {
       );
     }
 
-    const module = this.getModuleById(moduleId);
+    const module = this.getModuleById(moduleId, moduleVersion);
     if (module === undefined) {
       throw new ModuleNotAvailableError(
         `Error: Module with id ${moduleId} does not exist`
@@ -1427,7 +1438,7 @@ export class HatsModulesClient {
         transactionHash: receipt.transactionHash,
       };
     } catch (err) {
-      getModuleFunctionError(err, moduleId);
+      getModuleFunctionError(err, moduleId, moduleVersion);
     }
   }
 }

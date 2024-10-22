@@ -123,8 +123,12 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new jokerace instance and get instace parameters", async () => {
-    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
-    const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
+    const jokeraceId = "haberdasher-labs_jokerace-eligibility";
+    const jokeraceVersion = "v0.2.0";
+    const module = hatsModulesClient.getModuleById(
+      jokeraceId,
+      jokeraceVersion
+    ) as Module;
 
     const hatId = BigInt(
       "0x0000000100000000000000000000000000000000000000000000000000000000"
@@ -165,6 +169,7 @@ describe("Client Tests With a Static Modules File", () => {
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: jokeraceId,
+      moduleVersion: jokeraceVersion,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -228,8 +233,12 @@ describe("Client Tests With a Static Modules File", () => {
   }, 10000);
 
   test("Test create new staking instance and get instace parameters", async () => {
-    const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
-    const module = hatsModulesClient.getModuleById(stakingId) as Module;
+    const stakingId = "haberdasher-labs_staking-eligibility";
+    const stakingVersion = "v0.1.0";
+    const module = hatsModulesClient.getModuleById(
+      stakingId,
+      stakingVersion
+    ) as Module;
 
     const hatId = BigInt(
       "0x0000000100000000000000000000000000000000000000000000000000000000"
@@ -270,6 +279,7 @@ describe("Client Tests With a Static Modules File", () => {
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: stakingId,
+      moduleVersion: stakingVersion,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -340,8 +350,12 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc20 eligibility instance and get instance parameters", async () => {
-    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
-    const module = hatsModulesClient.getModuleById(erc20Id) as Module;
+    const erc20Id = "pumpedlunch_erc20-eligibility";
+    const erc20Version = "v0.1.0";
+    const module = hatsModulesClient.getModuleById(
+      erc20Id,
+      erc20Version
+    ) as Module;
 
     const hatId = BigInt(
       "0x0000000100000000000000000000000000000000000000000000000000000000"
@@ -382,6 +396,7 @@ describe("Client Tests With a Static Modules File", () => {
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: erc20Id,
+      moduleVersion: erc20Version,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -427,8 +442,12 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc721 eligibility instance and get instance parameters", async () => {
-    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
-    const module = hatsModulesClient.getModuleById(erc721Id) as Module;
+    const erc721Id = "pumpedlunch_erc721-eligibility";
+    const erc721Version = "v0.1.0";
+    const module = hatsModulesClient.getModuleById(
+      erc721Id,
+      erc721Version
+    ) as Module;
 
     const hatId = BigInt(
       "0x0000000100000000000000000000000000000000000000000000000000000000"
@@ -469,6 +488,7 @@ describe("Client Tests With a Static Modules File", () => {
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: erc721Id,
+      moduleVersion: erc721Version,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -514,8 +534,12 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
-    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
-    const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
+    const erc1155Id = "pumpedlunch_erc1155-eligibility";
+    const erc1155Version = "v0.1.0";
+    const module = hatsModulesClient.getModuleById(
+      erc1155Id,
+      erc1155Version
+    ) as Module;
 
     const hatId = BigInt(
       "0x0000000100000000000000000000000000000000000000000000000000000000"
@@ -557,6 +581,7 @@ describe("Client Tests With a Static Modules File", () => {
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
       moduleId: erc1155Id,
+      moduleVersion: erc1155Version,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -620,9 +645,11 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test get module by implementation", async () => {
-    const claimsHatterId = "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9";
+    const claimsHatterId = "haberdasher-labs_multi-claims-hatter";
+    const claimsHatterVersion = "v0.1.0";
     const claimsHatterModule = hatsModulesClient.getModuleById(
-      claimsHatterId
+      claimsHatterId,
+      claimsHatterVersion
     ) as Module;
 
     expect(
