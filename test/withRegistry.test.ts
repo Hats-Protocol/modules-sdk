@@ -71,14 +71,11 @@ describe("Eligibility Client Tests", () => {
     for (const [id, module] of Object.entries(modules)) {
       // jokerace and baal staking eligibilities deployment falis due to dependency on external contracts
       if (
-        id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a" ||
-        id === "0xa1E79f78630F77436C001Af44893A2720180E19F" ||
-        id === "0x0Bb0a2B9bc5Da206fead8e87D7Cbc6fCBa455320"
+        id === "haberdasher-labs_baal-staking-eligibility-v0.1.0" ||
+        id === "haberdasher-labs_jokerace-eligibility-v0.3.0"
       ) {
         continue;
       }
-
-      console.log(`Deploying an instance of module ${module.name}`);
 
       const hatId = module.creationArgs.useHatId
         ? BigInt(
@@ -124,7 +121,8 @@ describe("Eligibility Client Tests", () => {
 
       // check that module is not yet deployed
       const isDeployedPrev = await hatsModulesClient.isModuleDeployed({
-        moduleId: id,
+        moduleId: module.id,
+        moduleVersion: module.version,
         hatId: hatId,
         immutableArgs: immutableArgs,
         saltNonce,
@@ -134,7 +132,8 @@ describe("Eligibility Client Tests", () => {
       // create a new instance
       const res = await hatsModulesClient.createNewInstance({
         account: deployerAccount,
-        moduleId: id,
+        moduleId: module.id,
+        moduleVersion: module.version,
         hatId: hatId,
         immutableArgs: immutableArgs,
         mutableArgs: mutableArgs,
@@ -157,7 +156,8 @@ describe("Eligibility Client Tests", () => {
       // predict module address
       const predictedAddress = await hatsModulesClient.predictHatsModuleAddress(
         {
-          moduleId: id,
+          moduleId: module.id,
+          moduleVersion: module.version,
           hatId: hatId,
           immutableArgs: immutableArgs,
           saltNonce,
@@ -167,7 +167,8 @@ describe("Eligibility Client Tests", () => {
 
       // check that module is deployed
       const isDeployedAfter = await hatsModulesClient.isModuleDeployed({
-        moduleId: id,
+        moduleId: module.id,
+        moduleVersion: module.version,
         hatId: hatId,
         immutableArgs: immutableArgs,
         saltNonce,

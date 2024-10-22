@@ -67,19 +67,37 @@ describe("Batch Create Client Tests", () => {
     immutableArgs = [];
     mutableArgs = [];
 
-    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
-    const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
-    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
-    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
-    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
+    const jokeraceId = "haberdasher-labs_jokerace-eligibility";
+    const jokeraceVersion = "v0.2.0";
+    const stakingId = "haberdasher-labs_staking-eligibility";
+    const stakingVersion = "v0.1.0";
+    const erc20Id = "pumpedlunch_erc20-eligibility";
+    const erc20Version = "v0.1.0";
+    const erc721Id = "pumpedlunch_erc721-eligibility";
+    const erc721Version = "v0.1.0";
+    const erc1155Id = "pumpedlunch_erc1155-eligibility";
+    const erc1155Version = "v0.1.0";
 
     const jokeraceModule = hatsModulesClient.getModuleById(
-      jokeraceId
+      jokeraceId,
+      jokeraceVersion
     ) as Module;
-    const stakingModule = hatsModulesClient.getModuleById(stakingId) as Module;
-    const erc20Module = hatsModulesClient.getModuleById(erc20Id) as Module;
-    const erc721Module = hatsModulesClient.getModuleById(erc721Id) as Module;
-    const erc1155Module = hatsModulesClient.getModuleById(erc1155Id) as Module;
+    const stakingModule = hatsModulesClient.getModuleById(
+      stakingId,
+      stakingVersion
+    ) as Module;
+    const erc20Module = hatsModulesClient.getModuleById(
+      erc20Id,
+      erc20Version
+    ) as Module;
+    const erc721Module = hatsModulesClient.getModuleById(
+      erc721Id,
+      erc721Version
+    ) as Module;
+    const erc1155Module = hatsModulesClient.getModuleById(
+      erc1155Id,
+      erc1155Version
+    ) as Module;
 
     jokeraceAbi = jokeraceModule.abi;
     stakingAbi = stakingModule.abi;
@@ -94,12 +112,12 @@ describe("Batch Create Client Tests", () => {
       erc721Module,
       erc1155Module,
     ];
-    const moduleIds: string[] = [
-      jokeraceId,
-      stakingId,
-      erc20Id,
-      erc721Id,
-      erc1155Id,
+    const moduleIdsAndVersions: { id: string; version: string }[] = [
+      { id: jokeraceId, version: jokeraceVersion },
+      { id: stakingId, version: stakingVersion },
+      { id: erc20Id, version: erc20Version },
+      { id: erc721Id, version: erc721Version },
+      { id: erc1155Id, version: erc1155Version },
     ];
     const hatIds: bigint[] = [
       BigInt(
@@ -163,7 +181,8 @@ describe("Batch Create Client Tests", () => {
 
     const res = await hatsModulesClient.batchCreateNewInstances({
       account: deployerAccount,
-      moduleIds,
+      moduleIdsAndVersions,
+
       hatIds,
       immutableArgsArray: immutableArgs,
       mutableArgsArray: mutableArgs,
