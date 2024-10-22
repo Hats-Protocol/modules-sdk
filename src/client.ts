@@ -113,7 +113,7 @@ export class HatsModulesClient {
       });
 
       if (moduleSupportedInChain) {
-        const moduleId: string = module.implementationAddress;
+        const moduleId: string = `${module.id}-${module.version}`;
 
         if (this._modules !== undefined) {
           this._modules[moduleId] = module;
