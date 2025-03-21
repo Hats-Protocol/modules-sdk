@@ -546,14 +546,14 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
 
       // Error from an unknown module
       throw new ModuleFunctionRevertedError(
-        `Error: module function reverted with error name ${errorName}`
+        `Error: module function reverted with error name ${errorName}.\n${JSON.stringify(err)}`
       );
     }
   } else {
     if (err instanceof Error) {
       throw err;
     } else {
-      throw new Error("Unexpected error occured");
+      throw new Error("Unexpected error occurred");
     }
   }
 }

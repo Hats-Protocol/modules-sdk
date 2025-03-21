@@ -1,13 +1,13 @@
 {
   "name": "@hatsprotocol/modules-sdk",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "author": "Haberdasher Labs",
   "license": "MIT",
   "main": "dist/modules-sdk.cjs.js",
   "module": "dist/modules-sdk.esm.js",
   "typings": "dist/index.d.ts",
   "scripts": {
-    "test": "NODE_OPTIONS=--experimental-vm-modules yarn exec jest -- -i",
+    "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest ./test/*.test.ts",
     "build": "rollup -c",
     "eslint": "eslint . --ext '.ts,.tsx'",
     "eslint:fix": "eslint . --ext '.ts,.tsx' --fix"

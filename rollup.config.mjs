@@ -1,9 +1,9 @@
 import typescript from "rollup-plugin-typescript2";
 import json from "@rollup/plugin-json";
-import pkg from "./package.json" assert { type: "json" };
+import pkg from "./package.json" with { type: "json" };
 
 const input = "src/index.ts";
-const external = [...Object.keys(pkg.dependencies || {})];
+const external = [...Object.keys({ ...pkg.dependencies, viem: '' } || {})];
 
 export default [
   {
