@@ -16,8 +16,8 @@ importers:
         version: 3.24.2
     devDependencies:
       '@hatsprotocol/sdk-v1-core':
-        specifier: ^0.8.0
-        version: 0.8.1(viem@2.23.9(typescript@5.8.2)(zod@3.24.2))
+        specifier: ^0.11.0
+        version: 0.11.0(viem@2.23.9(typescript@5.8.2)(zod@3.24.2))
       '@rollup/plugin-json':
         specifier: ^6.0.0
         version: 6.1.0(rollup@3.29.5)
@@ -270,13 +270,13 @@ packages:
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
 
-  '@hatsprotocol/sdk-v1-core@0.8.1':
-    resolution: {integrity: sha512-3oTn5EPNT/5Sf74S8LjfjkR/IGQp+v4kUXb2Axof0rvMzuY/bi+7Sf8Vicg3UJ301MX8pkdDauNHXLNDNdFG6A==}
+  '@hatsprotocol/sdk-v1-core@0.11.0':
+    resolution: {integrity: sha512-Rbf3GRMX9YdN6ZDNd+O+KsTijhbblpcTFI53yNn80kPxbYXT7xINDEH/m/lKP7/7zb2knwzZxe82O/Go/jwjpg==}
     peerDependencies:
-      viem: ^1.11.0
+      viem: ^2.0.0
 
-  '@hatsprotocol/sdk-v1-subgraph@0.4.1':
-    resolution: {integrity: sha512-BIC3hvoHJWkOsa1FaYViCvN8aMOyWRRZ2f7O73NtxAPFP0hvrFwDB/ur+lwOXekIgaGGm1VVedChzRqFi99JOg==}
+  '@hatsprotocol/sdk-v1-subgraph@1.1.0':
+    resolution: {integrity: sha512-cxf+9cfs1gBmNhgDTUqQvN8g8GyED/vYb1YlbLI8VIEhRiD89bDKEh+JkJinc5yd8jOE9sPH/OmRlo4QYdbkrQ==}
 
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
@@ -2210,16 +2210,16 @@ snapshots:
     dependencies:
       graphql: 16.10.0
 
-  '@hatsprotocol/sdk-v1-core@0.8.1(viem@2.23.9(typescript@5.8.2)(zod@3.24.2))':
+  '@hatsprotocol/sdk-v1-core@0.11.0(viem@2.23.9(typescript@5.8.2)(zod@3.24.2))':
     dependencies:
-      '@hatsprotocol/sdk-v1-subgraph': 0.4.1
+      '@hatsprotocol/sdk-v1-subgraph': 1.1.0
       graphql: 16.10.0
       graphql-request: 6.1.0(graphql@16.10.0)
       viem: 2.23.9(typescript@5.8.2)(zod@3.24.2)
     transitivePeerDependencies:
       - encoding
 
-  '@hatsprotocol/sdk-v1-subgraph@0.4.1':
+  '@hatsprotocol/sdk-v1-subgraph@1.1.0':
     dependencies:
       graphql: 16.10.0
       graphql-request: 6.1.0(graphql@16.10.0)

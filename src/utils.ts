@@ -16,7 +16,7 @@ import type { TransactionReceipt } from "viem";
  * Thrown if one of the immutable/mutable args is invalid.
  *
  * @throws ParametersLengthsMismatchError
- * Thrown if one of the immutable/mutable args array's length doens't match the module's schema.
+ * Thrown if one of the immutable/mutable args array's length doesn't match the module's schema.
  */
 export const checkAndEncodeArgs = ({
   module,
@@ -62,7 +62,7 @@ export const checkAndEncodeArgs = ({
  * Thrown if one of the immutable args is invalid.
  *
  * @throws ParametersLengthsMismatchError
- * Thrown if the immutable args array's length doens't match the module's schema.
+ * Thrown if the immutable args array's length doesn't match the module's schema.
  */
 export const checkImmutableArgs = ({
   module,
@@ -98,7 +98,7 @@ export const checkImmutableArgs = ({
  * Thrown if one of the mutable args is invalid.
  *
  * @throws ParametersLengthsMismatchError
- * Thrown if the mutable args array's length doens't match the module's schema.
+ * Thrown if the mutable args array's length doesn't match the module's schema.
  */
 export const checkMutableArgs = ({
   module,

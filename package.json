@@ -1,6 +1,6 @@
 {
   "name": "@hatsprotocol/modules-sdk",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "author": "Haberdasher Labs",
   "license": "MIT",
   "main": "dist/modules-sdk.cjs.js",
@@ -13,7 +13,7 @@
     "eslint:fix": "eslint . --ext '.ts,.tsx' --fix"
   },
   "devDependencies": {
-    "@hatsprotocol/sdk-v1-core": "^0.8.0",
+    "@hatsprotocol/sdk-v1-core": "^0.11.0",
     "@rollup/plugin-json": "^6.0.0",
     "@types/jest": "^29.5.3",
     "@typescript-eslint/eslint-plugin": "^6.3.0",
