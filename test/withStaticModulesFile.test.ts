@@ -3,8 +3,15 @@ import "dotenv/config";
 import type { Anvil } from "@viem/anvil";
 import { createAnvil } from "@viem/anvil";
 import * as fs from "fs";
-import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
-import { createPublicClient, createWalletClient, http } from "viem";
+import {
+  type Address,
+  createPublicClient,
+  createWalletClient,
+  http,
+  type PrivateKeyAccount,
+  type PublicClient,
+  type WalletClient,
+} from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 
@@ -58,7 +65,7 @@ describe("Client Tests With a Static Modules File", () => {
     await anvil.stop();
   }, 30000);
 
-  test("Test get all active module", () => {
+  test("Test get all active modules", () => {
     const filter = (module: Module) => {
       for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
         const tag = module.tags[tagIndex];
@@ -117,7 +124,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(metaModulesCount).toBe(4);
   });
 
-  test("Test create new jokerace instance and get instace parameters", async () => {
+  test("Test create new jokerace instance and get instance parameters", async () => {
     const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
     const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
 

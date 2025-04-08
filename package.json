@@ -10,7 +10,8 @@
     "test": "NODE_OPTIONS=--experimental-vm-modules pnpm jest ./test/*.test.ts",
     "build": "rollup -c",
     "eslint": "eslint . --ext '.ts,.tsx'",
-    "eslint:fix": "eslint . --ext '.ts,.tsx' --fix"
+    "eslint:fix": "eslint . --ext '.ts,.tsx' --fix",
+    "registry": "curl https://raw.githubusercontent.com/Hats-Protocol/modules-registry/refs/heads/v1/modules.json -o ./test/modules.json"
   },
   "devDependencies": {
     "@eslint/js": "^9.24.0",

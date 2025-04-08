@@ -64,7 +64,7 @@ describe("Eligibility Client Tests", () => {
     });
 
     for (const [id, module] of Object.entries(modules)) {
-      // jokerace and baal staking eligibilities deployment falis due to dependency on external contracts
+      // jokerace and baal staking eligibilities deployment fails due to dependency on external contracts
       if (
         id === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a" ||
         id === "0xa1E79f78630F77436C001Af44893A2720180E19F" ||
@@ -73,7 +73,7 @@ describe("Eligibility Client Tests", () => {
         continue;
       }
 
-      console.log(`Deploying an instance of module ${module.name}`);
+      // console.log(`Deploying an instance of module ${module.name}`);
 
       const hatId = module.creationArgs.useHatId
         ? BigInt("0x0000000100000000000000000000000000000000000000000000000000000000")
