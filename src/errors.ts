@@ -1,3 +1,17 @@
+import {
+  AllHatsWornError,
+  AlreadyWearingError,
+  HatNotExistError,
+  InvalidAdminError,
+  MaxLevelReachedError,
+  NotActiveError,
+  NotAdminError,
+  NotAdminOrWearerError,
+  NotEligibilityError,
+  NotEligibleError,
+  NotToggleError,
+  NotWearerError,
+} from "@hatsprotocol/sdk-v1-core";
 import { BaseError, ContractFunctionRevertedError } from "viem";
 
 export class ChainIdMismatchError extends Error {
@@ -324,33 +338,28 @@ export class StakingEligibility_NotSlashedError extends Error {
 // @ts-ignore
 export function getModuleFunctionError(err: unknown, moduleId: string): never {
   if (err instanceof BaseError) {
-    const revertError = err.walk(
-      (err) => err instanceof ContractFunctionRevertedError
-    );
+    const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError);
     if (revertError instanceof ContractFunctionRevertedError) {
       const errorName = revertError.data?.errorName ?? "";
+      const errorArgs = revertError.data?.args as any[];
 
       // AllowList Eligibility error
       if (moduleId === "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5") {
         switch (errorName) {
           case "AllowlistEligibility_NotOwner": {
-            throw new AllowlistEligibility_NotOwnerError(
-              `Error: the caller does not wear the module's Owner Hat`
-            );
+            throw new AllowlistEligibility_NotOwnerError(`Error: the caller does not wear the module's Owner Hat`);
           }
           case "AllowlistEligibility_NotArbitrator": {
             throw new AllowlistEligibility_NotArbitratorError(
-              `Error: the caller does not wear the module's Arbitrator Hat`
+              `Error: the caller does not wear the module's Arbitrator Hat`,
             );
           }
           case "AllowlistEligibility_ArrayLengthMismatch": {
-            throw new AllowlistEligibility_NotArbitratorError(
-              `Error: array arguments are not of the same length`
-            );
+            throw new AllowlistEligibility_NotArbitratorError(`Error: array arguments are not of the same length`);
           }
           case "AllowlistEligibility_NotWearer": {
             throw new AllowlistEligibility_NotWearerError(
-              `Error: Attempting to burn a hat that an account is not wearing`
+              `Error: Attempting to burn a hat that an account is not wearing`,
             );
           }
           default: {
@@ -364,37 +373,35 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
         switch (errorName) {
           case "NotBallotBox": {
             throw new HatsElectionEligibility_NotBallotBoxError(
-              `Error: the caller does not wear the module's Ballot Box Hat`
+              `Error: the caller does not wear the module's Ballot Box Hat`,
             );
           }
           case "NotAdmin": {
-            throw new HatsElectionEligibility_NotAdminError(
-              `Error: the caller does not wear the module's Admin Hat`
-            );
+            throw new HatsElectionEligibility_NotAdminError(`Error: the caller does not wear the module's Admin Hat`);
           }
           case "TooManyWinners": {
             throw new HatsElectionEligibility_TooManyWinnersError(
-              `Error: amount of election winners is larger than the hat's max amount of wearers`
+              `Error: amount of election winners is larger than the hat's max amount of wearers`,
             );
           }
           case "ElectionClosed": {
             throw new HatsElectionEligibility_ElectionClosedError(
-              `Error: attempting to submit results for a closed election`
+              `Error: attempting to submit results for a closed election`,
             );
           }
           case "InvalidTermEnd": {
             throw new HatsElectionEligibility_InvalidTermEndError(
-              `Error: the next term's end time must be larger than the current one`
+              `Error: the next term's end time must be larger than the current one`,
             );
           }
           case "TermNotEnded": {
             throw new HatsElectionEligibility_TermNotEndedError(
-              `Error: attempting to start the next term while the current one has not ended`
+              `Error: attempting to start the next term while the current one has not ended`,
             );
           }
           case "NextTermNotReady": {
             throw new HatsElectionEligibility_NextTermNotReadyError(
-              `Error: next term must be set and its election must be closed`
+              `Error: next term must be set and its election must be closed`,
             );
           }
           default: {
@@ -407,28 +414,24 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       if (moduleId === "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a") {
         switch (errorName) {
           case "JokeraceEligibility_ContestNotCompleted": {
-            throw new JokeraceEligibility_ContestNotCompletedError(
-              `Error: the JokeRace contest has not completed yet`
-            );
+            throw new JokeraceEligibility_ContestNotCompletedError(`Error: the JokeRace contest has not completed yet`);
           }
           case "JokeraceEligibility_TermNotCompleted": {
             throw new JokeraceEligibility_TermNotCompletedError(
-              `Error: can only set a new election once the current term has ended`
+              `Error: can only set a new election once the current term has ended`,
             );
           }
           case "JokeraceEligibility_NotAdmin": {
-            throw new JokeraceEligibility_NotAdminError(
-              `Error: caller does not wear the module's Admin Hat`
-            );
+            throw new JokeraceEligibility_NotAdminError(`Error: caller does not wear the module's Admin Hat`);
           }
           case "JokeraceEligibility_MustHaveDownvotingDisabled": {
             throw new JokeraceEligibility_MustHaveDownvotingDisabledError(
-              `Error: only JokeRace contests with down-voting disabled are supported`
+              `Error: only JokeRace contests with down-voting disabled are supported`,
             );
           }
           case "JokeraceEligibility_MustHaveSortingEnabled": {
             throw new JokeraceEligibility_MustHaveSortingEnabledError(
-              `Error: only JokeRace contests with sorting enabled are supported`
+              `Error: only JokeRace contests with sorting enabled are supported`,
             );
           }
           default: {
@@ -442,7 +445,7 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
         switch (errorName) {
           case "NotAuthorized": {
             throw new PassthroughEligibility_NotAuthorizedError(
-              `Error: caller is not wearing the eligibility/toggle passthrough hat`
+              `Error: caller is not wearing the eligibility/toggle passthrough hat`,
             );
           }
           default: {
@@ -455,23 +458,19 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
       if (moduleId === "0xFb6bD2e96B123d0854064823f6cb59420A285C00") {
         switch (errorName) {
           case "SeasonToggle_NotBranchAdmin": {
-            throw new SeasonToggle_NotBranchAdminError(
-              `Error: caller is not an admin of the season toggle branch`
-            );
+            throw new SeasonToggle_NotBranchAdminError(`Error: caller is not an admin of the season toggle branch`);
           }
           case "SeasonToggle_NotExtendable": {
             throw new SeasonToggle_NotExtendableError(
-              `Error: attempting to extend a branch to a new season before its extendable`
+              `Error: attempting to extend a branch to a new season before its extendable`,
             );
           }
           case "SeasonToggle_InvalidExtensionDelay": {
-            throw new SeasonToggle_InvalidExtensionDelayError(
-              `Error: valid extension delays are smaller than 10,000`
-            );
+            throw new SeasonToggle_InvalidExtensionDelayError(`Error: valid extension delays are smaller than 10,000`);
           }
           case "SeasonToggle_SeasonDurationTooShort": {
             throw new SeasonToggle_SeasonDurationTooShortError(
-              `Error: season durations must be at least one hour long`
+              `Error: season durations must be at least one hour long`,
             );
           }
           default: {
@@ -485,58 +484,46 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
         switch (errorName) {
           case "StakingEligibility_InsufficientStake": {
             throw new StakingEligibility_InsufficientStakeError(
-              `Error: attempting to unstake more than staker has staked`
+              `Error: attempting to unstake more than staker has staked`,
             );
           }
           case "StakingEligibility_CooldownNotEnded": {
             throw new StakingEligibility_CooldownNotEndedError(
-              `Error: attempting to complete an unstake before the cooldown period has elapsed`
+              `Error: attempting to complete an unstake before the cooldown period has elapsed`,
             );
           }
           case "StakingEligibility_NoCooldownEnded": {
             throw new StakingEligibility_NoCooldownError(
-              `Error: attempting to complete an unstake before beginning a cooldown period`
+              `Error: attempting to complete an unstake before beginning a cooldown period`,
             );
           }
           case "StakingEligibility_AlreadySlashed": {
             throw new StakingEligibility_AlreadySlashedError(
-              `Error: attempting to slash an already-slashed wearer, or a slashed staker tries to unstake`
+              `Error: attempting to slash an already-slashed wearer, or a slashed staker tries to unstake`,
             );
           }
           case "StakingEligibility_NotJudge": {
-            throw new StakingEligibility_NotJudgeError(
-              `Error: caller is not wearing the Judge Hat`
-            );
+            throw new StakingEligibility_NotJudgeError(`Error: caller is not wearing the Judge Hat`);
           }
           case "StakingEligibility_NotRecipient": {
-            throw new StakingEligibility_NotRecipientError(
-              `Error: caller is not wearing the Recipient Hat`
-            );
+            throw new StakingEligibility_NotRecipientError(`Error: caller is not wearing the Recipient Hat`);
           }
           case "StakingEligibility_NotHatAdmin": {
-            throw new StakingEligibility_NotHatAdminError(
-              `Error: caller is not the hat's admin`
-            );
+            throw new StakingEligibility_NotHatAdminError(`Error: caller is not the hat's admin`);
           }
           case "StakingEligibility_HatImmutable": {
             throw new StakingEligibility_HatImmutableError(
-              `Error: a change to the minStake is attempted on an immutable hat`
+              `Error: a change to the minStake is attempted on an immutable hat`,
             );
           }
           case "StakingEligibility_TransferFailed": {
-            throw new StakingEligibility_TransferFailedError(
-              `Error: staking token transfer has failed`
-            );
+            throw new StakingEligibility_TransferFailedError(`Error: staking token transfer has failed`);
           }
           case "StakingEligibility_NothingToWithdraw": {
-            throw new StakingEligibility_NothingToWithdrawError(
-              `Error: nothing to withdraw`
-            );
+            throw new StakingEligibility_NothingToWithdrawError(`Error: nothing to withdraw`);
           }
           case "StakingEligibility_NotSlashed": {
-            throw new StakingEligibility_NotSlashedError(
-              `Error: attempting to forgive an unslashed staker`
-            );
+            throw new StakingEligibility_NotSlashedError(`Error: attempting to forgive an unslashed staker`);
           }
           default: {
             throw err;
@@ -544,9 +531,61 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
         }
       }
 
+      // Errors from Hats core
+      switch (errorName) {
+        case "NotAdmin": {
+          throw new NotAdminError(
+            `Error: address ${errorArgs[0]} is attempting to perform an action on ${errorArgs[1]} but is not wearing one of its admin hats`,
+          );
+        }
+        case "NotHatWearer": {
+          throw new NotWearerError(
+            `Error: attempting to perform an action as or for an account that is not a wearer of a given hat`,
+          );
+        }
+        case "NotAdminOrWearer": {
+          throw new NotAdminOrWearerError(
+            `Error: attempting to perform an action that requires being either an admin or wearer of a given hat`,
+          );
+        }
+        case "AllHatsWorn": {
+          throw new AllHatsWornError(`Error: attempting to mint ${errorArgs[0]} but its maxSupply has been reached`);
+        }
+        case "MaxLevelsReached": {
+          throw new MaxLevelReachedError(`Error: attempting to create a hat with a level 14 hat as its admin`);
+        }
+        case "InvalidHatId": {
+          throw new InvalidAdminError(`Error: provided hat id has empty intermediate level(s)`);
+        }
+        case "AlreadyWearingHat": {
+          throw new AlreadyWearingError(
+            `Error: attempting to mint hat with ID ${errorArgs[1]} to address ${errorArgs[0]} who is already wearing the hat`,
+          );
+        }
+        case "HatDoesNotExist": {
+          throw new HatNotExistError(`Error: attempting to mint a non-existent hat with ID ${errorArgs[0]}`);
+        }
+        case "HatNotActive": {
+          throw new NotActiveError(`Error: attempting to mint or transfer a hat that is not active`);
+        }
+        case "NotEligible": {
+          throw new NotEligibleError(`Error: attempting to mint or transfer a hat to an ineligible wearer`);
+        }
+        case "NotHatsToggle": {
+          throw new NotToggleError(
+            `Error: attempting to set a hat's status from an account that is not that hat's toggle module`,
+          );
+        }
+        case "NotHatsEligibility": {
+          throw new NotEligibilityError(
+            `Error: attempting to check or set a hat wearer's status from an account that is not that hat's eligibility module`,
+          );
+        }
+      }
+
       // Error from an unknown module
       throw new ModuleFunctionRevertedError(
-        `Error: module function reverted with error name ${errorName}.\n${JSON.stringify(err)}`
+        `Error: module function reverted with error name ${errorName}.\n${JSON.stringify(err)}`,
       );
     }
   } else {

@@ -1,46 +1,42 @@
-import { PublicClient, WalletClient, encodePacked, decodeEventLog } from "viem";
+import axios from "axios";
+import type { Abi, Account, Address, TransactionReceipt } from "viem";
+import { decodeEventLog, encodePacked, PublicClient, WalletClient } from "viem";
+
 import {
-  MissingPublicClientError,
-  MissingWalletClientError,
-  ModuleNotAvailableError,
-  TransactionRevertedError,
-  InvalidParamError,
-  ClientNotPreparedError,
-  ModulesRegistryFetchError,
-  ModuleParameterError,
-  getModuleFunctionError,
-  MissingPublicClientChainError,
-} from "./errors";
-import { verify } from "./schemas";
-import {
+  CHAIN_ABI,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
+  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL,
   HATS_MODULE_ABI,
   HATS_MODULES_FACTORY_ABI,
   HATS_MODULES_FACTORY_ADDRESS,
-  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS,
-  CHAIN_ABI,
-  HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL,
   HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL,
 } from "./constants";
-import axios from "axios";
 import {
-  checkAndEncodeArgs,
-  checkImmutableArgs,
-  getNewInstancesFromReceipt,
-  checkWriteFunctionArgs,
-} from "./utils";
-import type { Abi, Account, Address, TransactionReceipt } from "viem";
+  ClientNotPreparedError,
+  getModuleFunctionError,
+  InvalidParamError,
+  MissingPublicClientChainError,
+  MissingPublicClientError,
+  MissingWalletClientError,
+  ModuleNotAvailableError,
+  ModuleParameterError,
+  ModulesRegistryFetchError,
+  TransactionRevertedError,
+} from "./errors";
+import { verify } from "./schemas";
 import type {
-  Module,
-  ModuleParameter,
-  CreateInstanceResult,
   BatchCreateInstancesResult,
   CallInstanceWriteFunctionResult,
-  Registry,
-  WriteFunction,
-  Ruleset,
+  CreateInstanceResult,
   GetRulesetsConfig,
+  Module,
+  ModuleParameter,
+  Registry,
+  Ruleset,
+  WriteFunction,
 } from "./types";
+import { checkAndEncodeArgs, checkImmutableArgs, checkWriteFunctionArgs, getNewInstancesFromReceipt } from "./utils";
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
@@ -55,20 +51,12 @@ export class HatsModulesClient {
    * @param walletClient - Viem Wallet Client.
    * @returns A HatsModulesClient instance.
    */
-  constructor({
-    publicClient,
-    walletClient,
-  }: {
-    publicClient: PublicClient;
-    walletClient?: WalletClient;
-  }) {
+  constructor({ publicClient, walletClient }: { publicClient: PublicClient; walletClient?: WalletClient }) {
     if (publicClient === undefined) {
       throw new MissingPublicClientError("Error: Public client is required");
     }
     if (publicClient.chain === undefined) {
-      throw new MissingPublicClientChainError(
-        "Error: Public client must be initialized with a chain"
-      );
+      throw new MissingPublicClientChainError("Error: Public client must be initialized with a chain");
     }
 
     this._publicClient = publicClient;
@@ -88,22 +76,16 @@ export class HatsModulesClient {
     } else {
       try {
         const result = await axios.get(
-          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/v1/modules.json"
+          "https://raw.githubusercontent.com/Hats-Protocol/modules-registry/v1/modules.json",
         );
         registryToUse = result.data;
       } catch (err) {
-        throw new ModulesRegistryFetchError(
-          "Error: Could not fetch modules from the registry"
-        );
+        throw new ModulesRegistryFetchError("Error: Could not fetch modules from the registry");
       }
     }
 
     this._modules = {};
-    for (
-      let moduleIndex = 0;
-      moduleIndex < registryToUse.modules.length;
-      moduleIndex++
-    ) {
+    for (let moduleIndex = 0; moduleIndex < registryToUse.modules.length; moduleIndex++) {
       const module = registryToUse.modules[moduleIndex];
       let moduleSupportedInChain = false;
       module.deployments.forEach((deployment) => {
@@ -150,20 +132,18 @@ export class HatsModulesClient {
   }): Promise<CreateInstanceResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
     if (this._walletClient === undefined) {
       throw new MissingWalletClientError(
-        "Error: the client was initialized without a wallet client, which is required for this function"
+        "Error: the client was initialized without a wallet client, which is required for this function",
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Error: Module with id ${moduleId} does not exist`
-      );
+      throw new ModuleNotAvailableError(`Error: Module with id ${moduleId} does not exist`);
     }
 
     // verify hat ID
@@ -185,9 +165,7 @@ export class HatsModulesClient {
       }
       saltNonceToUse = saltNonce;
     } else {
-      saltNonceToUse = BigInt(
-        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-      );
+      saltNonceToUse = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
     }
 
     try {
@@ -255,12 +233,12 @@ export class HatsModulesClient {
   }): Promise<BatchCreateInstancesResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
     if (this._walletClient === undefined) {
       throw new MissingWalletClientError(
-        "Error: the client was initialized without a wallet client, which is required for this function"
+        "Error: the client was initialized without a wallet client, which is required for this function",
       );
     }
 
@@ -272,9 +250,7 @@ export class HatsModulesClient {
     for (let i = 0; i < moduleIds.length; i++) {
       const module = this.getModuleById(moduleIds[i]);
       if (module === undefined) {
-        throw new ModuleNotAvailableError(
-          `Error: Module with id ${moduleIds[i]} does not exist`
-        );
+        throw new ModuleNotAvailableError(`Error: Module with id ${moduleIds[i]} does not exist`);
       }
 
       // verify hat ID
@@ -289,9 +265,7 @@ export class HatsModulesClient {
         }
         saltNoncesToUse.push(saltNonces[i]);
       } else {
-        saltNoncesToUse.push(
-          BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER))
-        );
+        saltNoncesToUse.push(BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)));
       }
 
       const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
@@ -361,15 +335,13 @@ export class HatsModulesClient {
   }): Promise<Address> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Module with id ${moduleId} does not exist`
-      );
+      throw new ModuleNotAvailableError(`Module with id ${moduleId} does not exist`);
     }
 
     // verify hat ID
@@ -382,21 +354,13 @@ export class HatsModulesClient {
     const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
       return arg.type;
     });
-    const immutableArgsEncoded =
-      immutableArgs.length > 0
-        ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "0x";
+    const immutableArgsEncoded = immutableArgs.length > 0 ? encodePacked(immutableArgsTypes, immutableArgs) : "0x";
 
     const predictedAddress: Address = (await this._publicClient.readContract({
       address: HATS_MODULES_FACTORY_ADDRESS,
       abi: HATS_MODULES_FACTORY_ABI,
       functionName: "getHatsModuleAddress",
-      args: [
-        module.implementationAddress as Address,
-        hatId,
-        immutableArgsEncoded,
-        saltNonce,
-      ],
+      args: [module.implementationAddress as Address, hatId, immutableArgsEncoded, saltNonce],
     })) as Address;
 
     return predictedAddress;
@@ -424,15 +388,13 @@ export class HatsModulesClient {
   }): Promise<boolean> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Error: Module with id ${moduleId} does not exist`
-      );
+      throw new ModuleNotAvailableError(`Error: Module with id ${moduleId} does not exist`);
     }
 
     // verify hat ID
@@ -445,21 +407,13 @@ export class HatsModulesClient {
     const immutableArgsTypes = module.creationArgs.immutable.map((arg) => {
       return arg.type;
     });
-    const immutableArgsEncoded =
-      immutableArgs.length > 0
-        ? encodePacked(immutableArgsTypes, immutableArgs)
-        : "0x";
+    const immutableArgsEncoded = immutableArgs.length > 0 ? encodePacked(immutableArgsTypes, immutableArgs) : "0x";
 
     const deployed: boolean = (await this._publicClient.readContract({
       address: HATS_MODULES_FACTORY_ADDRESS,
       abi: HATS_MODULES_FACTORY_ABI,
       functionName: "deployed",
-      args: [
-        module.implementationAddress as Address,
-        hatId,
-        immutableArgsEncoded,
-        saltNonce,
-      ],
+      args: [module.implementationAddress as Address, hatId, immutableArgsEncoded, saltNonce],
     })) as boolean;
 
     return deployed;
@@ -473,12 +427,10 @@ export class HatsModulesClient {
    * @returns A list of objects, for each parameter. Each object includes the parameter's value, label, Solidity type and display type. If
    * the given address is not an instance of a registry module, then returns 'undefined'.
    */
-  async getInstanceParameters(
-    instance: Address
-  ): Promise<ModuleParameter[] | undefined> {
+  async getInstanceParameters(instance: Address): Promise<ModuleParameter[] | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -490,24 +442,13 @@ export class HatsModulesClient {
       return undefined;
     }
 
-    for (
-      let paramIndex = 0;
-      paramIndex < module.parameters.length;
-      paramIndex++
-    ) {
+    for (let paramIndex = 0; paramIndex < module.parameters.length; paramIndex++) {
       const param = module.parameters[paramIndex];
 
-      for (
-        let abiItemIndex = 0;
-        abiItemIndex < module.abi.length;
-        abiItemIndex++
-      ) {
+      for (let abiItemIndex = 0; abiItemIndex < module.abi.length; abiItemIndex++) {
         const abiItem = module.abi[abiItemIndex];
 
-        if (
-          abiItem.type === "function" &&
-          abiItem.name === param.functionName
-        ) {
+        if (abiItem.type === "function" && abiItem.name === param.functionName) {
           if (abiItem.inputs.length > 0 || abiItem.outputs.length !== 1) {
             break;
           }
@@ -521,7 +462,7 @@ export class HatsModulesClient {
             });
           } catch (err) {
             throw new ModuleParameterError(
-              `Error: Failed reading function ${param.functionName} from the module instance ${instance}`
+              `Error: Failed reading function ${param.functionName} from the module instance ${instance}`,
             );
           }
 
@@ -541,7 +482,7 @@ export class HatsModulesClient {
   }
 
   /*//////////////////////////////////////////////////////////////
-                       Chain Modules
+  //                     Chain Modules
   //////////////////////////////////////////////////////////////*/
 
   /**
@@ -572,14 +513,11 @@ export class HatsModulesClient {
   }): Promise<CreateInstanceResult> {
     if (this._walletClient === undefined) {
       throw new MissingWalletClientError(
-        "Error: the client was initialized without a wallet client, which is required for this function"
+        "Error: the client was initialized without a wallet client, which is required for this function",
       );
     }
 
-    const numModules = clausesLengths.reduce(
-      (partialSum, len) => partialSum + len,
-      0
-    );
+    const numModules = clausesLengths.reduce((partialSum, len) => partialSum + len, 0);
     const immutableArgsTypes = ["uint256", "uint256[]"];
     const immutableArgs: unknown[] = [numClauses, clausesLengths];
     for (let i = 0; i < numModules; i++) {
@@ -588,10 +526,7 @@ export class HatsModulesClient {
     }
 
     const mutableArgsEncoded = "0x";
-    const immutableArgsEncoded = encodePacked(
-      immutableArgsTypes,
-      immutableArgs
-    );
+    const immutableArgsEncoded = encodePacked(immutableArgsTypes, immutableArgs);
 
     let saltNonceToUse: bigint;
     if (saltNonce !== undefined) {
@@ -601,9 +536,7 @@ export class HatsModulesClient {
       }
       saltNonceToUse = saltNonce;
     } else {
-      saltNonceToUse = BigInt(
-        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-      );
+      saltNonceToUse = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
     }
 
     try {
@@ -682,14 +615,11 @@ export class HatsModulesClient {
   }): Promise<CreateInstanceResult> {
     if (this._walletClient === undefined) {
       throw new MissingWalletClientError(
-        "Error: the client was initialized without a wallet client, which is required for this function"
+        "Error: the client was initialized without a wallet client, which is required for this function",
       );
     }
 
-    const numModules = clausesLengths.reduce(
-      (partialSum, len) => partialSum + len,
-      0
-    );
+    const numModules = clausesLengths.reduce((partialSum, len) => partialSum + len, 0);
     const immutableArgsTypes = ["uint256", "uint256[]"];
     const immutableArgs: unknown[] = [numClauses, clausesLengths];
     for (let i = 0; i < numModules; i++) {
@@ -698,10 +628,7 @@ export class HatsModulesClient {
     }
 
     const mutableArgsEncoded = "0x";
-    const immutableArgsEncoded = encodePacked(
-      immutableArgsTypes,
-      immutableArgs
-    );
+    const immutableArgsEncoded = encodePacked(immutableArgsTypes, immutableArgs);
 
     let saltNonceToUse: bigint;
     if (saltNonce !== undefined) {
@@ -711,9 +638,7 @@ export class HatsModulesClient {
       }
       saltNonceToUse = saltNonce;
     } else {
-      saltNonceToUse = BigInt(
-        Math.floor(Math.random() * Number.MAX_SAFE_INTEGER)
-      );
+      saltNonceToUse = BigInt(Math.floor(Math.random() * Number.MAX_SAFE_INTEGER));
     }
 
     try {
@@ -770,10 +695,7 @@ export class HatsModulesClient {
    * @param address - instance address.
    * @returns the module's rulesets, or 'undefined' if the provided address is not a module.
    */
-  async getRulesets(
-    address: Address,
-    config?: GetRulesetsConfig
-  ): Promise<Ruleset[] | undefined> {
+  async getRulesets(address: Address, config?: GetRulesetsConfig): Promise<Ruleset[] | undefined> {
     const isChain = await this.isChain(address);
     if (isChain) {
       const rulesets = this.getChain(address, config?.includeLiveParams);
@@ -784,12 +706,8 @@ export class HatsModulesClient {
         return module;
       } else {
         if (config?.includeLiveParams) {
-          const liveParams = (await this.getInstanceParameters(
-            address
-          )) as ModuleParameter[];
-          return [
-            [{ module: module, address: address, liveParams: liveParams }],
-          ];
+          const liveParams = (await this.getInstanceParameters(address)) as ModuleParameter[];
+          return [[{ module: module, address: address, liveParams: liveParams }]];
         } else {
           return [[{ module: module, address: address }]];
         }
@@ -803,17 +721,12 @@ export class HatsModulesClient {
    * @param addresses - instances addresses.
    * @returns for each instance, returns the module's rulesets, or 'undefined' if the provided address is not a module.
    */
-  async getRulesetsBatched(
-    addresses: Address[],
-    config?: GetRulesetsConfig
-  ): Promise<(Ruleset[] | undefined)[]> {
+  async getRulesetsBatched(addresses: Address[], config?: GetRulesetsConfig): Promise<(Ruleset[] | undefined)[]> {
     if (addresses.length === 0) {
       return [];
     }
 
-    const res: (Ruleset[] | undefined)[] = new Array<Ruleset[] | undefined>(
-      addresses.length
-    );
+    const res: (Ruleset[] | undefined)[] = new Array<Ruleset[] | undefined>(addresses.length);
 
     const isChains = await this.isChainBatched(addresses);
 
@@ -830,26 +743,16 @@ export class HatsModulesClient {
     // handle chains
     const chains = await this.getChainBatched(
       chainAddressesAndPos.map((elem) => elem.address),
-      config?.includeLiveParams
+      config?.includeLiveParams,
     );
-    for (
-      let chainIndex = 0;
-      chainIndex < chainAddressesAndPos.length;
-      chainIndex++
-    ) {
+    for (let chainIndex = 0; chainIndex < chainAddressesAndPos.length; chainIndex++) {
       const rulesets = chains[chainIndex];
       res[chainAddressesAndPos[chainIndex].pos] = rulesets;
     }
 
     // handle non chains
-    const modules = await this.getModulesByInstances(
-      nonChainAddressesAndPos.map((elem) => elem.address)
-    );
-    for (
-      let nonChainIndex = 0;
-      nonChainIndex < nonChainAddressesAndPos.length;
-      nonChainIndex++
-    ) {
+    const modules = await this.getModulesByInstances(nonChainAddressesAndPos.map((elem) => elem.address));
+    for (let nonChainIndex = 0; nonChainIndex < nonChainAddressesAndPos.length; nonChainIndex++) {
       const address = nonChainAddressesAndPos[nonChainIndex].address;
       const module = modules[nonChainIndex];
       if (module === undefined) {
@@ -857,9 +760,7 @@ export class HatsModulesClient {
       } else {
         let liveParams: ModuleParameter[] = [];
         if (config?.includeLiveParams) {
-          liveParams = (await this.getInstanceParameters(
-            address
-          )) as ModuleParameter[];
+          liveParams = (await this.getInstanceParameters(address)) as ModuleParameter[];
         }
         res[nonChainAddressesAndPos[nonChainIndex].pos] = [
           [
@@ -891,14 +792,10 @@ export class HatsModulesClient {
       });
 
       if (
-        implementationAddress.toLowerCase() ===
-          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
-        implementationAddress.toLowerCase() ===
-          HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
-        implementationAddress.toLowerCase() ===
-          HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
-        implementationAddress.toLowerCase() ===
-          HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
+        implementationAddress.toLowerCase() === HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+        implementationAddress.toLowerCase() === HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+        implementationAddress.toLowerCase() === HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
+        implementationAddress.toLowerCase() === HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
       ) {
         return true;
       } else {
@@ -943,27 +840,18 @@ export class HatsModulesClient {
         contracts: calls,
       });
 
-      for (
-        let addressIndex = 0;
-        addressIndex < addresses.length;
-        addressIndex++
-      ) {
+      for (let addressIndex = 0; addressIndex < addresses.length; addressIndex++) {
         if (multicallResults[addressIndex].status == "failure") {
           // not a module
           res.push(false);
           continue;
         } else {
-          const implementationAddress = multicallResults[addressIndex]
-            .result as `0x${string}`;
+          const implementationAddress = multicallResults[addressIndex].result as `0x${string}`;
           if (
-            implementationAddress.toLowerCase() ===
-              HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
-            implementationAddress.toLowerCase() ===
-              HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
-            implementationAddress.toLowerCase() ===
-              HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
-            implementationAddress.toLowerCase() ===
-              HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
+            implementationAddress.toLowerCase() === HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+            implementationAddress.toLowerCase() === HATS_TOGGLES_CHAIN_MODULE_ADDRESS[this._chainId] ||
+            implementationAddress.toLowerCase() === HATS_ELIGIBILITIES_CHAIN_MODULE_ADDRESS_ADDITIONAL ||
+            implementationAddress.toLowerCase() === HATS_TOGGLES_CHAIN_MODULE_ADDRESS_ADDITIONAL
           ) {
             res.push(true);
             continue;
@@ -986,13 +874,10 @@ export class HatsModulesClient {
    * @param address - instance address.
    * @returns the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
-  async getChain(
-    address: Address,
-    includeLiveParams?: boolean
-  ): Promise<Ruleset[] | undefined> {
+  async getChain(address: Address, includeLiveParams?: boolean): Promise<Ruleset[] | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1019,25 +904,17 @@ export class HatsModulesClient {
         contracts: calls,
       });
 
-      if (
-        results[0].status === "failure" ||
-        results[1].status === "failure" ||
-        results[2].status === "failure"
-      ) {
+      if (results[0].status === "failure" || results[1].status === "failure" || results[2].status === "failure") {
         return undefined;
       }
 
       const numRulesets = results[0].result as bigint;
       const rulesetsLengths: bigint[] = results[1].result as bigint[];
-      const modulesAddresses: `0x${string}`[] = results[2]
-        .result as `0x${string}`[];
+      const modulesAddresses: `0x${string}`[] = results[2].result as `0x${string}`[];
 
       // get the module types
       const moduleTypes = await this.getModulesByInstances(modulesAddresses);
-      if (
-        moduleTypes.includes(undefined) ||
-        modulesAddresses.length !== moduleTypes.length
-      ) {
+      if (moduleTypes.includes(undefined) || modulesAddresses.length !== moduleTypes.length) {
         return undefined;
       }
 
@@ -1046,43 +923,35 @@ export class HatsModulesClient {
         const liveParamsCalls = modulesAddresses.map((moduleAddress) => {
           return this.getInstanceParameters(moduleAddress);
         });
-        liveParams = (await Promise.all(
-          liveParamsCalls
-        )) as ModuleParameter[][];
+        liveParams = (await Promise.all(liveParamsCalls)) as ModuleParameter[][];
       }
 
       const res: Ruleset[] = [];
       let rulesetModulesOffset = 0;
       for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
-        const rulesset: Ruleset = [];
+        const rulesSet: Ruleset = [];
 
-        for (
-          let rulesetModuleIndex = 0;
-          rulesetModuleIndex < rulesetsLengths[rulesetIndex];
-          rulesetModuleIndex++
-        ) {
-          const rulesetModuleAddress =
-            modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
-          const rulesetModuleType =
-            moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+        for (let rulesetModuleIndex = 0; rulesetModuleIndex < rulesetsLengths[rulesetIndex]; rulesetModuleIndex++) {
+          const rulesetModuleAddress = modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+          const rulesetModuleType = moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
           const rulesetModuleLiveParams = includeLiveParams
             ? liveParams[rulesetModulesOffset + rulesetModuleIndex]
             : undefined;
 
-          rulesset.push({
+          rulesSet.push({
             module: rulesetModuleType as Module,
             address: rulesetModuleAddress,
             liveParams: rulesetModuleLiveParams,
           });
         }
 
-        res.push(rulesset);
+        res.push(rulesSet);
         rulesetModulesOffset += Number(rulesetsLengths[rulesetIndex]);
       }
 
       return res;
     } catch (err) {
-      undefined;
+      // undefined;
     }
   }
 
@@ -1092,17 +961,14 @@ export class HatsModulesClient {
    * @param addresses - instances addresses.
    * @returns for each instance, the array of ruleset in the chain, or 'undefined' if the provided address is not a valid chain.
    */
-  async getChainBatched(
-    addresses: Address[],
-    includeLiveParams?: boolean
-  ): Promise<(Ruleset[] | undefined)[]> {
+  async getChainBatched(addresses: Address[], includeLiveParams?: boolean): Promise<(Ruleset[] | undefined)[]> {
     if (addresses.length === 0) {
       return [];
     }
 
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1138,11 +1004,7 @@ export class HatsModulesClient {
         contracts: calls,
       });
 
-      for (
-        let addressIndex = 0;
-        addressIndex < addresses.length;
-        addressIndex++
-      ) {
+      for (let addressIndex = 0; addressIndex < addresses.length; addressIndex++) {
         const multicallPos = addressIndex * 3;
 
         if (
@@ -1155,28 +1017,20 @@ export class HatsModulesClient {
         }
 
         const numRulesets = multicallResults[multicallPos].result as bigint;
-        const rulesetsLengths: bigint[] = multicallResults[multicallPos + 1]
-          .result as bigint[];
-        const modulesAddresses: `0x${string}`[] = multicallResults[
-          multicallPos + 2
-        ].result as `0x${string}`[];
+        const rulesetsLengths: bigint[] = multicallResults[multicallPos + 1].result as bigint[];
+        const modulesAddresses: `0x${string}`[] = multicallResults[multicallPos + 2].result as `0x${string}`[];
 
         let liveParams: ModuleParameter[][] = [];
         if (includeLiveParams) {
           const liveParamsCalls = modulesAddresses.map((moduleAddress) => {
             return this.getInstanceParameters(moduleAddress);
           });
-          liveParams = (await Promise.all(
-            liveParamsCalls
-          )) as ModuleParameter[][];
+          liveParams = (await Promise.all(liveParamsCalls)) as ModuleParameter[][];
         }
 
         // get the module types
         const moduleTypes = await this.getModulesByInstances(modulesAddresses);
-        if (
-          moduleTypes.includes(undefined) ||
-          modulesAddresses.length !== moduleTypes.length
-        ) {
+        if (moduleTypes.includes(undefined) || modulesAddresses.length !== moduleTypes.length) {
           res.push(undefined);
           continue;
         }
@@ -1186,15 +1040,9 @@ export class HatsModulesClient {
         for (let rulesetIndex = 0; rulesetIndex < numRulesets; rulesetIndex++) {
           const rulesset: Ruleset = [];
 
-          for (
-            let rulesetModuleIndex = 0;
-            rulesetModuleIndex < rulesetsLengths[rulesetIndex];
-            rulesetModuleIndex++
-          ) {
-            const rulesetModuleAddress =
-              modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
-            const rulesetModuleType =
-              moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
+          for (let rulesetModuleIndex = 0; rulesetModuleIndex < rulesetsLengths[rulesetIndex]; rulesetModuleIndex++) {
+            const rulesetModuleAddress = modulesAddresses[rulesetModulesOffset + rulesetModuleIndex];
+            const rulesetModuleType = moduleTypes[rulesetModulesOffset + rulesetModuleIndex];
             const rulesetModuleLiveParams = includeLiveParams
               ? liveParams[rulesetModulesOffset + rulesetModuleIndex]
               : undefined;
@@ -1220,7 +1068,7 @@ export class HatsModulesClient {
   }
 
   /*//////////////////////////////////////////////////////////////
-                       Module Getters
+  //                   Module Getters
   //////////////////////////////////////////////////////////////*/
 
   /**
@@ -1232,7 +1080,7 @@ export class HatsModulesClient {
   getModuleById(moduleId: string): Module | undefined {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1248,7 +1096,7 @@ export class HatsModulesClient {
   getModuleByImplementation(address: Address): Module | undefined {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1269,7 +1117,7 @@ export class HatsModulesClient {
   async getModuleByInstance(address: Address): Promise<Module | undefined> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1294,12 +1142,10 @@ export class HatsModulesClient {
    * @returns The modules matching the provided instances addresses. For every address that is not an instance of a registry module, the corresponding
    * return value in the array will be 'undefined'.
    */
-  async getModulesByInstances(
-    addresses: Address[]
-  ): Promise<(Module | undefined)[]> {
+  async getModulesByInstances(addresses: Address[]): Promise<(Module | undefined)[]> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1323,9 +1169,7 @@ export class HatsModulesClient {
           continue;
         }
 
-        const module = this.getModuleByImplementation(
-          results[i].result as Address
-        );
+        const module = this.getModuleByImplementation(results[i].result as Address);
 
         modules.push(module);
       }
@@ -1345,7 +1189,7 @@ export class HatsModulesClient {
   getModules(filter?: (module: Module) => boolean): { [id: string]: Module } {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
 
@@ -1353,7 +1197,7 @@ export class HatsModulesClient {
       return Object.fromEntries(
         Object.entries(this._modules).filter(([, module]) => {
           return filter(module);
-        })
+        }),
       );
     }
 
@@ -1361,7 +1205,7 @@ export class HatsModulesClient {
   }
 
   /*//////////////////////////////////////////////////////////////
-                    Module Write Functions
+  //                Module Write Functions
   //////////////////////////////////////////////////////////////*/
 
   /**
@@ -1389,20 +1233,18 @@ export class HatsModulesClient {
   }): Promise<CallInstanceWriteFunctionResult> {
     if (this._modules === undefined) {
       throw new ClientNotPreparedError(
-        "Error: Client has not been initialized, requires a call to the prepare function"
+        "Error: Client has not been initialized, requires a call to the prepare function",
       );
     }
     if (this._walletClient === undefined) {
       throw new MissingWalletClientError(
-        "Error: the client was initialized without a wallet client, which is required for this function"
+        "Error: the client was initialized without a wallet client, which is required for this function",
       );
     }
 
     const module = this.getModuleById(moduleId);
     if (module === undefined) {
-      throw new ModuleNotAvailableError(
-        `Error: Module with id ${moduleId} does not exist`
-      );
+      throw new ModuleNotAvailableError(`Error: Module with id ${moduleId} does not exist`);
     }
 
     checkWriteFunctionArgs({ func, args });

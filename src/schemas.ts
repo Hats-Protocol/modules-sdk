@@ -1,94 +1,25 @@
-import { z } from "zod";
 import type { ZodType } from "zod";
+import { z } from "zod";
+
 import type { ArgumentTsType } from "./types";
 
 // Uint
-export const Uint8Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(255)
-  .describe("number");
-export const Uint16Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(65535)
-  .describe("number");
-export const Uint24Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(16777215)
-  .describe("number");
-export const Uint32Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(4294967295)
-  .describe("number");
-export const Uint40Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(1099511627775)
-  .describe("number");
-export const Uint48Schema = z
-  .number()
-  .int()
-  .nonnegative()
-  .lte(281474976710655)
-  .describe("number");
-export const Uint56Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(72057594037927935n)
-  .describe("bigint");
-export const Uint64Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(18446744073709551615n)
-  .describe("bigint");
-export const Uint72Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(4722366482869645213695n)
-  .describe("bigint");
-export const Uint80Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(1208925819614629174706175n)
-  .describe("bigint");
-export const Uint88Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(309485009821345068724781055n)
-  .describe("bigint");
-export const Uint96Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(79228162514264337593543950335n)
-  .describe("bigint");
-export const Uint104Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(20282409603651670423947251286015n)
-  .describe("bigint");
-export const Uint112Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(5192296858534827628530496329220095n)
-  .describe("bigint");
-export const Uint120Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(1329227995784915872903807060280344575n)
-  .describe("bigint");
-export const Uint128Schema = z
-  .bigint()
-  .nonnegative()
-  .lte(340282366920938463463374607431768211455n)
-  .describe("bigint");
+export const Uint8Schema = z.number().int().nonnegative().lte(255).describe("number");
+export const Uint16Schema = z.number().int().nonnegative().lte(65535).describe("number");
+export const Uint24Schema = z.number().int().nonnegative().lte(16777215).describe("number");
+export const Uint32Schema = z.number().int().nonnegative().lte(4294967295).describe("number");
+export const Uint40Schema = z.number().int().nonnegative().lte(1099511627775).describe("number");
+export const Uint48Schema = z.number().int().nonnegative().lte(281474976710655).describe("number");
+export const Uint56Schema = z.bigint().nonnegative().lte(72057594037927935n).describe("bigint");
+export const Uint64Schema = z.bigint().nonnegative().lte(18446744073709551615n).describe("bigint");
+export const Uint72Schema = z.bigint().nonnegative().lte(4722366482869645213695n).describe("bigint");
+export const Uint80Schema = z.bigint().nonnegative().lte(1208925819614629174706175n).describe("bigint");
+export const Uint88Schema = z.bigint().nonnegative().lte(309485009821345068724781055n).describe("bigint");
+export const Uint96Schema = z.bigint().nonnegative().lte(79228162514264337593543950335n).describe("bigint");
+export const Uint104Schema = z.bigint().nonnegative().lte(20282409603651670423947251286015n).describe("bigint");
+export const Uint112Schema = z.bigint().nonnegative().lte(5192296858534827628530496329220095n).describe("bigint");
+export const Uint120Schema = z.bigint().nonnegative().lte(1329227995784915872903807060280344575n).describe("bigint");
+export const Uint128Schema = z.bigint().nonnegative().lte(340282366920938463463374607431768211455n).describe("bigint");
 export const Uint136Schema = z
   .bigint()
   .nonnegative()
@@ -157,82 +88,30 @@ export const Uint232Schema = z
 export const Uint240Schema = z
   .bigint()
   .nonnegative()
-  .lte(
-    1766847064778384329583297500742918515827483896875618958121606201292619775n
-  )
+  .lte(1766847064778384329583297500742918515827483896875618958121606201292619775n)
   .describe("bigint");
 export const Uint248Schema = z
   .bigint()
   .nonnegative()
-  .lte(
-    452312848583266388373324160190187140051835877600158453279131187530910662655n
-  )
+  .lte(452312848583266388373324160190187140051835877600158453279131187530910662655n)
   .describe("bigint");
 export const Uint256Schema = z
   .bigint()
   .nonnegative()
-  .lte(
-    115792089237316195423570985008687907853269984665640564039457584007913129639935n
-  )
+  .lte(115792089237316195423570985008687907853269984665640564039457584007913129639935n)
   .describe("bigint");
 
 // Int
-export const Int8Schema = z
-  .number()
-  .int()
-  .gte(-128)
-  .lte(127)
-  .describe("number");
-export const Int16Schema = z
-  .number()
-  .int()
-  .gte(-32768)
-  .lte(32767)
-  .describe("number");
-export const Int24Schema = z
-  .number()
-  .int()
-  .gte(-8388608)
-  .lte(8388607)
-  .describe("number");
-export const Int32Schema = z
-  .number()
-  .int()
-  .gte(-2147483648)
-  .lte(2147483647)
-  .describe("number");
-export const Int40Schema = z
-  .number()
-  .int()
-  .gte(-549755813888)
-  .lte(549755813887)
-  .describe("number");
-export const Int48Schema = z
-  .number()
-  .int()
-  .gte(-140737488355328)
-  .lte(140737488355327)
-  .describe("number");
-export const Int56Schema = z
-  .bigint()
-  .gte(-36028797018963968n)
-  .lte(36028797018963967n)
-  .describe("bigint");
-export const Int64Schema = z
-  .bigint()
-  .gte(-9223372036854775808n)
-  .lte(9223372036854775807n)
-  .describe("bigint");
-export const Int72Schema = z
-  .bigint()
-  .gte(-2361183241434822606848n)
-  .lte(2361183241434822606847n)
-  .describe("bigint");
-export const Int80Schema = z
-  .bigint()
-  .gte(-604462909807314587353088n)
-  .lte(604462909807314587353088n)
-  .describe("bigint");
+export const Int8Schema = z.number().int().gte(-128).lte(127).describe("number");
+export const Int16Schema = z.number().int().gte(-32768).lte(32767).describe("number");
+export const Int24Schema = z.number().int().gte(-8388608).lte(8388607).describe("number");
+export const Int32Schema = z.number().int().gte(-2147483648).lte(2147483647).describe("number");
+export const Int40Schema = z.number().int().gte(-549755813888).lte(549755813887).describe("number");
+export const Int48Schema = z.number().int().gte(-140737488355328).lte(140737488355327).describe("number");
+export const Int56Schema = z.bigint().gte(-36028797018963968n).lte(36028797018963967n).describe("bigint");
+export const Int64Schema = z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n).describe("bigint");
+export const Int72Schema = z.bigint().gte(-2361183241434822606848n).lte(2361183241434822606847n).describe("bigint");
+export const Int80Schema = z.bigint().gte(-604462909807314587353088n).lte(604462909807314587353088n).describe("bigint");
 export const Int88Schema = z
   .bigint()
   .gte(-154742504910672534362390528n)
@@ -330,30 +209,18 @@ export const Int232Schema = z
   .describe("bigint");
 export const Int240Schema = z
   .bigint()
-  .gte(
-    -883423532389192164791648750371459257913741948437809479060803100646309888n
-  )
-  .lte(
-    883423532389192164791648750371459257913741948437809479060803100646309887n
-  )
+  .gte(-883423532389192164791648750371459257913741948437809479060803100646309888n)
+  .lte(883423532389192164791648750371459257913741948437809479060803100646309887n)
   .describe("bigint");
 export const Int248Schema = z
   .bigint()
-  .gte(
-    -226156424291633194186662080095093570025917938800079226639565593765455331328n
-  )
-  .lte(
-    226156424291633194186662080095093570025917938800079226639565593765455331327n
-  )
+  .gte(-226156424291633194186662080095093570025917938800079226639565593765455331328n)
+  .lte(226156424291633194186662080095093570025917938800079226639565593765455331327n)
   .describe("bigint");
 export const Int256Schema = z
   .bigint()
-  .gte(
-    -57896044618658097711785492504343953926634992332820282019728792003956564819968n
-  )
-  .lte(
-    57896044618658097711785492504343953926634992332820282019728792003956564819967n
-  )
+  .gte(-57896044618658097711785492504343953926634992332820282019728792003956564819968n)
+  .lte(57896044618658097711785492504343953926634992332820282019728792003956564819967n)
   .describe("bigint");
 
 export const AddressSchema = z

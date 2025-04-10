@@ -1,19 +1,20 @@
-import { HatsModulesClient } from "../src/index";
-import { HatsClient } from "@hatsprotocol/sdk-v1-core";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-import { createAnvil } from "@viem/anvil";
-import { privateKeyToAccount } from "viem/accounts";
-import * as fs from "fs";
-import type {
-  PublicClient,
-  WalletClient,
-  PrivateKeyAccount,
-  Address,
-} from "viem";
-import type { Anvil } from "@viem/anvil";
-import type { Module, Registry } from "../src/types";
 import "dotenv/config";
+
+import { HatsClient } from "@hatsprotocol/sdk-v1-core";
+import type { Anvil } from "@viem/anvil";
+import { createAnvil } from "@viem/anvil";
+import * as fs from "fs";
+import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { sepolia } from "viem/chains";
+
+import { HatsModulesClient } from "../src/index";
+import type { Module, Registry } from "../src/types";
+
+const AGREEMENT_MODULE_ID = "0x0000000000000000000000000000000000000000";
+const ALLOWLIST_MODULE_ID = "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5";
+const MCH_MODULE_ID = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
 
 describe("Write Functions Client Tests", () => {
   let publicClient: PublicClient;
@@ -28,6 +29,7 @@ describe("Write Functions Client Tests", () => {
   let hat1_1: bigint;
   let hat1_1_1: bigint;
   let hat1_2: bigint;
+  let mchInstance: Address;
 
   beforeAll(async () => {
     anvil = createAnvil({
@@ -36,12 +38,8 @@ describe("Write Functions Client Tests", () => {
     });
     await anvil.start();
 
-    account1 = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
-    account2 = privateKeyToAccount(
-      "0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
-    );
+    account1 = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
+    account2 = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d");
 
     // init Viem clients
     publicClient = createPublicClient({
@@ -70,6 +68,7 @@ describe("Write Functions Client Tests", () => {
       walletClient: walletClient,
     });
 
+    // create top hat
     const resHat1 = await hatsClient.mintTopHat({
       target: account1.address,
       details: "Tophat SDK",
@@ -78,6 +77,7 @@ describe("Write Functions Client Tests", () => {
     });
     hat1 = resHat1.hatId;
 
+    // create 1.1 hat
     const resHat1_1 = await hatsClient.createHat({
       admin: hat1,
       maxSupply: 3,
@@ -90,30 +90,50 @@ describe("Write Functions Client Tests", () => {
     });
     hat1_1 = resHat1_1.hatId;
 
+    // create 1.1.1 hat
     const resHat1_1_1 = await hatsClient.createHat({
       admin: hat1_1,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
       mutable: true,
-      details: "1.1 details",
-      imageURI: "1.1 URI",
+      details: "1.1.1 details",
+      imageURI: "1.1.1 URI",
       account: account1,
     });
     hat1_1_1 = resHat1_1_1.hatId;
 
+    // create 1.2 hat
     const resHat1_2 = await hatsClient.createHat({
       admin: hat1,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
       mutable: true,
-      details: "1.1 details",
-      imageURI: "1.1 URI",
+      details: "1.2 details",
+      imageURI: "1.2 URI",
       account: account1,
     });
     hat1_2 = resHat1_2.hatId;
 
+    // create MCH instance
+    const resMchInstance = await hatsModulesClient.createNewInstance({
+      account: account1,
+      moduleId: MCH_MODULE_ID,
+      hatId: hat1_1_1,
+      immutableArgs: [hat1, hat1_1],
+      mutableArgs: [[]],
+    });
+    mchInstance = resMchInstance.newInstance;
+
+    // mint 1.1 hat to mch instance
+    await hatsClient.mintHat({
+      account: account1,
+      hatId: hat1_1,
+      wearer: mchInstance,
+    });
+
+    // mint 1.1 hat to account2
     await hatsClient.mintHat({
       account: account1,
       hatId: hat1_1,
@@ -121,13 +141,15 @@ describe("Write Functions Client Tests", () => {
     });
   }, 30000);
 
-  describe("Allow List Eligibility Write Functions", () => {
+  describe("Allowlist Eligibility Write Functions", () => {
     let allowListInstance: Address;
+    let module: Module;
 
     beforeAll(async () => {
+      module = hatsModulesClient.getModuleById(ALLOWLIST_MODULE_ID) as Module;
       const resAllowListInstance = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         hatId: hat1_1_1,
         immutableArgs: [hat1, hat1_1],
         mutableArgs: [[]],
@@ -142,37 +164,29 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test addAccount", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
-
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: ALLOWLIST_MODULE_ID,
           instance: allowListInstance,
           func: module?.writeFunctions[0],
           args: [account2.address],
         });
-      }).rejects.toThrow(
-        "Error: the caller does not wear the module's Owner Hat"
-      );
+      }).rejects.toThrow("Error: the caller does not wear the module's Owner Hat");
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: ALLOWLIST_MODULE_ID,
           instance: allowListInstance,
           func: module?.writeFunctions[0],
           args: [1],
         });
-      }).rejects.toThrow(
-        "Error: received an invalid value for parameter 'Account'"
-      );
+      }).rejects.toThrow("Error: received an invalid value for parameter 'Account'");
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         instance: allowListInstance,
         func: module?.writeFunctions[0],
         args: [account2.address],
@@ -190,13 +204,9 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test removeAccount", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
-
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         instance: allowListInstance,
         func: module?.writeFunctions[2],
         args: [account2.address],
@@ -214,13 +224,11 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test addAccounts", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById(ALLOWLIST_MODULE_ID) as Module;
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         instance: allowListInstance,
         func: module?.writeFunctions[1],
         args: [[account1.address, account2.address]],
@@ -245,13 +253,9 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test removeAccounts", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
-
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         instance: allowListInstance,
         func: module?.writeFunctions[4],
         args: [[account1.address, account2.address]],
@@ -276,25 +280,21 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test setStandingForAccount", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById(ALLOWLIST_MODULE_ID) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: ALLOWLIST_MODULE_ID,
           instance: allowListInstance,
           func: module?.writeFunctions[5],
           args: [account2.address, false],
         });
-      }).rejects.toThrow(
-        "Error: the caller does not wear the module's Arbitrator Hat"
-      );
+      }).rejects.toThrow("Error: the caller does not wear the module's Arbitrator Hat");
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: ALLOWLIST_MODULE_ID,
         instance: allowListInstance,
         func: module?.writeFunctions[5],
         args: [account2.address, false],
@@ -312,38 +312,72 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test removeAccountAndBurnHat", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
-
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: ALLOWLIST_MODULE_ID,
           instance: allowListInstance,
           func: module?.writeFunctions[3],
           args: [account2.address],
         });
-      }).rejects.toThrow(
-        "Error: Attempting to burn a hat that an account is not wearing"
-      );
+      }).rejects.toThrow("Error: Attempting to burn a hat that an account is not wearing");
     }, 30000);
 
     test("Test setStandingForAccounts", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById(ALLOWLIST_MODULE_ID) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: ALLOWLIST_MODULE_ID,
           instance: allowListInstance,
           func: module?.writeFunctions[7],
           args: [[account2.address], [true, false]],
         });
       }).rejects.toThrow("Error: array arguments are not of the same length");
     }, 30000);
+  });
+
+  describe("Agreement Eligibility Write Functions", () => {
+    let agreementInstance: Address;
+    const module = hatsModulesClient.getModuleById(AGREEMENT_MODULE_ID) as Module;
+
+    beforeAll(async () => {
+      const resAgreementInstance = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: AGREEMENT_MODULE_ID,
+        hatId: hat1_1_1,
+        immutableArgs: [hat1, hat1_1],
+        mutableArgs: [[]],
+      });
+      agreementInstance = resAgreementInstance.newInstance;
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_1,
+        newEligibility: agreementInstance,
+      });
+    }, 30000);
+
+    test("Test setAgreement", async () => {
+      await expect(async () => {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: ALLOWLIST_MODULE_ID,
+          instance: agreementInstance,
+          func: module?.writeFunctions[0],
+          args: [account2.address],
+        });
+      }).rejects.toThrow("Error: the caller does not wear the module's Owner Hat");
+    });
+
+    test("Test signAgreement", async () => {
+      const module = hatsModulesClient.getModuleById("0x0000000000000000000000000000000000000000") as Module;
+    });
+
+    test("Test signAgreementAndClaim", async () => {
+      const module = hatsModulesClient.getModuleById("0x0000000000000000000000000000000000000000") as Module;
+    });
   });
 
   describe("Hat Elections Eligibility Write Functions", () => {
@@ -354,15 +388,13 @@ describe("Write Functions Client Tests", () => {
       const block = await publicClient.getBlock();
       electionsEndTime = block.timestamp + 3600n;
 
-      const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance(
-        {
-          account: account1,
-          moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
-          hatId: hat1_1_1,
-          immutableArgs: [hat1_1, hat1_2],
-          mutableArgs: [electionsEndTime],
-        }
-      );
+      const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
+        hatId: hat1_1_1,
+        immutableArgs: [hat1_1, hat1_2],
+        mutableArgs: [electionsEndTime],
+      });
       hatElectionsInstance = hatElectionsInstanceRes.newInstance;
 
       await hatsClient.changeHatEligibility({
@@ -373,9 +405,7 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test elect", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById("0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E") as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
@@ -385,9 +415,7 @@ describe("Write Functions Client Tests", () => {
           func: module?.writeFunctions[1],
           args: [electionsEndTime, [account1.address]],
         });
-      }).rejects.toThrow(
-        "Error: the caller does not wear the module's Ballot Box Hat"
-      );
+      }).rejects.toThrow("Error: the caller does not wear the module's Ballot Box Hat");
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
@@ -422,11 +450,7 @@ describe("Write Functions Client Tests", () => {
         moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
         hatId: hat1_1_1,
         immutableArgs: [hat1_1],
-        mutableArgs: [
-          "0xc5E226Caec417de53A38Fc63242291e474772274",
-          electionsEndTime,
-          3n,
-        ],
+        mutableArgs: ["0xc5E226Caec417de53A38Fc63242291e474772274", electionsEndTime, 3n],
       });
       jokeraceInstance = jokeraceInstanceRes.newInstance;
 
@@ -438,9 +462,7 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test pullElectionResults and reelection", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById("0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a") as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
@@ -448,15 +470,9 @@ describe("Write Functions Client Tests", () => {
           moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
           instance: jokeraceInstance,
           func: module?.writeFunctions[1],
-          args: [
-            "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
-            electionsEndTime,
-            5n,
-          ],
+          args: ["0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0", electionsEndTime, 5n],
         });
-      }).rejects.toThrow(
-        "Error: can only set a new election once the current term has ended"
-      );
+      }).rejects.toThrow("Error: can only set a new election once the current term has ended");
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
@@ -491,9 +507,7 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test setHatWearerStatus", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0x050079a8fbFCE76818C62481BA015b89567D2d35"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById("0x050079a8fbFCE76818C62481BA015b89567D2d35") as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
@@ -503,9 +517,7 @@ describe("Write Functions Client Tests", () => {
           func: module?.writeFunctions[0],
           args: [hat1_1_1, account2.address, false, false],
         });
-      }).rejects.toThrow(
-        "Error: caller is not wearing the eligibility/toggle passthrough hat"
-      );
+      }).rejects.toThrow("Error: caller is not wearing the eligibility/toggle passthrough hat");
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
@@ -540,9 +552,7 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test extend", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0xFb6bD2e96B123d0854064823f6cb59420A285C00"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById("0xFb6bD2e96B123d0854064823f6cb59420A285C00") as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
@@ -552,9 +562,7 @@ describe("Write Functions Client Tests", () => {
           func: module?.writeFunctions[0],
           args: [2592000n, 5000n],
         });
-      }).rejects.toThrow(
-        "Error: caller is not an admin of the season toggle branch"
-      );
+      }).rejects.toThrow("Error: caller is not an admin of the season toggle branch");
     }, 30000);
   });
 
@@ -579,9 +587,7 @@ describe("Write Functions Client Tests", () => {
     }, 30000);
 
     test("Test slash", async () => {
-      const module = hatsModulesClient.getModuleById(
-        "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7"
-      ) as Module;
+      const module = hatsModulesClient.getModuleById("0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7") as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({

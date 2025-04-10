@@ -1,22 +1,15 @@
-import {
-  HatsModulesClient,
-  solidityToTypescriptType,
-  HATS_ELIGIBILITIES_CHAIN_MODULE_ABI,
-} from "../src/index";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-import { createAnvil } from "@viem/anvil";
-import { privateKeyToAccount } from "viem/accounts";
-import * as fs from "fs";
-import type {
-  PublicClient,
-  WalletClient,
-  PrivateKeyAccount,
-  Address,
-} from "viem";
-import type { Anvil } from "@viem/anvil";
-import type { Module, Registry } from "../src/types";
 import "dotenv/config";
+
+import type { Anvil } from "@viem/anvil";
+import { createAnvil } from "@viem/anvil";
+import * as fs from "fs";
+import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { sepolia } from "viem/chains";
+
+import { HATS_ELIGIBILITIES_CHAIN_MODULE_ABI, HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import type { Module, Registry } from "../src/types";
 
 describe("Batch Create Client Tests", () => {
   let publicClient: PublicClient;
@@ -45,9 +38,7 @@ describe("Batch Create Client Tests", () => {
     });
     await anvil.start();
 
-    deployerAccount = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
+    deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
     // init Viem clients
     publicClient = createPublicClient({
@@ -79,44 +70,20 @@ describe("Batch Create Client Tests", () => {
     const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
     const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
 
-    const jokeraceModule = hatsModulesClient.getModuleById(
-      jokeraceId
-    ) as Module;
+    const jokeraceModule = hatsModulesClient.getModuleById(jokeraceId) as Module;
     const stakingModule = hatsModulesClient.getModuleById(stakingId) as Module;
     const erc20Module = hatsModulesClient.getModuleById(erc20Id) as Module;
     const erc721Module = hatsModulesClient.getModuleById(erc721Id) as Module;
     const erc1155Module = hatsModulesClient.getModuleById(erc1155Id) as Module;
 
-    const modules: Module[] = [
-      jokeraceModule,
-      stakingModule,
-      erc20Module,
-      erc721Module,
-      erc1155Module,
-    ];
-    const moduleIds: string[] = [
-      jokeraceId,
-      stakingId,
-      erc20Id,
-      erc721Id,
-      erc1155Id,
-    ];
+    const modules: Module[] = [jokeraceModule, stakingModule, erc20Module, erc721Module, erc1155Module];
+    const moduleIds: string[] = [jokeraceId, stakingId, erc20Id, erc721Id, erc1155Id];
     const hatIds: bigint[] = [
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
     ];
 
     for (let i = 0; i < modules.length; i++) {
@@ -127,9 +94,7 @@ describe("Batch Create Client Tests", () => {
       for (let i = 0; i < module.creationArgs.immutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.immutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.immutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.immutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -145,9 +110,7 @@ describe("Batch Create Client Tests", () => {
       for (let i = 0; i < module.creationArgs.mutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.mutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.mutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.mutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -184,18 +147,10 @@ describe("Batch Create Client Tests", () => {
     test("Test scenario 1", async () => {
       const res = await hatsModulesClient.createEligibilitiesChain({
         account: deployerAccount,
-        hatId: BigInt(
-          "0x0000000100000000000000000000000000000000000000000000000000000000"
-        ),
+        hatId: BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
         numClauses: 2,
         clausesLengths: [2, 3],
-        modules: [
-          jokeraceInstance,
-          stakingInstance,
-          erc20Instance,
-          erc721Instance,
-          erc1155Instance,
-        ],
+        modules: [jokeraceInstance, stakingInstance, erc20Instance, erc721Instance, erc1155Instance],
       });
 
       chain1 = res.newInstance;
@@ -232,18 +187,10 @@ describe("Batch Create Client Tests", () => {
     test("Test scenario 2", async () => {
       const res = await hatsModulesClient.createEligibilitiesChain({
         account: deployerAccount,
-        hatId: BigInt(
-          "0x0000000100000000000000000000000000000000000000000000000000000000"
-        ),
+        hatId: BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
         numClauses: 1,
         clausesLengths: [5],
-        modules: [
-          jokeraceInstance,
-          stakingInstance,
-          erc20Instance,
-          erc721Instance,
-          erc1155Instance,
-        ],
+        modules: [jokeraceInstance, stakingInstance, erc20Instance, erc721Instance, erc1155Instance],
       });
 
       chain2 = res.newInstance;
@@ -280,18 +227,10 @@ describe("Batch Create Client Tests", () => {
     test("Test scenario 3", async () => {
       const res = await hatsModulesClient.createEligibilitiesChain({
         account: deployerAccount,
-        hatId: BigInt(
-          "0x0000000100000000000000000000000000000000000000000000000000000000"
-        ),
+        hatId: BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
         numClauses: 5,
         clausesLengths: [1, 1, 1, 1, 1],
-        modules: [
-          jokeraceInstance,
-          stakingInstance,
-          erc20Instance,
-          erc721Instance,
-          erc1155Instance,
-        ],
+        modules: [jokeraceInstance, stakingInstance, erc20Instance, erc721Instance, erc1155Instance],
       });
 
       chain3 = res.newInstance;
@@ -441,7 +380,7 @@ describe("Batch Create Client Tests", () => {
         expect(ruleset1[0].liveParams?.length).toBe(4);
         if (ruleset1[0].liveParams !== undefined) {
           expect(ruleset1[0].liveParams[0].value).toBe(
-            26959946667150639794667015087019630673637144422540572481103610249216n
+            26959946667150639794667015087019630673637144422540572481103610249216n,
           );
         }
         expect(ruleset1[1].address).toBe(stakingInstance);
@@ -532,20 +471,14 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("Scenario 5", async () => {
-      const rulesets = await hatsModulesClient.getRulesets(
-        deployerAccount.address
-      );
+      const rulesets = await hatsModulesClient.getRulesets(deployerAccount.address);
       expect(rulesets).toBeUndefined();
     });
   });
 
   describe("Test get chains batched", () => {
     test("scenario 1", async () => {
-      const res = await hatsModulesClient.getChainBatched([
-        chain1,
-        chain2,
-        chain3,
-      ]);
+      const res = await hatsModulesClient.getChainBatched([chain1, chain2, chain3]);
 
       // check first chain
       const rulesets1 = res[0];
@@ -632,11 +565,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("scenario 2", async () => {
-      const res = await hatsModulesClient.getChainBatched([
-        erc20Instance,
-        chain2,
-        chain3,
-      ]);
+      const res = await hatsModulesClient.getChainBatched([erc20Instance, chain2, chain3]);
 
       // check first chain
       const rulesets1 = res[0];
@@ -725,10 +654,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("Scenario 3", async () => {
-      const res = await hatsModulesClient.isChainBatched([
-        erc20Instance,
-        chain2,
-      ]);
+      const res = await hatsModulesClient.isChainBatched([erc20Instance, chain2]);
       expect(res.length).toBe(2);
       expect(res[0]).toBe(false);
       expect(res[1]).toBe(true);
@@ -742,10 +668,7 @@ describe("Batch Create Client Tests", () => {
 
   describe("get rulesets batched tests", () => {
     test("Scenario 1", async () => {
-      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
-        chain1,
-        chain2,
-      ]);
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([chain1, chain2]);
 
       expect(rulesetsArray.length).toBe(2);
 
@@ -795,10 +718,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("Scenario 2", async () => {
-      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
-        chain1,
-        erc20Instance,
-      ]);
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([chain1, erc20Instance]);
 
       expect(rulesetsArray.length).toBe(2);
 
@@ -838,10 +758,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("Scenario 3", async () => {
-      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
-        erc721Instance,
-        erc20Instance,
-      ]);
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([erc721Instance, erc20Instance]);
 
       expect(rulesetsArray.length).toBe(2);
 
@@ -867,10 +784,7 @@ describe("Batch Create Client Tests", () => {
     });
 
     test("Scenario 4", async () => {
-      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([
-        erc721Instance,
-        deployerAccount.address,
-      ]);
+      const rulesetsArray = await hatsModulesClient.getRulesetsBatched([erc721Instance, deployerAccount.address]);
 
       expect(rulesetsArray.length).toBe(2);
 

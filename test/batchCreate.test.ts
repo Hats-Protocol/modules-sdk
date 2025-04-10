@@ -1,14 +1,16 @@
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-import { createAnvil } from "@viem/anvil";
-import { privateKeyToAccount } from "viem/accounts";
-import * as fs from "fs";
-import type { PublicClient, WalletClient, PrivateKeyAccount } from "viem";
-import type { Anvil } from "@viem/anvil";
-import type { Module, Registry } from "../src/types";
 import "dotenv/config";
+
+import type { Anvil } from "@viem/anvil";
+import { createAnvil } from "@viem/anvil";
 import { Abi } from "abitype";
+import * as fs from "fs";
+import type { PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { sepolia } from "viem/chains";
+
+import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import type { Module, Registry } from "../src/types";
 
 describe("Batch Create Client Tests", () => {
   let publicClient: PublicClient;
@@ -39,9 +41,7 @@ describe("Batch Create Client Tests", () => {
     });
     await anvil.start();
 
-    deployerAccount = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
+    deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
     // init Viem clients
     publicClient = createPublicClient({
@@ -73,9 +73,7 @@ describe("Batch Create Client Tests", () => {
     const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
     const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
 
-    const jokeraceModule = hatsModulesClient.getModuleById(
-      jokeraceId
-    ) as Module;
+    const jokeraceModule = hatsModulesClient.getModuleById(jokeraceId) as Module;
     const stakingModule = hatsModulesClient.getModuleById(stakingId) as Module;
     const erc20Module = hatsModulesClient.getModuleById(erc20Id) as Module;
     const erc721Module = hatsModulesClient.getModuleById(erc721Id) as Module;
@@ -87,36 +85,14 @@ describe("Batch Create Client Tests", () => {
     erc721Abi = erc721Module.abi;
     erc1155Abi = erc1155Module.abi;
 
-    const modules: Module[] = [
-      jokeraceModule,
-      stakingModule,
-      erc20Module,
-      erc721Module,
-      erc1155Module,
-    ];
-    const moduleIds: string[] = [
-      jokeraceId,
-      stakingId,
-      erc20Id,
-      erc721Id,
-      erc1155Id,
-    ];
+    const modules: Module[] = [jokeraceModule, stakingModule, erc20Module, erc721Module, erc1155Module];
+    const moduleIds: string[] = [jokeraceId, stakingId, erc20Id, erc721Id, erc1155Id];
     const hatIds: bigint[] = [
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      ),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
+      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
     ];
 
     for (let i = 0; i < modules.length; i++) {
@@ -127,9 +103,7 @@ describe("Batch Create Client Tests", () => {
       for (let i = 0; i < module.creationArgs.immutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.immutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.immutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.immutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -145,9 +119,7 @@ describe("Batch Create Client Tests", () => {
       for (let i = 0; i < module.creationArgs.mutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.mutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.mutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.mutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -216,11 +188,7 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
+    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
     expect(adminHatResult).toBe(immutableArgs[0][0]);
     expect(underlyingContestResult).toBe(mutableArgs[0][0]);
     expect(termEndResult).toBe(mutableArgs[0][1]);
@@ -269,11 +237,7 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
+    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
     expect(tokenResult).toBe(immutableArgs[1][0]);
     expect(minStakeResult).toBe(mutableArgs[1][0]);
     expect(judgeHatResult).toBe(mutableArgs[1][1]);
@@ -303,11 +267,7 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
+    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
     expect(tokenResult).toBe(immutableArgs[2][0]);
     expect(minBalanceResult).toBe(immutableArgs[2][1]);
   });
@@ -334,11 +294,7 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
+    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
     expect(tokenResult).toBe(immutableArgs[3][0]);
     expect(minBalanceResult).toBe(immutableArgs[3][1]);
   });
@@ -379,11 +335,7 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(
-      BigInt(
-        "0x0000000100000000000000000000000000000000000000000000000000000000"
-      )
-    );
+    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
     expect(tokenResult).toBe(immutableArgs[4][0]);
     expect(arrayLengthResult).toBe(immutableArgs[4][1]);
     expect(tokenIdsResult).toEqual(immutableArgs[4][2]);

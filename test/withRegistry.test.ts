@@ -1,16 +1,13 @@
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-import { createAnvil } from "@viem/anvil";
-import { privateKeyToAccount } from "viem/accounts";
-import type {
-  PublicClient,
-  WalletClient,
-  PrivateKeyAccount,
-  Address,
-} from "viem";
-import type { Anvil } from "@viem/anvil";
 import "dotenv/config";
+
+import type { Anvil } from "@viem/anvil";
+import { createAnvil } from "@viem/anvil";
+import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import { createPublicClient, createWalletClient, http } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { sepolia } from "viem/chains";
+
+import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
 
 describe("Eligibility Client Tests", () => {
   let publicClient: PublicClient;
@@ -30,9 +27,7 @@ describe("Eligibility Client Tests", () => {
     });
     await anvil.start();
 
-    deployerAccount = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
+    deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
     // init Viem clients
     publicClient = createPublicClient({
@@ -81,9 +76,7 @@ describe("Eligibility Client Tests", () => {
       console.log(`Deploying an instance of module ${module.name}`);
 
       const hatId = module.creationArgs.useHatId
-        ? BigInt(
-            "0x0000000100000000000000000000000000000000000000000000000000000000"
-          )
+        ? BigInt("0x0000000100000000000000000000000000000000000000000000000000000000")
         : BigInt("0");
       const immutableArgs: unknown[] = [];
       const mutableArgs: unknown[] = [];
@@ -91,9 +84,7 @@ describe("Eligibility Client Tests", () => {
       for (let i = 0; i < module.creationArgs.immutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.immutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.immutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.immutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -108,9 +99,7 @@ describe("Eligibility Client Tests", () => {
       for (let i = 0; i < module.creationArgs.mutable.length; i++) {
         let arg: unknown;
         const exampleArg = module.creationArgs.mutable[i].example;
-        const tsType = solidityToTypescriptType(
-          module.creationArgs.mutable[i].type
-        );
+        const tsType = solidityToTypescriptType(module.creationArgs.mutable[i].type);
         if (tsType === "bigint") {
           arg = BigInt(exampleArg as string);
         } else if (tsType === "bigint[]") {
@@ -155,14 +144,12 @@ describe("Eligibility Client Tests", () => {
       expect(hatIdResult).toBe(hatId);
 
       // predict module address
-      const predictedAddress = await hatsModulesClient.predictHatsModuleAddress(
-        {
-          moduleId: id,
-          hatId: hatId,
-          immutableArgs: immutableArgs,
-          saltNonce,
-        }
-      );
+      const predictedAddress = await hatsModulesClient.predictHatsModuleAddress({
+        moduleId: id,
+        hatId: hatId,
+        immutableArgs: immutableArgs,
+        saltNonce,
+      });
       expect(predictedAddress).toBe(res.newInstance);
 
       // check that module is deployed
@@ -183,9 +170,7 @@ describe("Eligibility Client Tests", () => {
       expect(module?.implementationAddress).toBe(implementation);
     }
 
-    const nonExistentModule = await hatsModulesClient.getModuleByInstance(
-      "0x0000000000000000000000000000000000000000"
-    );
+    const nonExistentModule = await hatsModulesClient.getModuleByInstance("0x0000000000000000000000000000000000000000");
     expect(nonExistentModule).toBe(undefined);
   });
 });
