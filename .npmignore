@@ -1,0 +1,15 @@
+.env*
+node_modules
+src
+test
+.gitignore
+.git
+.prettierrc
+eslint.config.mjs
+.eslintignore
+example.env
+funding.json
+jest.config.ts
+rollup.config.mjs
+tsconfig.json
+scripts/*

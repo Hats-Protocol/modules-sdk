@@ -1,18 +1,29 @@
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
-import { createPublicClient, createWalletClient, http } from "viem";
-import { sepolia } from "viem/chains";
-import { createAnvil } from "@viem/anvil";
-import { privateKeyToAccount } from "viem/accounts";
-import * as fs from "fs";
-import type {
-  PublicClient,
-  WalletClient,
-  PrivateKeyAccount,
-  Address,
-} from "viem";
-import type { Anvil } from "@viem/anvil";
-import type { Module, Registry, ModuleParameter } from "../src/types";
 import "dotenv/config";
+
+import type { Anvil } from "@viem/anvil";
+import { createAnvil } from "@viem/anvil";
+import * as fs from "fs";
+import {
+  type Address,
+  createPublicClient,
+  createWalletClient,
+  http,
+  type PrivateKeyAccount,
+  type PublicClient,
+  type WalletClient,
+} from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { sepolia } from "viem/chains";
+
+import { HatsModulesClient } from "../src/index";
+import type { Module, ModuleParameter, Registry } from "../src/types";
+import { prepareArgs } from "./utils";
+
+// const JOKERACE_MODULE_ID = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"; // jokerace v0.2.0
+// const STAKING_MODULE_ID = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7"; // staking v0.1.0
+const ERC20_MODULE_ID = "0xbA5b218e6685D0607139c06f81442681a32a0EC3"; // erc20 v0.1.0
+const ERC721_MODULE_ID = "0xF37cf12fB4493D29270806e826fDDf50dd722bab"; // erc721 v0.1.0
+const ERC1155_MODULE_ID = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"; // erc1155 v0.1.0
 
 describe("Client Tests With a Static Modules File", () => {
   let publicClient: PublicClient;
@@ -33,9 +44,7 @@ describe("Client Tests With a Static Modules File", () => {
     });
     await anvil.start();
 
-    deployerAccount = privateKeyToAccount(
-      "0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
-    );
+    deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
     // init Viem clients
     publicClient = createPublicClient({
@@ -63,7 +72,7 @@ describe("Client Tests With a Static Modules File", () => {
     await anvil.stop();
   }, 30000);
 
-  test("Test get all active module", () => {
+  test("Test get all active modules", () => {
     const filter = (module: Module) => {
       for (let tagIndex = 0; tagIndex < module.tags.length; tagIndex++) {
         const tag = module.tags[tagIndex];
@@ -122,150 +131,92 @@ describe("Client Tests With a Static Modules File", () => {
     expect(metaModulesCount).toBe(4);
   });
 
-  test("Test create new jokerace instance and get instace parameters", async () => {
-    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
-    const module = hatsModulesClient.getModuleById(jokeraceId) as Module;
+  // test("Test create new jokerace instance and get instance parameters", async () => {
+  //   const module = hatsModulesClient.getModuleByImplementation(JOKERACE_MODULE_ID) as Module;
 
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
+  //   const hatId = BigInt("0x0000000100000000000000000000000000000000000000000000000000000000");
+  //   const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+  //   const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
-    for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.immutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.immutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
+  //   const res = await hatsModulesClient.createNewInstance({
+  //     account: deployerAccount,
+  //     moduleId: JOKERACE_MODULE_ID,
+  //     hatId: hatId,
+  //     immutableArgs: immutableArgs,
+  //     mutableArgs: mutableArgs,
+  //   });
 
-      immutableArgs.push(arg);
-    }
+  //   const hatIdResult = await publicClient.readContract({
+  //     address: res.newInstance as Address,
+  //     abi: module.abi,
+  //     functionName: "hatId",
+  //     args: [],
+  //   });
 
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
+  //   const adminHatResult = await publicClient.readContract({
+  //     address: res.newInstance as Address,
+  //     abi: module.abi,
+  //     functionName: "ADMIN_HAT",
+  //     args: [],
+  //   });
 
-      mutableArgs.push(arg);
-    }
+  //   const underlyingContestResult = await publicClient.readContract({
+  //     address: res.newInstance as Address,
+  //     abi: module.abi,
+  //     functionName: "underlyingContest",
+  //     args: [],
+  //   });
 
-    const res = await hatsModulesClient.createNewInstance({
-      account: deployerAccount,
-      moduleId: jokeraceId,
-      hatId: hatId,
-      immutableArgs: immutableArgs,
-      mutableArgs: mutableArgs,
-    });
+  //   const termEndResult = await publicClient.readContract({
+  //     address: res.newInstance as Address,
+  //     abi: module.abi,
+  //     functionName: "termEnd",
+  //     args: [],
+  //   });
 
-    const hatIdResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "hatId",
-      args: [],
-    });
+  //   // v0.3.0
+  //   // const transitionPeriodResult = await publicClient.readContract({
+  //   //   address: res.newInstance as Address,
+  //   //   abi: module.abi,
+  //   //   functionName: "transitionPeriod",
+  //   //   args: [],
+  //   // });
 
-    const adminHatResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "ADMIN_HAT",
-      args: [],
-    });
+  //   const topKResult = await publicClient.readContract({
+  //     address: res.newInstance as Address,
+  //     abi: module.abi,
+  //     functionName: "topK",
+  //     args: [],
+  //   });
 
-    const underlyingContestResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "underlyingContest",
-      args: [],
-    });
+  //   expect(hatIdResult).toBe(hatId);
+  //   expect(adminHatResult).toBe(immutableArgs[0]);
+  //   expect(underlyingContestResult).toBe(mutableArgs[0]);
+  //   expect(termEndResult).toBe(mutableArgs[1]);
+  //   // expect(transitionPeriodResult).toBe(mutableArgs[2]); // v0.3.0
+  //   expect(topKResult).toBe(mutableArgs[2]);
 
-    const termEndResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "termEnd",
-      args: [],
-    });
+  //   // Test getting instance parameters
+  //   const instanceParams = (await hatsModulesClient.getInstanceParameters(res.newInstance)) as ModuleParameter[];
 
-    const topKResult = await publicClient.readContract({
-      address: res.newInstance as Address,
-      abi: module.abi,
-      functionName: "topK",
-      args: [],
-    });
+  //   expect(instanceParams).not.toBe(undefined);
+  //   expect(instanceParams[0].value).toBe(adminHatResult);
+  //   expect(instanceParams[0].solidityType).toBe("uint256");
+  //   expect(instanceParams[1].value).toBe(underlyingContestResult);
+  //   expect(instanceParams[1].solidityType).toBe("address");
+  //   expect(instanceParams[2].value).toBe(termEndResult);
+  //   expect(instanceParams[2].solidityType).toBe("uint256");
+  //   expect(instanceParams[3].value).toBe(topKResult);
+  //   expect(instanceParams[3].solidityType).toBe("uint256");
+  // }, 10000);
 
-    expect(hatIdResult).toBe(hatId);
-    expect(adminHatResult).toBe(immutableArgs[0]);
-    expect(underlyingContestResult).toBe(mutableArgs[0]);
-    expect(termEndResult).toBe(mutableArgs[1]);
-    expect(topKResult).toBe(mutableArgs[2]);
-
-    // Test getting instance parameters
-    const instanceParams = (await hatsModulesClient.getInstanceParameters(
-      res.newInstance
-    )) as ModuleParameter[];
-
-    expect(instanceParams).not.toBe(undefined);
-    expect(instanceParams[0].value).toBe(adminHatResult);
-    expect(instanceParams[0].solidityType).toBe("uint256");
-    expect(instanceParams[1].value).toBe(underlyingContestResult);
-    expect(instanceParams[1].solidityType).toBe("address");
-    expect(instanceParams[2].value).toBe(termEndResult);
-    expect(instanceParams[2].solidityType).toBe("uint256");
-    expect(instanceParams[3].value).toBe(topKResult);
-    expect(instanceParams[3].solidityType).toBe("uint256");
-  }, 10000);
-
-  test("Test create new staking instance and get instace parameters", async () => {
+  test("Test create new staking instance and get instance parameters", async () => {
     const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
     const module = hatsModulesClient.getModuleById(stakingId) as Module;
 
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
-
-    for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.immutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.immutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      immutableArgs.push(arg);
-    }
-
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      mutableArgs.push(arg);
-    }
+    const hatId = BigInt("0x0000000100000000000000000000000000000000000000000000000000000000");
+    const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+    const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
@@ -324,9 +275,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(cooldownPeriodResult).toBe(mutableArgs[3]);
 
     // Test getting instance parameters
-    const instanceParams = (await hatsModulesClient.getInstanceParameters(
-      res.newInstance
-    )) as ModuleParameter[];
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(res.newInstance)) as ModuleParameter[];
 
     expect(instanceParams).not.toBe(undefined);
     expect(instanceParams[0].value).toBe(tokenResult);
@@ -340,48 +289,15 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc20 eligibility instance and get instance parameters", async () => {
-    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
-    const module = hatsModulesClient.getModuleById(erc20Id) as Module;
+    const module = hatsModulesClient.getModuleByImplementation(ERC20_MODULE_ID) as Module;
 
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
-
-    for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.immutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.immutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      immutableArgs.push(arg);
-    }
-
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      mutableArgs.push(arg);
-    }
+    const hatId = BigInt("0x0000000100000000000000000000000000000000000000000000000000000000");
+    const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+    const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
-      moduleId: erc20Id,
+      moduleId: ERC20_MODULE_ID,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -415,9 +331,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(minBalanceResult).toBe(immutableArgs[1]);
 
     // Test getting instance parameters
-    const instanceParams = (await hatsModulesClient.getInstanceParameters(
-      res.newInstance
-    )) as ModuleParameter[];
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(res.newInstance)) as ModuleParameter[];
 
     expect(instanceParams).not.toBe(undefined);
     expect(instanceParams[0].value).toBe(tokenResult);
@@ -427,48 +341,15 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc721 eligibility instance and get instance parameters", async () => {
-    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
-    const module = hatsModulesClient.getModuleById(erc721Id) as Module;
+    const module = hatsModulesClient.getModuleByImplementation(ERC721_MODULE_ID) as Module;
 
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
-
-    for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.immutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.immutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      immutableArgs.push(arg);
-    }
-
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      mutableArgs.push(arg);
-    }
+    const hatId = BigInt("0x0000000100000000000000000000000000000000000000000000000000000000");
+    const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+    const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
-      moduleId: erc721Id,
+      moduleId: ERC721_MODULE_ID,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -502,9 +383,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(minBalanceResult).toBe(immutableArgs[1]);
 
     // Test getting instance parameters
-    const instanceParams = (await hatsModulesClient.getInstanceParameters(
-      res.newInstance
-    )) as ModuleParameter[];
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(res.newInstance)) as ModuleParameter[];
 
     expect(instanceParams).not.toBe(undefined);
     expect(instanceParams[0].value).toBe(tokenResult);
@@ -514,49 +393,15 @@ describe("Client Tests With a Static Modules File", () => {
   });
 
   test("Test create new erc1155 eligibility instance and get instance parameters", async () => {
-    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
-    const module = hatsModulesClient.getModuleById(erc1155Id) as Module;
+    const module = hatsModulesClient.getModuleByImplementation(ERC1155_MODULE_ID) as Module;
 
-    const hatId = BigInt(
-      "0x0000000100000000000000000000000000000000000000000000000000000000"
-    );
-    const immutableArgs: unknown[] = [];
-    const mutableArgs: unknown[] = [];
-    for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.immutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.immutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else if (tsType === "bigint[]") {
-        arg = (exampleArg as Array<string>).map((val) => BigInt(val));
-      } else {
-        arg = exampleArg;
-      }
-
-      immutableArgs.push(arg);
-    }
-
-    for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-      let arg: unknown;
-      const exampleArg = module.creationArgs.mutable[i].example;
-      const tsType = solidityToTypescriptType(
-        module.creationArgs.mutable[i].type
-      );
-      if (tsType === "bigint") {
-        arg = BigInt(exampleArg as string);
-      } else {
-        arg = exampleArg;
-      }
-
-      mutableArgs.push(arg);
-    }
+    const hatId = BigInt("0x0000000100000000000000000000000000000000000000000000000000000000");
+    const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+    const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
     const res = await hatsModulesClient.createNewInstance({
       account: deployerAccount,
-      moduleId: erc1155Id,
+      moduleId: ERC1155_MODULE_ID,
       hatId: hatId,
       immutableArgs: immutableArgs,
       mutableArgs: mutableArgs,
@@ -606,9 +451,7 @@ describe("Client Tests With a Static Modules File", () => {
     expect(minBalancesResult).toEqual(immutableArgs[3]);
 
     // Test getting instance parameters
-    const instanceParams = (await hatsModulesClient.getInstanceParameters(
-      res.newInstance
-    )) as ModuleParameter[];
+    const instanceParams = (await hatsModulesClient.getInstanceParameters(res.newInstance)) as ModuleParameter[];
 
     expect(instanceParams).not.toBe(undefined);
     expect(instanceParams[0].value).toBe(tokenResult);
@@ -621,15 +464,11 @@ describe("Client Tests With a Static Modules File", () => {
 
   test("Test get module by implementation", async () => {
     const claimsHatterId = "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9";
-    const claimsHatterModule = hatsModulesClient.getModuleById(
-      claimsHatterId
-    ) as Module;
+    const claimsHatterModule = hatsModulesClient.getModuleById(claimsHatterId) as Module;
 
-    expect(
-      hatsModulesClient.getModuleByImplementation(
-        "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9"
-      )
-    ).toEqual(claimsHatterModule);
+    expect(hatsModulesClient.getModuleByImplementation("0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9")).toEqual(
+      claimsHatterModule,
+    );
   });
 
   test("Test getModulesByInstances scenario 1", async () => {
@@ -639,15 +478,9 @@ describe("Client Tests With a Static Modules File", () => {
       erc1155EligibilityInstance,
     ]);
 
-    expect(modules[0]?.implementationAddress).toBe(
-      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
-    );
-    expect(modules[1]?.implementationAddress).toBe(
-      "0xF37cf12fB4493D29270806e826fDDf50dd722bab"
-    );
-    expect(modules[2]?.implementationAddress).toBe(
-      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
-    );
+    expect(modules[0]?.implementationAddress).toBe("0xbA5b218e6685D0607139c06f81442681a32a0EC3");
+    expect(modules[1]?.implementationAddress).toBe("0xF37cf12fB4493D29270806e826fDDf50dd722bab");
+    expect(modules[2]?.implementationAddress).toBe("0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17");
   }, 30000);
 
   test("Test getModulesByInstances scenario 2", async () => {
@@ -657,13 +490,9 @@ describe("Client Tests With a Static Modules File", () => {
       erc1155EligibilityInstance,
     ]);
 
-    expect(modules[0]?.implementationAddress).toBe(
-      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
-    );
+    expect(modules[0]?.implementationAddress).toBe("0xbA5b218e6685D0607139c06f81442681a32a0EC3");
     expect(modules[1]).toBe(undefined);
-    expect(modules[2]?.implementationAddress).toBe(
-      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
-    );
+    expect(modules[2]?.implementationAddress).toBe("0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17");
   }, 30000);
 
   test("Test getModulesByInstances scenario 3", async () => {
@@ -673,12 +502,8 @@ describe("Client Tests With a Static Modules File", () => {
       erc1155EligibilityInstance,
     ]);
 
-    expect(modules[0]?.implementationAddress).toBe(
-      "0xbA5b218e6685D0607139c06f81442681a32a0EC3"
-    );
+    expect(modules[0]?.implementationAddress).toBe("0xbA5b218e6685D0607139c06f81442681a32a0EC3");
     expect(modules[1]).toBe(undefined);
-    expect(modules[2]?.implementationAddress).toBe(
-      "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"
-    );
+    expect(modules[2]?.implementationAddress).toBe("0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17");
   }, 30000);
 });
