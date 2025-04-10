@@ -6,4 +6,3 @@ dist
 .idea
 .vscode
 .env
-scripts/*

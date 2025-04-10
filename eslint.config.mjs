@@ -30,4 +30,5 @@ export default tseslint.config(
       "simple-import-sort/exports": "error",
     },
   },
+  { ignores: ["scripts/**"] },
 );

@@ -4,7 +4,7 @@
     "module": "ES2020",
     "outDir": "./dist",
     "baseUrl": "./src",
-    "allowJs": false,
+    "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
     "declaration": true,
@@ -15,6 +15,6 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["./src"],
+  "include": ["./src", "./scripts"],
   "exclude": ["dist", "node_modules", "./**/*.test.ts", "./src/testing/**/*"]
 }
