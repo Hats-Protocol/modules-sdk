@@ -169,9 +169,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -264,43 +262,33 @@
         {
           "inputs": [],
           "name": "ARBITRATOR_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "OWNER_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "claimer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "claimer", "type": "address" }],
           "name": "claimerAgreements",
           "outputs": [
             {
@@ -315,25 +303,19 @@
         {
           "inputs": [],
           "name": "currentAgreement",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentAgreementId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "forgive",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -355,25 +337,19 @@
         {
           "inputs": [],
           "name": "graceEndsAt",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "revoke",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -394,9 +370,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -425,25 +399,19 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "wearerStanding",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -647,9 +615,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -773,34 +739,26 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "arbitratorHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "claimer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "claimer", "type": "address" }],
           "name": "claimerAgreements",
           "outputs": [
             {
@@ -815,25 +773,19 @@
         {
           "inputs": [],
           "name": "currentAgreement",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentAgreementId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "forgive",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -855,34 +807,26 @@
         {
           "inputs": [],
           "name": "graceEndsAt",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "ownerHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "revoke",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -929,9 +873,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -960,25 +902,19 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "wearerStanding",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -1184,9 +1120,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -1310,34 +1244,26 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "arbitratorHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "claimer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "claimer", "type": "address" }],
           "name": "claimerAgreements",
           "outputs": [
             {
@@ -1352,25 +1278,19 @@
         {
           "inputs": [],
           "name": "currentAgreement",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentAgreementId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "forgive",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -1392,34 +1312,26 @@
         {
           "inputs": [],
           "name": "graceEndsAt",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "ownerHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "revoke",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -1466,9 +1378,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -1497,25 +1407,19 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "wearerStanding",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -1745,9 +1649,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -1923,34 +1825,26 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "arbitratorHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "claimer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "claimer", "type": "address" }],
           "name": "claimerAgreements",
           "outputs": [
             {
@@ -1965,25 +1859,19 @@
         {
           "inputs": [],
           "name": "currentAgreement",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentAgreementId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "forgive",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2018,27 +1906,21 @@
         {
           "inputs": [],
           "name": "graceEndsAt",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "ownerHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -2056,9 +1938,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "revoke",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2105,9 +1985,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2136,25 +2014,19 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_wearer", "type": "address" }],
           "name": "wearerStanding",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -2230,10 +2102,7 @@
             "name": "Accounts",
             "description": "Initial accounts for the allowlist.",
             "type": "address[]",
-            "example": [
-              "0x0000000000000000000000000000000000000001",
-              "0x0000000000000000000000000000000000000002"
-            ],
+            "example": ["0x0000000000000000000000000000000000000001", "0x0000000000000000000000000000000000000002"],
             "displayType": "default"
           }
         ]
@@ -2380,9 +2249,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -2512,43 +2379,33 @@
         {
           "inputs": [],
           "name": "ARBITRATOR_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "OWNER_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "addAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2568,9 +2425,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
           "name": "allowlist",
           "outputs": [
             { "internalType": "bool", "name": "eligible", "type": "bool" },
@@ -2595,25 +2450,19 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccountAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2633,9 +2482,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "setBadStandingAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2670,9 +2517,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -2681,18 +2526,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -2764,10 +2605,7 @@
             "name": "Accounts",
             "description": "Initial accounts for the allowlist.",
             "type": "address[]",
-            "example": [
-              "0x0000000000000000000000000000000000000001",
-              "0x0000000000000000000000000000000000000002"
-            ],
+            "example": ["0x0000000000000000000000000000000000000001", "0x0000000000000000000000000000000000000002"],
             "displayType": "default"
           }
         ]
@@ -2942,9 +2780,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -3105,25 +2941,19 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "addAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3143,9 +2973,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
           "name": "allowlist",
           "outputs": [
             { "internalType": "bool", "name": "eligible", "type": "bool" },
@@ -3157,9 +2985,7 @@
         {
           "inputs": [],
           "name": "arbitratorHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -3179,34 +3005,26 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "ownerHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccountAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3239,9 +3057,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "setBadStandingAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3289,9 +3105,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3300,18 +3114,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -3379,10 +3189,7 @@
             "name": "Accounts",
             "description": "Initial accounts for the allowlist.",
             "type": "address[]",
-            "example": [
-              "0x0000000000000000000000000000000000000001",
-              "0x0000000000000000000000000000000000000002"
-            ],
+            "example": ["0x0000000000000000000000000000000000000001", "0x0000000000000000000000000000000000000002"],
             "displayType": "default"
           }
         ]
@@ -3557,9 +3364,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -3720,25 +3525,19 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "addAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3758,9 +3557,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "account", "type": "address" }],
           "name": "allowlist",
           "outputs": [
             { "internalType": "bool", "name": "eligible", "type": "bool" },
@@ -3772,9 +3569,7 @@
         {
           "inputs": [],
           "name": "arbitratorHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -3794,34 +3589,26 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "ownerHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccount",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "removeAccountAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3854,9 +3641,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_account", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_account", "type": "address" }],
           "name": "setBadStandingAndBurnHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3904,9 +3689,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -3915,18 +3698,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -4195,9 +3974,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -4327,27 +4104,21 @@
         {
           "inputs": [],
           "name": "BAAL",
-          "outputs": [
-            { "internalType": "contract IBaal", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IBaal", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -4367,16 +4138,12 @@
         {
           "inputs": [],
           "name": "STAKING_PROXY_IMPL",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint112", "name": "_amount", "type": "uint112" }
-          ],
+          "inputs": [{ "internalType": "uint112", "name": "_amount", "type": "uint112" }],
           "name": "beginUnstake",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -4396,9 +4163,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_member", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_member", "type": "address" }],
           "name": "completeUnstake",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -4407,18 +4172,14 @@
         {
           "inputs": [],
           "name": "cooldownBuffer",
-          "outputs": [
-            { "internalType": "uint32", "name": "", "type": "uint32" }
-          ],
+          "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "cooldownPeriod",
-          "outputs": [
-            { "internalType": "uint32", "name": "", "type": "uint32" }
-          ],
+          "outputs": [{ "internalType": "uint32", "name": "", "type": "uint32" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -4436,9 +4197,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_member", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_member", "type": "address" }],
           "name": "getStakedSharesAndProxy",
           "outputs": [
             { "internalType": "uint112", "name": "amount", "type": "uint112" },
@@ -4467,9 +4226,7 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -4483,16 +4240,12 @@
         {
           "inputs": [],
           "name": "judge",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_member", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_member", "type": "address" }],
           "name": "memberStakes",
           "outputs": [
             {
@@ -4507,9 +4260,7 @@
         {
           "inputs": [],
           "name": "minStake",
-          "outputs": [
-            { "internalType": "uint112", "name": "", "type": "uint112" }
-          ],
+          "outputs": [{ "internalType": "uint112", "name": "", "type": "uint112" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -4527,9 +4278,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_judge", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_judge", "type": "uint256" }],
           "name": "setJudge",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -4559,18 +4308,14 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_member", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_member", "type": "address" }],
           "name": "slash",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -4610,9 +4355,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "member", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "member", "type": "address" }],
           "name": "stakes",
           "outputs": [
             {
@@ -4644,18 +4387,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -4710,9 +4449,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -4745,27 +4482,21 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "THRESHOLD",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -4785,16 +4516,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -4803,18 +4530,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -4905,9 +4628,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -4927,45 +4648,35 @@
         {
           "inputs": [],
           "name": "CONJUNCTION_CLAUSE_LENGTHS",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MODULES",
-          "outputs": [
-            { "internalType": "address[]", "name": "", "type": "address[]" }
-          ],
+          "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "NUM_CONJUNCTION_CLAUSES",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -4985,16 +4696,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -5003,18 +4710,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -5106,9 +4809,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -5128,45 +4829,35 @@
         {
           "inputs": [],
           "name": "CONJUNCTION_CLAUSE_LENGTHS",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MODULES",
-          "outputs": [
-            { "internalType": "address[]", "name": "", "type": "address[]" }
-          ],
+          "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "NUM_CONJUNCTION_CLAUSES",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -5186,16 +4877,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -5204,18 +4891,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -5274,9 +4957,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -5296,18 +4977,14 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -5340,16 +5017,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "wearer", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "wearer", "type": "address" }],
           "name": "isHuman",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -5358,16 +5031,12 @@
         {
           "inputs": [],
           "name": "scoreCriterion",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -5376,18 +5045,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -5504,9 +5169,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -5577,38 +5240,28 @@
         {
           "inputs": [],
           "name": "CONTROLLER_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "getHatStatus",
-          "outputs": [
-            { "internalType": "bool", "name": "active", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "active", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -5628,9 +5281,7 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -5645,9 +5296,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -5668,18 +5317,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -5739,9 +5384,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -5761,27 +5404,21 @@
         {
           "inputs": [],
           "name": "CRITERION_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -5801,16 +5438,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -5819,18 +5452,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -5993,16 +5622,12 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
         {
-          "inputs": [
-            { "internalType": "uint128", "name": "termEnd", "type": "uint128" }
-          ],
+          "inputs": [{ "internalType": "uint128", "name": "termEnd", "type": "uint128" }],
           "name": "ElectionClosed",
           "type": "error"
         },
@@ -6088,45 +5713,35 @@
         {
           "inputs": [],
           "name": "ADMIN_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "BALLOT_BOX_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentTermEnd",
-          "outputs": [
-            { "internalType": "uint128", "name": "", "type": "uint128" }
-          ],
+          "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6158,20 +5773,14 @@
             }
           ],
           "name": "electionResults",
-          "outputs": [
-            { "internalType": "bool", "name": "elected", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "elected", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint128", "name": "termEnd", "type": "uint128" }
-          ],
+          "inputs": [{ "internalType": "uint128", "name": "termEnd", "type": "uint128" }],
           "name": "electionStatus",
-          "outputs": [
-            { "internalType": "bool", "name": "isElectionOpen", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "isElectionOpen", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6191,18 +5800,14 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "nextTermEnd",
-          "outputs": [
-            { "internalType": "uint128", "name": "", "type": "uint128" }
-          ],
+          "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6238,9 +5843,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -6256,18 +5859,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -6435,16 +6034,12 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
         {
-          "inputs": [
-            { "internalType": "uint128", "name": "termEnd", "type": "uint128" }
-          ],
+          "inputs": [{ "internalType": "uint128", "name": "termEnd", "type": "uint128" }],
           "name": "ElectionClosed",
           "type": "error"
         },
@@ -6536,45 +6131,35 @@
         {
           "inputs": [],
           "name": "ADMIN_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "BALLOT_BOX_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentTermEnd",
-          "outputs": [
-            { "internalType": "uint128", "name": "", "type": "uint128" }
-          ],
+          "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6606,20 +6191,14 @@
             }
           ],
           "name": "electionResults",
-          "outputs": [
-            { "internalType": "bool", "name": "elected", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "elected", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint128", "name": "termEnd", "type": "uint128" }
-          ],
+          "inputs": [{ "internalType": "uint128", "name": "termEnd", "type": "uint128" }],
           "name": "electionStatus",
-          "outputs": [
-            { "internalType": "bool", "name": "isElectionOpen", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "isElectionOpen", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6639,18 +6218,14 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "nextTermEnd",
-          "outputs": [
-            { "internalType": "uint128", "name": "", "type": "uint128" }
-          ],
+          "outputs": [{ "internalType": "uint128", "name": "", "type": "uint128" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6686,9 +6261,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -6704,18 +6277,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -6858,9 +6427,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -6921,27 +6488,21 @@
         {
           "inputs": [],
           "name": "ADMIN_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -6951,9 +6512,7 @@
             { "internalType": "address", "name": "contest", "type": "address" }
           ],
           "name": "eligibleWearersPerContest",
-          "outputs": [
-            { "internalType": "bool", "name": "eligible", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "eligible", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -6973,9 +6532,7 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -7008,16 +6565,12 @@
         {
           "inputs": [],
           "name": "reelectionAllowed",
-          "outputs": [
-            { "internalType": "bool", "name": "allowed", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "allowed", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -7026,45 +6579,35 @@
         {
           "inputs": [],
           "name": "termEnd",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "topK",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "underlyingContest",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -7144,7 +6687,7 @@
             "name": "JokeRace Contest",
             "description": "The JokeRace contest that facilitates the election",
             "type": "address",
-            "example": "0x8E612AD3CD04981A69e8ad532b5c20466e3Af5E0",
+            "example": "0xd00F6a711522a84C73aED9997Fcf207B41E97311",
             "displayType": "jokerace"
           },
           {
@@ -7210,9 +6753,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -7282,27 +6823,21 @@
         {
           "inputs": [],
           "name": "ADMIN_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -7312,9 +6847,7 @@
             { "internalType": "address", "name": "contest", "type": "address" }
           ],
           "name": "eligibleWearersPerContest",
-          "outputs": [
-            { "internalType": "bool", "name": "eligible", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "eligible", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -7334,18 +6867,14 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "pullElectionResults",
-          "outputs": [
-            { "internalType": "bool", "name": "success", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
           "stateMutability": "nonpayable",
           "type": "function"
         },
@@ -7371,16 +6900,12 @@
         {
           "inputs": [],
           "name": "reelectionAllowed",
-          "outputs": [
-            { "internalType": "bool", "name": "allowed", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "allowed", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -7389,45 +6914,35 @@
         {
           "inputs": [],
           "name": "termEnd",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "topK",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "underlyingContest",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -7565,9 +7080,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -7679,54 +7192,42 @@
         {
           "inputs": [],
           "name": "ADMIN_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "canStartNextTerm",
-          "outputs": [
-            { "internalType": "bool", "name": "allowed", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "allowed", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentTermEnded",
-          "outputs": [
-            { "internalType": "bool", "name": "ended", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "ended", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "currentTermIndex",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -7740,9 +7241,7 @@
             }
           ],
           "name": "eligibleWearersPerTerm",
-          "outputs": [
-            { "internalType": "bool", "name": "eligible", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "eligible", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -7762,18 +7261,14 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "nextContestCompleted",
-          "outputs": [
-            { "internalType": "bool", "name": "completed", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "completed", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -7802,9 +7297,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -7842,18 +7335,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -7863,9 +7352,7 @@
       "id": "haberdasher-labs_multi-claims-hatter",
       "version": "v0.1.0",
       "name": "Multi Claims Hatter",
-      "details": [
-        "A Hats Protocol hatter contract enabling explicitly eligible wearers to claim a hat."
-      ],
+      "details": ["A Hats Protocol hatter contract enabling explicitly eligible wearers to claim a hat."],
       "links": [
         {
           "label": "GitHub",
@@ -7897,9 +7384,7 @@
             "name": "Initial Claimable Hats",
             "description": "The ID of the hats to set claimability for",
             "type": "uint256[]",
-            "example": [
-              "26959946667150639794667015087019630673637144422540572481103610249216"
-            ],
+            "example": ["26959946667150639794667015087019630673637144422540572481103610249216"],
             "displayType": "hat"
           },
           {
@@ -7915,9 +7400,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -7927,16 +7410,12 @@
           "type": "error"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "hatId", "type": "uint256" }],
           "name": "MultiClaimsHatter_HatNotClaimable",
           "type": "error"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "hatId", "type": "uint256" }],
           "name": "MultiClaimsHatter_HatNotClaimableFor",
           "type": "error"
         },
@@ -8010,18 +7489,14 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -8054,9 +7529,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "claimHat",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -8104,9 +7577,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "hatExists",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -8115,16 +7586,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "hatId", "type": "uint256" }],
           "name": "hatToClaimType",
           "outputs": [
             {
@@ -8137,18 +7604,14 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "isClaimableBy",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "isClaimableFor",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -8266,16 +7729,12 @@
             }
           ],
           "name": "setHatsClaimabilityAndCreateModules",
-          "outputs": [
-            { "internalType": "bool", "name": "success", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "success", "type": "bool" }],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -8284,25 +7743,19 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "wearsAdmin",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -8424,9 +7877,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -8447,36 +7898,28 @@
         {
           "inputs": [],
           "name": "CRITERION_HAT",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -8503,9 +7946,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -8514,18 +7955,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -8709,45 +8146,35 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "LOCK_VERSION",
-          "outputs": [
-            { "internalType": "uint16", "name": "", "type": "uint16" }
-          ],
+          "outputs": [{ "internalType": "uint16", "name": "", "type": "uint16" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "REFERRER",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "expirationDuration",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -8767,27 +8194,21 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "implementationReferrerFeePercentage",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "keyPurchasePrice",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -8812,9 +8233,7 @@
         {
           "inputs": [],
           "name": "keyPurchaseToken",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -8834,9 +8253,7 @@
         {
           "inputs": [],
           "name": "maxNumberOfKeys",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -8876,9 +8293,7 @@
         {
           "inputs": [],
           "name": "referrerFeePercentage",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -8909,9 +8324,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -8946,18 +8359,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -9049,9 +8458,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "__version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "__version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -9112,27 +8519,21 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MIN_SEASON_DURATION",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -9164,63 +8565,47 @@
         {
           "inputs": [],
           "name": "extensionDelay",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "extensionThreshold",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "name": "getHatStatus",
-          "outputs": [
-            { "internalType": "bool", "name": "_active", "type": "bool" }
-          ],
+          "outputs": [{ "internalType": "bool", "name": "_active", "type": "bool" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "seasonDuration",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "seasonEnd",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -9229,18 +8614,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -9504,9 +8885,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -9758,34 +9137,26 @@
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "TOKEN",
-          "outputs": [
-            { "internalType": "contract IERC20", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IERC20", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint248", "name": "_amount", "type": "uint248" }
-          ],
+          "inputs": [{ "internalType": "uint248", "name": "_amount", "type": "uint248" }],
           "name": "beginUnstake",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -9844,9 +9215,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_staker", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_staker", "type": "address" }],
           "name": "completeUnstake",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -9862,16 +9231,12 @@
         {
           "inputs": [],
           "name": "cooldownPeriod",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "staker", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "staker", "type": "address" }],
           "name": "cooldowns",
           "outputs": [
             { "internalType": "uint248", "name": "amount", "type": "uint248" },
@@ -9881,9 +9246,7 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_staker", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_staker", "type": "address" }],
           "name": "forgive",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -9905,70 +9268,54 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "judgeHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "minStake",
-          "outputs": [
-            { "internalType": "uint248", "name": "", "type": "uint248" }
-          ],
+          "outputs": [{ "internalType": "uint248", "name": "", "type": "uint248" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "recipientHat",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "_staker", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "_staker", "type": "address" }],
           "name": "slash",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint248", "name": "_amount", "type": "uint248" }
-          ],
+          "inputs": [{ "internalType": "uint248", "name": "_amount", "type": "uint248" }],
           "name": "stake",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "address", "name": "staker", "type": "address" }
-          ],
+          "inputs": [{ "internalType": "address", "name": "staker", "type": "address" }],
           "name": "stakes",
           "outputs": [
             { "internalType": "uint248", "name": "amount", "type": "uint248" },
@@ -9980,27 +9327,21 @@
         {
           "inputs": [],
           "name": "totalSlashedStakes",
-          "outputs": [
-            { "internalType": "uint248", "name": "", "type": "uint248" }
-          ],
+          "outputs": [{ "internalType": "uint248", "name": "", "type": "uint248" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -10089,10 +9430,7 @@
             "name": "Modules",
             "description": "The list of module instances to chain together",
             "type": "address[]",
-            "example": [
-              "0xe1f50cd1078b4f7920c7d6657dc3d8d2e5155ae0",
-              "0x4f28253ece7b52dd800160e7fecdb1c531a3fe1f"
-            ],
+            "example": ["0xe1f50cd1078b4f7920c7d6657dc3d8d2e5155ae0", "0x4f28253ece7b52dd800160e7fecdb1c531a3fe1f"],
             "displayType": "default"
           }
         ],
@@ -10102,9 +9440,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -10124,52 +9460,40 @@
         {
           "inputs": [],
           "name": "CONJUNCTION_CLAUSE_LENGTHS",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MODULES",
-          "outputs": [
-            { "internalType": "address[]", "name": "", "type": "address[]" }
-          ],
+          "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "NUM_CONJUNCTION_CLAUSES",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "getHatStatus",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -10178,16 +9502,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -10196,18 +9516,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -10285,10 +9601,7 @@
             "name": "Modules",
             "description": "The list of module instances to chain together",
             "type": "address[]",
-            "example": [
-              "0xe1f50cd1078b4f7920c7d6657dc3d8d2e5155ae0",
-              "0x4f28253ece7b52dd800160e7fecdb1c531a3fe1f"
-            ],
+            "example": ["0xe1f50cd1078b4f7920c7d6657dc3d8d2e5155ae0", "0x4f28253ece7b52dd800160e7fecdb1c531a3fe1f"],
             "displayType": "default"
           }
         ],
@@ -10298,9 +9611,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -10320,52 +9631,40 @@
         {
           "inputs": [],
           "name": "CONJUNCTION_CLAUSE_LENGTHS",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MODULES",
-          "outputs": [
-            { "internalType": "address[]", "name": "", "type": "address[]" }
-          ],
+          "outputs": [{ "internalType": "address[]", "name": "", "type": "address[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "NUM_CONJUNCTION_CLAUSES",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "_hatId", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "_hatId", "type": "uint256" }],
           "name": "getHatStatus",
           "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
           "stateMutability": "view",
@@ -10374,16 +9673,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -10392,18 +9687,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -10493,9 +9784,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -10517,54 +9806,42 @@
         {
           "inputs": [],
           "name": "ARRAY_LENGTH",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MIN_BALANCES",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "TOKEN_ADDRESS",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "TOKEN_IDS",
-          "outputs": [
-            { "internalType": "uint256[]", "name": "", "type": "uint256[]" }
-          ],
+          "outputs": [{ "internalType": "uint256[]", "name": "", "type": "uint256[]" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -10584,16 +9861,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -10602,18 +9875,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -10684,9 +9953,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -10708,36 +9975,28 @@
         {
           "inputs": [],
           "name": "ERC20_TOKEN_ADDRESS",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MIN_BALANCE",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -10757,16 +10016,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -10775,18 +10030,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -10857,9 +10108,7 @@
       "writeFunctions": [],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -10881,36 +10130,28 @@
         {
           "inputs": [],
           "name": "ERC721_TOKEN_ADDRESS",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "MIN_BALANCE",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -10930,16 +10171,12 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -10948,18 +10185,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }
@@ -11048,7 +10281,7 @@
             },
             {
               "name": "Min Levels",
-              "description": "The min levels corrsponding to each new class, in the same order",
+              "description": "The min levels corresponding to each new class, in the same order",
               "type": "uint256[]",
               "displayType": "default"
             }
@@ -11057,9 +10290,7 @@
       ],
       "abi": [
         {
-          "inputs": [
-            { "internalType": "string", "name": "_version", "type": "string" }
-          ],
+          "inputs": [{ "internalType": "string", "name": "_version", "type": "string" }],
           "stateMutability": "nonpayable",
           "type": "constructor"
         },
@@ -11122,45 +10353,35 @@
         {
           "inputs": [],
           "name": "ARRAY_LENGTH",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "CLASSES_ADDRESS",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "HATS",
-          "outputs": [
-            { "internalType": "contract IHats", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "contract IHats", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "IMPLEMENTATION",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "SHEETS_ADDRESS",
-          "outputs": [
-            { "internalType": "address", "name": "", "type": "address" }
-          ],
+          "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
           "stateMutability": "pure",
           "type": "function"
         },
@@ -11183,13 +10404,9 @@
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "name": "classIds",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
@@ -11209,27 +10426,19 @@
         {
           "inputs": [],
           "name": "hatId",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "pure",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "inputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "name": "minLevels",
-          "outputs": [
-            { "internalType": "uint256", "name": "", "type": "uint256" }
-          ],
+          "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
-          "inputs": [
-            { "internalType": "bytes", "name": "_initData", "type": "bytes" }
-          ],
+          "inputs": [{ "internalType": "bytes", "name": "_initData", "type": "bytes" }],
           "name": "setUp",
           "outputs": [],
           "stateMutability": "nonpayable",
@@ -11238,18 +10447,14 @@
         {
           "inputs": [],
           "name": "version",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         },
         {
           "inputs": [],
           "name": "version_",
-          "outputs": [
-            { "internalType": "string", "name": "", "type": "string" }
-          ],
+          "outputs": [{ "internalType": "string", "name": "", "type": "string" }],
           "stateMutability": "view",
           "type": "function"
         }

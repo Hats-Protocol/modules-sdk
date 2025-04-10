@@ -341,6 +341,7 @@ export function getModuleFunctionError(err: unknown, moduleId: string): never {
     const revertError = err.walk((err) => err instanceof ContractFunctionRevertedError);
     if (revertError instanceof ContractFunctionRevertedError) {
       const errorName = revertError.data?.errorName ?? "";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const errorArgs = revertError.data?.args as any[];
 
       // AllowList Eligibility error

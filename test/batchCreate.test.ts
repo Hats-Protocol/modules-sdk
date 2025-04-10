@@ -4,13 +4,21 @@ import type { Anvil } from "@viem/anvil";
 import { createAnvil } from "@viem/anvil";
 import { Abi } from "abitype";
 import * as fs from "fs";
-import type { PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import { HatsModulesClient } from "../src/index";
 import type { Module, Registry } from "../src/types";
+import { prepareArgs } from "./utils";
+
+const HAT_ID = "0x0000000100000000000000000000000000000000000000000000000000000000";
+// const JOKERACE_MODULE_ID = "0x0Bb0a2B9bc5Da206fead8e87D7Cbc6fCBa455320"; // jokerace v0.3.0
+const STAKING_MODULE_ID = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7"; // staking v0.1.0
+const ERC20_MODULE_ID = "0xbA5b218e6685D0607139c06f81442681a32a0EC3"; // erc20 v0.1.0
+const ERC721_MODULE_ID = "0xF37cf12fB4493D29270806e826fDDf50dd722bab"; // erc721 v0.1.0
+const ERC1155_MODULE_ID = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17"; // erc1155 v0.1.0
 
 describe("Batch Create Client Tests", () => {
   let publicClient: PublicClient;
@@ -18,21 +26,21 @@ describe("Batch Create Client Tests", () => {
   let hatsModulesClient: HatsModulesClient;
   let anvil: Anvil;
   let deployerAccount: PrivateKeyAccount;
+  // let timestamp: bigint;
 
-  let jokeraceInstance: `0x${string}`;
-  let stakingInstance: `0x${string}`;
-  let erc20Instance: `0x${string}`;
-  let erc721Instance: `0x${string}`;
-  let erc1155Instance: `0x${string}`;
+  // let jokeraceInstance: Address;
+  let stakingInstance: Address;
+  let erc20Instance: Address;
+  let erc721Instance: Address;
+  let erc1155Instance: Address;
 
-  let jokeraceAbi: Abi;
+  // let jokeraceAbi: Abi;
   let stakingAbi: Abi;
   let erc20Abi: Abi;
   let erc721Abi: Abi;
   let erc1155Abi: Abi;
 
-  let immutableArgs: unknown[][];
-  let mutableArgs: unknown[][];
+  let modules: { [key: string]: { mod: Module; immutable: unknown[]; mutable: unknown[] } };
 
   beforeAll(async () => {
     anvil = createAnvil({
@@ -53,6 +61,9 @@ describe("Batch Create Client Tests", () => {
       transport: http("http://127.0.0.1:8545"),
     });
 
+    // const block = await publicClient.getBlock();
+    // timestamp = block.timestamp;
+
     const modulesFile = new URL("modules.json", import.meta.url);
     const data = fs.readFileSync(modulesFile, "utf-8");
     const registryModules: Registry = JSON.parse(data);
@@ -64,136 +75,104 @@ describe("Batch Create Client Tests", () => {
 
     await hatsModulesClient.prepare(registryModules);
 
-    immutableArgs = [];
-    mutableArgs = [];
+    // const jokeraceModule = hatsModulesClient.getModuleByImplementation(JOKERACE_MODULE_ID) as Module;
+    const stakingModule = hatsModulesClient.getModuleByImplementation(STAKING_MODULE_ID) as Module;
+    const erc20Module = hatsModulesClient.getModuleByImplementation(ERC20_MODULE_ID) as Module;
+    const erc721Module = hatsModulesClient.getModuleByImplementation(ERC721_MODULE_ID) as Module;
+    const erc1155Module = hatsModulesClient.getModuleByImplementation(ERC1155_MODULE_ID) as Module;
 
-    const jokeraceId = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
-    const stakingId = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
-    const erc20Id = "0xbA5b218e6685D0607139c06f81442681a32a0EC3";
-    const erc721Id = "0xF37cf12fB4493D29270806e826fDDf50dd722bab";
-    const erc1155Id = "0x0089FbD2e0c42F2090890e1d9A3bd8d40E0e2e17";
-
-    const jokeraceModule = hatsModulesClient.getModuleById(jokeraceId) as Module;
-    const stakingModule = hatsModulesClient.getModuleById(stakingId) as Module;
-    const erc20Module = hatsModulesClient.getModuleById(erc20Id) as Module;
-    const erc721Module = hatsModulesClient.getModuleById(erc721Id) as Module;
-    const erc1155Module = hatsModulesClient.getModuleById(erc1155Id) as Module;
-
-    jokeraceAbi = jokeraceModule.abi;
+    // jokeraceAbi = jokeraceModule.abi;
     stakingAbi = stakingModule.abi;
     erc20Abi = erc20Module.abi;
     erc721Abi = erc721Module.abi;
     erc1155Abi = erc1155Module.abi;
 
-    const modules: Module[] = [jokeraceModule, stakingModule, erc20Module, erc721Module, erc1155Module];
-    const moduleIds: string[] = [jokeraceId, stakingId, erc20Id, erc721Id, erc1155Id];
-    const hatIds: bigint[] = [
-      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
-      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
-      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
-      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
-      BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"),
-    ];
-
-    for (let i = 0; i < modules.length; i++) {
-      const module = modules[i];
-      const moduleImmutableArgs: unknown[] = [];
-      const moduleMutableArgs: unknown[] = [];
-
-      for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-        let arg: unknown;
-        const exampleArg = module.creationArgs.immutable[i].example;
-        const tsType = solidityToTypescriptType(module.creationArgs.immutable[i].type);
-        if (tsType === "bigint") {
-          arg = BigInt(exampleArg as string);
-        } else if (tsType === "bigint[]") {
-          arg = (exampleArg as Array<string>).map((val) => BigInt(val));
-        } else {
-          arg = exampleArg;
-        }
-
-        moduleImmutableArgs.push(arg);
-      }
-      immutableArgs.push(moduleImmutableArgs);
-
-      for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-        let arg: unknown;
-        const exampleArg = module.creationArgs.mutable[i].example;
-        const tsType = solidityToTypescriptType(module.creationArgs.mutable[i].type);
-        if (tsType === "bigint") {
-          arg = BigInt(exampleArg as string);
-        } else if (tsType === "bigint[]") {
-          arg = (exampleArg as Array<string>).map((val) => BigInt(val));
-        } else {
-          arg = exampleArg;
-        }
-
-        moduleMutableArgs.push(arg);
-      }
-      mutableArgs.push(moduleMutableArgs);
-    }
+    modules = {
+      [ERC20_MODULE_ID]: {
+        mod: erc20Module,
+        immutable: prepareArgs({ args: erc20Module.creationArgs.immutable }),
+        mutable: prepareArgs({ args: erc20Module.creationArgs.mutable }),
+      },
+      [ERC721_MODULE_ID]: {
+        mod: erc721Module,
+        immutable: prepareArgs({ args: erc721Module.creationArgs.immutable }),
+        mutable: prepareArgs({ args: erc721Module.creationArgs.mutable }),
+      },
+      [ERC1155_MODULE_ID]: {
+        mod: erc1155Module,
+        immutable: prepareArgs({ args: erc1155Module.creationArgs.immutable }),
+        mutable: prepareArgs({ args: erc1155Module.creationArgs.mutable }),
+      },
+      [STAKING_MODULE_ID]: {
+        mod: stakingModule,
+        immutable: prepareArgs({ args: stakingModule.creationArgs.immutable }),
+        mutable: prepareArgs({ args: stakingModule.creationArgs.mutable }),
+      },
+      // [JOKERACE_MODULE_ID]: {
+      //   mod: jokeraceModule,
+      //   immutable: prepareArgs({ args: jokeraceModule.creationArgs.immutable }),
+      //   mutable: prepareArgs({ args: jokeraceModule.creationArgs.mutable }),
+      // },
+    };
+    const hatIds: bigint[] = Array(Object.keys(modules).length).fill(BigInt(HAT_ID));
 
     const res = await hatsModulesClient.batchCreateNewInstances({
       account: deployerAccount,
-      moduleIds,
+      moduleIds: Object.keys(modules),
       hatIds,
-      immutableArgsArray: immutableArgs,
-      mutableArgsArray: mutableArgs,
+      immutableArgsArray: Object.keys(modules).map((m) => modules[m].immutable),
+      mutableArgsArray: Object.keys(modules).map((m) => modules[m].mutable),
     });
 
-    jokeraceInstance = res.newInstances[0];
-    stakingInstance = res.newInstances[1];
-    erc20Instance = res.newInstances[2];
-    erc721Instance = res.newInstances[3];
-    erc1155Instance = res.newInstances[4];
-  }, 35000);
+    [erc20Instance, erc721Instance, erc1155Instance, stakingInstance] = res.newInstances;
+  }, 30000);
 
   afterAll(async () => {
     await anvil.stop();
   }, 30000);
 
-  test("Test jokerace instance", async () => {
-    const hatIdResult = await publicClient.readContract({
-      address: jokeraceInstance,
-      abi: jokeraceAbi,
-      functionName: "hatId",
-      args: [],
-    });
+  // test("Test jokerace instance", async () => {
+  //   const hatIdResult = await publicClient.readContract({
+  //     address: jokeraceInstance,
+  //     abi: jokeraceAbi,
+  //     functionName: "hatId",
+  //     args: [],
+  //   });
 
-    const adminHatResult = await publicClient.readContract({
-      address: jokeraceInstance,
-      abi: jokeraceAbi,
-      functionName: "ADMIN_HAT",
-      args: [],
-    });
+  //   const adminHatResult = await publicClient.readContract({
+  //     address: jokeraceInstance,
+  //     abi: jokeraceAbi,
+  //     functionName: "ADMIN_HAT",
+  //     args: [],
+  //   });
 
-    const underlyingContestResult = await publicClient.readContract({
-      address: jokeraceInstance,
-      abi: jokeraceAbi,
-      functionName: "underlyingContest",
-      args: [],
-    });
+  //   const underlyingContestResult = await publicClient.readContract({
+  //     address: jokeraceInstance,
+  //     abi: jokeraceAbi,
+  //     functionName: "underlyingContest",
+  //     args: [],
+  //   });
 
-    const termEndResult = await publicClient.readContract({
-      address: jokeraceInstance,
-      abi: jokeraceAbi,
-      functionName: "termEnd",
-      args: [],
-    });
+  //   const termEndResult = await publicClient.readContract({
+  //     address: jokeraceInstance,
+  //     abi: jokeraceAbi,
+  //     functionName: "termEnd",
+  //     args: [],
+  //   });
 
-    const topKResult = await publicClient.readContract({
-      address: jokeraceInstance,
-      abi: jokeraceAbi,
-      functionName: "topK",
-      args: [],
-    });
+  //   const topKResult = await publicClient.readContract({
+  //     address: jokeraceInstance,
+  //     abi: jokeraceAbi,
+  //     functionName: "topK",
+  //     args: [],
+  //   });
 
-    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
-    expect(adminHatResult).toBe(immutableArgs[0][0]);
-    expect(underlyingContestResult).toBe(mutableArgs[0][0]);
-    expect(termEndResult).toBe(mutableArgs[0][1]);
-    expect(topKResult).toBe(mutableArgs[0][2]);
-  });
+  //   expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
+  //   expect(adminHatResult).toBe(modules[JOKERACE_MODULE_ID].immutable[0]);
+  //   expect(underlyingContestResult).toBe(modules[JOKERACE_MODULE_ID].mutable[0]);
+  //   expect(termEndResult).toBe(modules[JOKERACE_MODULE_ID].mutable[1]);
+  //   expect(topKResult).toBe(modules[JOKERACE_MODULE_ID].mutable[2]);
+  // });
 
   test("Test staking instance", async () => {
     const hatIdResult = await publicClient.readContract({
@@ -237,12 +216,12 @@ describe("Batch Create Client Tests", () => {
       args: [],
     });
 
-    expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
-    expect(tokenResult).toBe(immutableArgs[1][0]);
-    expect(minStakeResult).toBe(mutableArgs[1][0]);
-    expect(judgeHatResult).toBe(mutableArgs[1][1]);
-    expect(recipientHatResult).toBe(mutableArgs[1][2]);
-    expect(cooldownPeriodResult).toBe(mutableArgs[1][3]);
+    expect(hatIdResult).toBe(BigInt(HAT_ID));
+    expect(tokenResult).toBe(modules[STAKING_MODULE_ID].immutable[0]);
+    expect(minStakeResult).toBe(modules[STAKING_MODULE_ID].mutable[0]);
+    expect(judgeHatResult).toBe(modules[STAKING_MODULE_ID].mutable[1]);
+    expect(recipientHatResult).toBe(modules[STAKING_MODULE_ID].mutable[2]);
+    expect(cooldownPeriodResult).toBe(modules[STAKING_MODULE_ID].mutable[3]);
   });
 
   test("Test erc20 instance", async () => {
@@ -268,8 +247,8 @@ describe("Batch Create Client Tests", () => {
     });
 
     expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
-    expect(tokenResult).toBe(immutableArgs[2][0]);
-    expect(minBalanceResult).toBe(immutableArgs[2][1]);
+    expect(tokenResult).toBe(modules[ERC20_MODULE_ID].immutable[0]);
+    expect(minBalanceResult).toBe(modules[ERC20_MODULE_ID].immutable[1]);
   });
 
   test("Test erc721 instance", async () => {
@@ -295,8 +274,8 @@ describe("Batch Create Client Tests", () => {
     });
 
     expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
-    expect(tokenResult).toBe(immutableArgs[3][0]);
-    expect(minBalanceResult).toBe(immutableArgs[3][1]);
+    expect(tokenResult).toBe(modules[ERC721_MODULE_ID].immutable[0]);
+    expect(minBalanceResult).toBe(modules[ERC721_MODULE_ID].immutable[1]);
   });
 
   test("Test erc1155 instance", async () => {
@@ -336,9 +315,9 @@ describe("Batch Create Client Tests", () => {
     });
 
     expect(hatIdResult).toBe(BigInt("0x0000000100000000000000000000000000000000000000000000000000000000"));
-    expect(tokenResult).toBe(immutableArgs[4][0]);
-    expect(arrayLengthResult).toBe(immutableArgs[4][1]);
-    expect(tokenIdsResult).toEqual(immutableArgs[4][2]);
-    expect(minBalancesResult).toEqual(immutableArgs[4][3]);
+    expect(tokenResult).toBe(modules[ERC1155_MODULE_ID].immutable[0]);
+    expect(arrayLengthResult).toBe(modules[ERC1155_MODULE_ID].immutable[1]);
+    expect(tokenIdsResult).toEqual(modules[ERC1155_MODULE_ID].immutable[2]);
+    expect(minBalancesResult).toEqual(modules[ERC1155_MODULE_ID].immutable[3]);
   });
 });

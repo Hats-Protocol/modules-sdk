@@ -7,7 +7,8 @@ import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 
-import { HatsModulesClient, solidityToTypescriptType } from "../src/index";
+import { HatsModulesClient } from "../src/index";
+import { prepareArgs } from "./utils";
 
 describe("Eligibility Client Tests", () => {
   let publicClient: PublicClient;
@@ -78,38 +79,8 @@ describe("Eligibility Client Tests", () => {
       const hatId = module.creationArgs.useHatId
         ? BigInt("0x0000000100000000000000000000000000000000000000000000000000000000")
         : BigInt("0");
-      const immutableArgs: unknown[] = [];
-      const mutableArgs: unknown[] = [];
-
-      for (let i = 0; i < module.creationArgs.immutable.length; i++) {
-        let arg: unknown;
-        const exampleArg = module.creationArgs.immutable[i].example;
-        const tsType = solidityToTypescriptType(module.creationArgs.immutable[i].type);
-        if (tsType === "bigint") {
-          arg = BigInt(exampleArg as string);
-        } else if (tsType === "bigint[]") {
-          arg = (exampleArg as Array<string>).map((val) => BigInt(val));
-        } else {
-          arg = exampleArg;
-        }
-
-        immutableArgs.push(arg);
-      }
-
-      for (let i = 0; i < module.creationArgs.mutable.length; i++) {
-        let arg: unknown;
-        const exampleArg = module.creationArgs.mutable[i].example;
-        const tsType = solidityToTypescriptType(module.creationArgs.mutable[i].type);
-        if (tsType === "bigint") {
-          arg = BigInt(exampleArg as string);
-        } else if (tsType === "bigint[]") {
-          arg = (exampleArg as Array<string>).map((val) => BigInt(val));
-        } else {
-          arg = exampleArg;
-        }
-
-        mutableArgs.push(arg);
-      }
+      const immutableArgs = prepareArgs({ args: module.creationArgs.immutable });
+      const mutableArgs = prepareArgs({ args: module.creationArgs.mutable });
 
       // check that module is not yet deployed
       const isDeployedPrev = await hatsModulesClient.isModuleDeployed({

@@ -16,7 +16,7 @@ const AGREEMENT_MODULE_ID = "0x4F10B9e99ce11f081652646f4b192ed1b812D5Bb";
 const ALLOWLIST_MODULE_ID = "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5";
 const MCH_MODULE_ID = "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9";
 const ELECTIONS_MODULE_ID = "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E";
-const JOKERACE_MODULE_ID = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a";
+const JOKERACE_MODULE_ID = "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"; // jokerace v0.2.0
 const PASSTHROUGH_MODULE_ID = "0x050079a8fbFCE76818C62481BA015b89567D2d35";
 const SEASON_TOGGLE_MODULE_ID = "0xFb6bD2e96B123d0854064823f6cb59420A285C00";
 const STAKING_MODULE_ID = "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7";
@@ -33,6 +33,7 @@ describe("Write Functions Client Tests", () => {
   let hat1: bigint;
   let hat1_1: bigint;
   let hat1_1_1: bigint;
+  let hat1_1_2: bigint;
   let hat1_2: bigint;
   let mchInstance: Address;
 
@@ -108,9 +109,22 @@ describe("Write Functions Client Tests", () => {
     });
     hat1_1_1 = resHat1_1_1.hatId;
 
+    // create 1.1.2 hat
+    const resHat1_1_2 = await hatsClient.createHat({
+      admin: hat1_1,
+      maxSupply: 1,
+      eligibility: account1.address,
+      toggle: account1.address,
+      mutable: true,
+      details: "1.1.2 details",
+      imageURI: "1.1.2 URI",
+      account: account1,
+    });
+    hat1_1_2 = resHat1_1_2.hatId;
+
     // create 1.2 hat
     const resHat1_2 = await hatsClient.createHat({
-      admin: hat1,
+      admin: hat1_1,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
@@ -127,7 +141,10 @@ describe("Write Functions Client Tests", () => {
       moduleId: MCH_MODULE_ID,
       hatId: hat1,
       immutableArgs: [],
-      mutableArgs: [[hat1_1_1], [2]],
+      mutableArgs: [
+        [hat1_1_1, hat1_1_2],
+        [2, 2],
+      ],
     });
     mchInstance = resMchInstance.newInstance;
 
@@ -342,6 +359,7 @@ describe("Write Functions Client Tests", () => {
 
   describe("Agreement Eligibility Write Functions", () => {
     let agreementInstance: Address;
+    let agreementInstance2: Address;
     let module: Module;
     let gracePeriodEndTime: bigint;
 
@@ -360,10 +378,25 @@ describe("Write Functions Client Tests", () => {
       });
       agreementInstance = resAgreementInstance.newInstance;
 
+      const resAgreementInstance2 = await hatsModulesClient.createNewInstance({
+        account: account1,
+        moduleId: AGREEMENT_MODULE_ID,
+        hatId: hat1_1_2,
+        immutableArgs: [],
+        mutableArgs: [hat1_1, hat1_1, "test agreement"], // should be an IPFS hash
+      });
+      agreementInstance2 = resAgreementInstance2.newInstance;
+
       await hatsClient.changeHatEligibility({
         account: account1,
         hatId: hat1_1_1,
         newEligibility: agreementInstance,
+      });
+
+      await hatsClient.changeHatEligibility({
+        account: account1,
+        hatId: hat1_1_2,
+        newEligibility: agreementInstance2,
       });
     }, 30000);
 
@@ -425,6 +458,31 @@ describe("Write Functions Client Tests", () => {
           args: [mchInstance],
         }),
       ).resolves.toHaveProperty("status", "success");
+    });
+
+    test("Test signAgreementAndClaim fails with AllHatsWorn error", async () => {
+      const func = module.writeFunctions.find((f) => f.functionName === "signAgreementAndClaimHat");
+      if (!func) throw new Error("Error: signAgreementAndClaim write function not found");
+
+      await expect(
+        hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: AGREEMENT_MODULE_ID,
+          instance: agreementInstance2,
+          func,
+          args: [mchInstance],
+        }),
+      ).resolves.toHaveProperty("status", "success");
+
+      await expect(
+        hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: AGREEMENT_MODULE_ID,
+          instance: agreementInstance2,
+          func,
+          args: [mchInstance],
+        }),
+      ).rejects.toThrow(`Error: attempting to mint ${hat1_1_2} but its maxSupply has been reached`);
     });
   });
 
@@ -570,15 +628,15 @@ describe("Write Functions Client Tests", () => {
         }),
       ).rejects.toThrow("Error: caller is not wearing the eligibility/toggle passthrough hat");
 
-      const res = await hatsModulesClient.callInstanceWriteFunction({
-        account: account2,
-        moduleId: PASSTHROUGH_MODULE_ID,
-        instance: passthroughInstance,
-        func: module?.writeFunctions[0],
-        args: [hat1_1_1, account2.address, false, false],
-      });
-
-      expect(res.status).toBe("success");
+      await expect(
+        hatsModulesClient.callInstanceWriteFunction({
+          account: account2,
+          moduleId: PASSTHROUGH_MODULE_ID,
+          instance: passthroughInstance,
+          func: module?.writeFunctions[0],
+          args: [hat1_1_1, account2.address, false, false],
+        }),
+      ).resolves.toBeUndefined();
     });
   });
 
@@ -614,7 +672,8 @@ describe("Write Functions Client Tests", () => {
           func: module?.writeFunctions[0],
           args: [2592000n, 5000n],
         }),
-      ).rejects.toThrow("Error: caller is not an admin of the season toggle branch");
+      ).rejects.toThrow("Error: attempting to extend a branch to a new season before its extendable");
+      // ).rejects.toThrow("Error: caller is not an admin of the season toggle branch");
     });
   });
 

@@ -1,3 +1,4 @@
+import { HATS_ABI } from "@hatsprotocol/sdk-v1-core";
 import axios from "axios";
 import type { Abi, Account, Address, TransactionReceipt } from "viem";
 import { decodeEventLog, encodePacked, PublicClient, WalletClient } from "viem";
@@ -37,6 +38,8 @@ import type {
   WriteFunction,
 } from "./types";
 import { checkAndEncodeArgs, checkImmutableArgs, checkWriteFunctionArgs, getNewInstancesFromReceipt } from "./utils";
+
+const MCH_MODULE_ID = "0xB985eA1be961f7c4A4C45504444C02c88c4fdEF9"; // MCH v0.6.0
 
 export class HatsModulesClient {
   private readonly _publicClient: PublicClient;
@@ -80,6 +83,8 @@ export class HatsModulesClient {
         );
         registryToUse = result.data;
       } catch (err) {
+        // eslint-disable-next-line no-console
+        console.log(err);
         throw new ModulesRegistryFetchError("Error: Could not fetch modules from the registry");
       }
     }
@@ -169,7 +174,7 @@ export class HatsModulesClient {
     }
 
     try {
-      const hash = await this._walletClient.writeContract({
+      const { request } = await this._publicClient.simulateContract({
         address: HATS_MODULES_FACTORY_ADDRESS,
         abi: HATS_MODULES_FACTORY_ABI,
         functionName: "createHatsModule",
@@ -181,8 +186,10 @@ export class HatsModulesClient {
           encodedMutableArgs,
           saltNonceToUse,
         ],
-        chain: this._walletClient.chain,
+        chain: this._publicClient.chain,
       });
+
+      const hash = await this._walletClient.writeContract(request);
 
       const receipt = await this._publicClient.waitForTransactionReceipt({
         hash,
@@ -200,6 +207,7 @@ export class HatsModulesClient {
         newInstance: instances[0],
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       throw new TransactionRevertedError("Error: Transaction reverted");
     }
@@ -281,13 +289,13 @@ export class HatsModulesClient {
 
     let receipt: TransactionReceipt;
     try {
-      const hash = await this._walletClient.writeContract({
-        address: HATS_MODULES_FACTORY_ADDRESS as `0x${string}`,
+      const { request } = await this._publicClient.simulateContract({
+        address: HATS_MODULES_FACTORY_ADDRESS as Address,
         abi: HATS_MODULES_FACTORY_ABI,
         functionName: "batchCreateHatsModule",
         account,
         args: [
-          implementations as Array<`0x${string}`>,
+          implementations as Array<Address>,
           hatIds,
           encodedImmutableArgsArray,
           encodedMutableArgsArray,
@@ -296,10 +304,13 @@ export class HatsModulesClient {
         chain: this._walletClient.chain,
       });
 
+      const hash = await this._walletClient.writeContract(request);
+
       receipt = await this._publicClient.waitForTransactionReceipt({
         hash,
       });
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       throw new TransactionRevertedError("Error: Transaction reverted");
     }
@@ -460,7 +471,7 @@ export class HatsModulesClient {
               abi: module.abi,
               functionName: param.functionName,
             });
-          } catch (err) {
+          } catch {
             throw new ModuleParameterError(
               `Error: Failed reading function ${param.functionName} from the module instance ${instance}`,
             );
@@ -562,7 +573,7 @@ export class HatsModulesClient {
       let instance: `0x${string}` = "0x";
       for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
         try {
-          const event: any = decodeEventLog({
+          const event = decodeEventLog({
             abi: HATS_MODULES_FACTORY_ABI,
             eventName: "HatsModuleFactory_ModuleDeployed",
             data: receipt.logs[eventIndex].data,
@@ -571,7 +582,7 @@ export class HatsModulesClient {
 
           instance = event.args.instance;
           break;
-        } catch (err) {
+        } catch {
           // continue
         }
       }
@@ -582,6 +593,7 @@ export class HatsModulesClient {
         newInstance: instance,
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       throw new TransactionRevertedError("Error: Transaction reverted");
     }
@@ -664,7 +676,7 @@ export class HatsModulesClient {
       let instance: `0x${string}` = "0x";
       for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
         try {
-          const event: any = decodeEventLog({
+          const event = decodeEventLog({
             abi: HATS_MODULES_FACTORY_ABI,
             eventName: "HatsModuleFactory_ModuleDeployed",
             data: receipt.logs[eventIndex].data,
@@ -673,7 +685,7 @@ export class HatsModulesClient {
 
           instance = event.args.instance;
           break;
-        } catch (err) {
+        } catch {
           // continue
         }
       }
@@ -684,6 +696,7 @@ export class HatsModulesClient {
         newInstance: instance,
       };
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.log(err);
       throw new TransactionRevertedError("Error: Transaction reverted");
     }
@@ -801,7 +814,7 @@ export class HatsModulesClient {
       } else {
         return false;
       }
-    } catch (err) {
+    } catch {
       // not a module
       return false;
     }
@@ -863,7 +876,7 @@ export class HatsModulesClient {
       }
 
       return res;
-    } catch (err) {
+    } catch {
       throw new Error("Error: multicall failed");
     }
   }
@@ -950,7 +963,7 @@ export class HatsModulesClient {
       }
 
       return res;
-    } catch (err) {
+    } catch {
       // undefined;
     }
   }
@@ -1062,7 +1075,7 @@ export class HatsModulesClient {
       }
 
       return res;
-    } catch (err) {
+    } catch {
       throw new Error("Error: multicall failed");
     }
   }
@@ -1130,7 +1143,7 @@ export class HatsModulesClient {
 
       const res = this.getModuleByImplementation(implementationAddress);
       return res;
-    } catch (err) {
+    } catch {
       return undefined;
     }
   }
@@ -1175,7 +1188,7 @@ export class HatsModulesClient {
       }
 
       return modules;
-    } catch (err) {
+    } catch {
       throw new Error("Error: multicall unexpected error");
     }
   }
@@ -1243,6 +1256,7 @@ export class HatsModulesClient {
     }
 
     const module = this.getModuleById(moduleId);
+    const mchModule = this.getModuleByImplementation(MCH_MODULE_ID);
     if (module === undefined) {
       throw new ModuleNotAvailableError(`Error: Module with id ${moduleId} does not exist`);
     }
@@ -1252,9 +1266,12 @@ export class HatsModulesClient {
     try {
       const { request } = await this._publicClient.simulateContract({
         address: instance,
-        abi: module.abi,
-        functionName: func.functionName,
-        args: args,
+        // include HATS_ABI and MCH_ABI to catch errors from those contracts
+        abi: [...module.abi, ...HATS_ABI, ...(mchModule?.abi as Abi)],
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        functionName: func.functionName as any,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        args: args as any,
         account,
       });
 
@@ -1268,7 +1285,7 @@ export class HatsModulesClient {
         status: receipt.status,
         transactionHash: receipt.transactionHash,
       };
-    } catch (err) {
+    } catch (err: unknown) {
       getModuleFunctionError(err, moduleId);
     }
   }

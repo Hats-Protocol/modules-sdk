@@ -1,4 +1,4 @@
-import type { TransactionReceipt } from "viem";
+import type { Address, TransactionReceipt } from "viem";
 import { decodeEventLog, encodeAbiParameters, encodePacked } from "viem";
 
 import { InvalidParamError, ParametersLengthsMismatchError } from "./errors";
@@ -28,8 +28,8 @@ export const checkAndEncodeArgs = ({
   immutableArgs: unknown[];
   mutableArgs: unknown[];
 }): {
-  encodedImmutableArgs: `0x${string}`;
-  encodedMutableArgs: `0x${string}`;
+  encodedImmutableArgs: Address;
+  encodedMutableArgs: Address;
 } => {
   checkImmutableArgs({ module, immutableArgs });
   checkMutableArgs({ module, mutableArgs });
@@ -122,11 +122,11 @@ export const checkWriteFunctionArgs = ({ func, args }: { func: WriteFunction; ar
  *
  * @param receipt - The transaction receipt as a TransactionReceipt Viem object.
  */
-export const getNewInstancesFromReceipt = (receipt: TransactionReceipt): `0x${string}`[] => {
-  const instances: `0x${string}`[] = [];
+export const getNewInstancesFromReceipt = (receipt: TransactionReceipt): Address[] => {
+  const instances: Address[] = [];
   for (let eventIndex = 0; eventIndex < receipt.logs.length; eventIndex++) {
     try {
-      const event: any = decodeEventLog({
+      const event = decodeEventLog({
         abi: [
           {
             anonymous: false,
@@ -179,12 +179,12 @@ export const getNewInstancesFromReceipt = (receipt: TransactionReceipt): `0x${st
 
       instances.push(event.args.instance);
       continue;
-    } catch (err) {
+    } catch {
       // continue
     }
 
     try {
-      const event: any = decodeEventLog({
+      const event = decodeEventLog({
         abi: [
           {
             anonymous: false,
@@ -230,7 +230,7 @@ export const getNewInstancesFromReceipt = (receipt: TransactionReceipt): `0x${st
       });
 
       instances.push(event.args.instance);
-    } catch (err) {
+    } catch {
       // continue
     }
   }
