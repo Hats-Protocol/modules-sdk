@@ -13,3 +13,4 @@ jest.config.ts
 rollup.config.mjs
 tsconfig.json
 scripts/*
+.github/*
