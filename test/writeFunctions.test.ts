@@ -127,7 +127,8 @@ describe("Write Functions Client Tests", () => {
     beforeAll(async () => {
       const resAllowListInstance = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         hatId: hat1_1_1,
         immutableArgs: [hat1, hat1_1],
         mutableArgs: [[]],
@@ -143,13 +144,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test addAccount", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: "haberdasher-labs_allowlist-eligibility",
+          moduleVersion: "v0.1.0",
           instance: allowListInstance,
           func: module?.writeFunctions[0],
           args: [account2.address],
@@ -161,7 +164,8 @@ describe("Write Functions Client Tests", () => {
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: "haberdasher-labs_allowlist-eligibility",
+          moduleVersion: "v0.1.0",
           instance: allowListInstance,
           func: module?.writeFunctions[0],
           args: [1],
@@ -172,7 +176,8 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         instance: allowListInstance,
         func: module?.writeFunctions[0],
         args: [account2.address],
@@ -191,12 +196,14 @@ describe("Write Functions Client Tests", () => {
 
     test("Test removeAccount", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         instance: allowListInstance,
         func: module?.writeFunctions[2],
         args: [account2.address],
@@ -215,12 +222,14 @@ describe("Write Functions Client Tests", () => {
 
     test("Test addAccounts", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         instance: allowListInstance,
         func: module?.writeFunctions[1],
         args: [[account1.address, account2.address]],
@@ -246,12 +255,14 @@ describe("Write Functions Client Tests", () => {
 
     test("Test removeAccounts", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account1,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         instance: allowListInstance,
         func: module?.writeFunctions[4],
         args: [[account1.address, account2.address]],
@@ -277,13 +288,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test setStandingForAccount", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: "haberdasher-labs_allowlist-eligibility",
+          moduleVersion: "v0.1.0",
           instance: allowListInstance,
           func: module?.writeFunctions[5],
           args: [account2.address, false],
@@ -294,7 +307,8 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+        moduleId: "haberdasher-labs_allowlist-eligibility",
+        moduleVersion: "v0.1.0",
         instance: allowListInstance,
         func: module?.writeFunctions[5],
         args: [account2.address, false],
@@ -313,13 +327,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test removeAccountAndBurnHat", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: "haberdasher-labs_allowlist-eligibility",
+          moduleVersion: "v0.1.0",
           instance: allowListInstance,
           func: module?.writeFunctions[3],
           args: [account2.address],
@@ -331,13 +347,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test setStandingForAccounts", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5"
+        "haberdasher-labs_allowlist-eligibility",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xaC208e6668DE569C6ea1db76DeCea70430335Ed5",
+          moduleId: "haberdasher-labs_allowlist-eligibility",
+          moduleVersion: "v0.1.0",
           instance: allowListInstance,
           func: module?.writeFunctions[7],
           args: [[account2.address], [true, false]],
@@ -357,7 +375,8 @@ describe("Write Functions Client Tests", () => {
       const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance(
         {
           account: account1,
-          moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
+          moduleId: "haberdasher-labs_hats-election-eligibility",
+          moduleVersion: "v0.2.0",
           hatId: hat1_1_1,
           immutableArgs: [hat1_1, hat1_2],
           mutableArgs: [electionsEndTime],
@@ -374,13 +393,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test elect", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E"
+        "haberdasher-labs_hats-election-eligibility",
+        "v0.2.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
+          moduleId: "haberdasher-labs_hats-election-eligibility",
+          moduleVersion: "v0.2.0",
           instance: hatElectionsInstance,
           func: module?.writeFunctions[1],
           args: [electionsEndTime, [account1.address]],
@@ -391,7 +412,8 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0xd3b916a8F0C4f9D1d5B6Af29c3C012dbd4f3149E",
+        moduleId: "haberdasher-labs_hats-election-eligibility",
+        moduleVersion: "v0.2.0",
         instance: hatElectionsInstance,
         func: module?.writeFunctions[1],
         args: [electionsEndTime, [account1.address]],
@@ -419,7 +441,8 @@ describe("Write Functions Client Tests", () => {
 
       const jokeraceInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        moduleId: "haberdasher-labs_jokerace-eligibility",
+        moduleVersion: "v0.2.0",
         hatId: hat1_1_1,
         immutableArgs: [hat1_1],
         mutableArgs: [
@@ -439,13 +462,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test pullElectionResults and reelection", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a"
+        "haberdasher-labs_jokerace-eligibility",
+        "v0.2.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+          moduleId: "haberdasher-labs_jokerace-eligibility",
+          moduleVersion: "v0.2.0",
           instance: jokeraceInstance,
           func: module?.writeFunctions[1],
           args: [
@@ -460,7 +485,8 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0xAE0e56A0c509dA713722c1aFFcF4B5f1C6CDc73a",
+        moduleId: "haberdasher-labs_jokerace-eligibility",
+        moduleVersion: "v0.2.0",
         instance: jokeraceInstance,
         func: module?.writeFunctions[0],
         args: [],
@@ -476,7 +502,8 @@ describe("Write Functions Client Tests", () => {
     beforeAll(async () => {
       const passthroughInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+        moduleId: "haberdasher-labs_passthrough-module",
+        moduleVersion: "v0.1.0",
         hatId: hat1_1_1,
         immutableArgs: [hat1_1],
         mutableArgs: [],
@@ -492,13 +519,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test setHatWearerStatus", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0x050079a8fbFCE76818C62481BA015b89567D2d35"
+        "haberdasher-labs_passthrough-module",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+          moduleId: "haberdasher-labs_passthrough-module",
+          moduleVersion: "v0.1.0",
           instance: passthroughInstance,
           func: module?.writeFunctions[0],
           args: [hat1_1_1, account2.address, false, false],
@@ -509,7 +538,8 @@ describe("Write Functions Client Tests", () => {
 
       const res = await hatsModulesClient.callInstanceWriteFunction({
         account: account2,
-        moduleId: "0x050079a8fbFCE76818C62481BA015b89567D2d35",
+        moduleId: "haberdasher-labs_passthrough-module",
+        moduleVersion: "v0.1.0",
         instance: passthroughInstance,
         func: module?.writeFunctions[0],
         args: [hat1_1_1, account2.address, false, false],
@@ -525,7 +555,8 @@ describe("Write Functions Client Tests", () => {
     beforeAll(async () => {
       const seasonInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0xFb6bD2e96B123d0854064823f6cb59420A285C00",
+        moduleId: "haberdasher-labs_season-toggle",
+        moduleVersion: "v0.1.0",
         hatId: hat1_2,
         immutableArgs: [],
         mutableArgs: [2592000n, 5000n],
@@ -541,13 +572,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test extend", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0xFb6bD2e96B123d0854064823f6cb59420A285C00"
+        "haberdasher-labs_season-toggle",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account2,
-          moduleId: "0xFb6bD2e96B123d0854064823f6cb59420A285C00",
+          moduleId: "haberdasher-labs_season-toggle",
+          moduleVersion: "v0.1.0",
           instance: seasonInstance,
           func: module?.writeFunctions[0],
           args: [2592000n, 5000n],
@@ -564,7 +597,8 @@ describe("Write Functions Client Tests", () => {
     beforeAll(async () => {
       const stakingInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
-        moduleId: "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7",
+        moduleId: "haberdasher-labs_staking-eligibility",
+        moduleVersion: "v0.1.0",
         hatId: hat1_1_1,
         immutableArgs: ["0x1d256A1154382921067d4B17CA52209f2d3bE106"],
         mutableArgs: [100n, hat1_1, hat1_1, 86400n],
@@ -580,13 +614,15 @@ describe("Write Functions Client Tests", () => {
 
     test("Test slash", async () => {
       const module = hatsModulesClient.getModuleById(
-        "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7"
+        "haberdasher-labs_staking-eligibility",
+        "v0.1.0"
       ) as Module;
 
       await expect(async () => {
         await hatsModulesClient.callInstanceWriteFunction({
           account: account1,
-          moduleId: "0x9E01030aF633Be5a439DF122F2eEf750b44B8aC7",
+          moduleId: "haberdasher-labs_staking-eligibility",
+          moduleVersion: "v0.1.0",
           instance: stakingInstance,
           func: module?.writeFunctions[8],
           args: [account2.address],
