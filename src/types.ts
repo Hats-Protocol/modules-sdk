@@ -5,7 +5,7 @@ export interface TransactionResult {
   transactionHash: `0x${string}`;
 }
 
-export interface CallInstanceWriteFunctionResult extends TransactionResult {}
+export type CallInstanceWriteFunctionResult = TransactionResult;
 
 export interface CreateInstanceResult extends TransactionResult {
   newInstance: `0x${string}`;
