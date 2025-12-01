@@ -9,7 +9,7 @@ const config: JestConfigWithTsJest = {
     "^.+\\.(ts|tsx)?$": ["ts-jest", { useESM: true }],
   },
   testPathIgnorePatterns: ["./dist"],
-  setupFilesAfterEnv: ["./test/jest.setup.ts"],
+  setupFilesAfterEnv: ["<rootDir>/test/jest.setup.ts"],
   forceExit: true,
 };
 

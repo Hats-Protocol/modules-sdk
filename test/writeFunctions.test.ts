@@ -402,7 +402,10 @@ describe("Write Functions Client Tests", () => {
         address: mchInstance,
         abi: mchModule.abi,
         functionName: "setHatsClaimability",
-        args: [[hatX_1_1, hatX_1_2], [2, 2]], // ClaimType.ClaimableFor = 2
+        args: [
+          [hatX_1_1, hatX_1_2],
+          [2, 2],
+        ], // ClaimType.ClaimableFor = 2
         account: account1,
         chain: sepolia,
       });
