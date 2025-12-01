@@ -398,18 +398,14 @@ describe("Write Functions Client Tests", () => {
       // set hats as claimable in MCH for signAgreementAndClaim tests
       // ClaimType.ClaimableFor = 2
       const mchModule = hatsModulesClient.getModuleById(MCH_MODULE_ID) as Module;
-      const setHatsClaimabilityFunc = mchModule.writeFunctions.find(
-        (f) => f.functionName === "setHatsClaimability",
-      );
-      if (setHatsClaimabilityFunc) {
-        await hatsModulesClient.callInstanceWriteFunction({
-          account: account1,
-          moduleId: MCH_MODULE_ID,
-          instance: mchInstance,
-          func: setHatsClaimabilityFunc,
-          args: [[hatX_1_1, hatX_1_2], [2, 2]], // ClaimType.ClaimableFor = 2
-        });
-      }
+      await walletClient.writeContract({
+        address: mchInstance,
+        abi: mchModule.abi,
+        functionName: "setHatsClaimability",
+        args: [[hatX_1_1, hatX_1_2], [2, 2]], // ClaimType.ClaimableFor = 2
+        account: account1,
+        chain: sepolia,
+      });
     }, 30000);
 
     test("Test setAgreement fails if caller is not owner", async () => {
