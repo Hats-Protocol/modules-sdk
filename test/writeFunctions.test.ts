@@ -394,6 +394,22 @@ describe("Write Functions Client Tests", () => {
         hatId: hatX_1_2,
         newEligibility: agreementInstance2,
       });
+
+      // set hats as claimable in MCH for signAgreementAndClaim tests
+      // ClaimType.ClaimableFor = 2
+      const mchModule = hatsModulesClient.getModuleById(MCH_MODULE_ID) as Module;
+      const setHatsClaimabilityFunc = mchModule.writeFunctions.find(
+        (f) => f.functionName === "setHatsClaimability",
+      );
+      if (setHatsClaimabilityFunc) {
+        await hatsModulesClient.callInstanceWriteFunction({
+          account: account1,
+          moduleId: MCH_MODULE_ID,
+          instance: mchInstance,
+          func: setHatsClaimabilityFunc,
+          args: [[hatX_1_1, hatX_1_2], [2, 2]], // ClaimType.ClaimableFor = 2
+        });
+      }
     }, 30000);
 
     test("Test setAgreement fails if caller is not owner", async () => {
@@ -408,7 +424,7 @@ describe("Write Functions Client Tests", () => {
           func,
           args: ["test agreement", gracePeriodEndTime],
         }),
-      ).rejects.toThrow("Do not know how to serialize a BigInt"); // ("Error: the caller does not wear the module's Owner Hat");
+      ).rejects.toThrow("AgreementEligibility_NotOwner");
     });
 
     test("Test setAgreement succeeds for owner", async () => {
