@@ -1,7 +1,7 @@
 import { HATS_ABI } from "@hatsprotocol/sdk-v1-core";
 import axios from "axios";
 import type { Abi, Account, Address, TransactionReceipt } from "viem";
-import { decodeEventLog, encodePacked, PublicClient, WalletClient } from "viem";
+import { decodeEventLog, encodeFunctionData, encodePacked, PublicClient, WalletClient } from "viem";
 
 import {
   CHAIN_ABI,
@@ -214,6 +214,60 @@ export class HatsModulesClient {
   }
 
   /**
+   * Create a new module instance calldata.
+   *
+   * @param moduleId - The module ID.
+   * @param hatId - The hat ID for which the module is created.
+   * @param immutableArgs - The module's immutable arguments.
+   * @param mutableArgs - The module's mutable arguments.
+   * @param saltNonce - Salt nonce to use.
+   * @returns The calldata for the createHatsModule function.
+   */
+  createNewInstanceCalldata({
+    moduleId,
+    hatId,
+    immutableArgs,
+    mutableArgs,
+    saltNonce,
+  }: {
+    moduleId: string;
+    hatId: bigint;
+    immutableArgs: unknown[];
+    mutableArgs: unknown[];
+    saltNonce: bigint;
+  }): { functionName: string; callData: `0x${string}` } {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function",
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function",
+      );
+    }
+
+    const module = this.getModuleById(moduleId);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(`Error: Module with id ${moduleId} does not exist`);
+    }
+
+    const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
+      module,
+      immutableArgs,
+      mutableArgs,
+    });
+
+    const callData = encodeFunctionData({
+      abi: HATS_MODULES_FACTORY_ABI,
+      functionName: "createHatsModule",
+      args: [module.implementationAddress as `0x${string}`, hatId, encodedImmutableArgs, encodedMutableArgs, saltNonce],
+    });
+
+    return { functionName: "createHatsModule", callData };
+  }
+
+  /**
    * Batch create new module instances.
    *
    * @param account - A Viem account.
@@ -322,6 +376,64 @@ export class HatsModulesClient {
       transactionHash: receipt.transactionHash,
       newInstances: instances,
     };
+  }
+
+  /**
+   * Batch create new module instances calldata.
+   *
+   * @param moduleImplementations - The module implementations.
+   * @param hatIds - The hat IDs for which the modules are created.
+   * @param immutableArgsArray - Each module's immutable arguments.
+   * @param mutableArgsArray - Each module's mutable arguments.
+   * @param saltNonces - Salt nonces to use.
+   * @returns The calldata for the batchCreateHatsModule function.
+   */
+  batchCreateNewInstancesCalldata({
+    moduleImplementations,
+    hatIds,
+    immutableArgsArray,
+    mutableArgsArray,
+    saltNonces,
+  }: {
+    moduleImplementations: Address[];
+    hatIds: bigint[];
+    immutableArgsArray: unknown[][];
+    mutableArgsArray: unknown[][];
+    saltNonces: bigint[];
+  }): { functionName: string; callData: `0x${string}` } {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function",
+      );
+    }
+    if (this._walletClient === undefined) {
+      throw new MissingWalletClientError(
+        "Error: the client was initialized without a wallet client, which is required for this function",
+      );
+    }
+    // TODO check lengths of all the arrays
+
+    const encodedImmutableArgsArray: Array<`0x${string}`> = [];
+    const encodedMutableArgsArray: Array<`0x${string}`> = [];
+
+    for (let i = 0; i < moduleImplementations.length; i++) {
+      const { encodedImmutableArgs, encodedMutableArgs } = checkAndEncodeArgs({
+        module: this.getModuleByImplementation(moduleImplementations[i])!,
+        immutableArgs: immutableArgsArray[i],
+        mutableArgs: mutableArgsArray[i],
+      });
+
+      encodedMutableArgsArray.push(encodedMutableArgs);
+      encodedImmutableArgsArray.push(encodedImmutableArgs);
+    }
+
+    const callData = encodeFunctionData({
+      abi: HATS_MODULES_FACTORY_ABI,
+      functionName: "batchCreateHatsModule",
+      args: [moduleImplementations, hatIds, encodedImmutableArgsArray, encodedMutableArgsArray, saltNonces!],
+    });
+
+    return { functionName: "batchCreateHatsModule", callData };
   }
 
   /**
@@ -1288,5 +1400,48 @@ export class HatsModulesClient {
     } catch (err: unknown) {
       getModuleFunctionError(err, moduleId);
     }
+  }
+
+  /**
+   * Generate calldata for a module's instance write function.
+   *
+   * @param implementation - The module implementation.
+   * @param func - Function to call.
+   * @param args - Function's input arguments.
+   * @returns The calldata for the function.
+   */
+  callInstanceWriteFunctionCalldata({
+    implementation,
+    functionName,
+    args,
+  }: {
+    implementation: Address;
+    functionName: string;
+    args: unknown[];
+  }): { functionName: string; callData: `0x${string}` } {
+    if (this._modules === undefined) {
+      throw new ClientNotPreparedError(
+        "Error: Client has not been initialized, requires a call to the prepare function",
+      );
+    }
+
+    const module = this.getModuleByImplementation(implementation);
+    if (module === undefined) {
+      throw new ModuleNotAvailableError(`Error: Module with id ${implementation} does not exist`);
+    }
+    const func = module.writeFunctions.find((f) => f.functionName === functionName);
+    if (func === undefined) {
+      throw new ModuleNotAvailableError(`Error: Function with name ${functionName} does not exist`);
+    }
+
+    checkWriteFunctionArgs({ func, args });
+
+    const callData = encodeFunctionData({
+      abi: module.abi,
+      functionName: func.functionName,
+      args,
+    });
+
+    return { functionName: func.functionName, callData };
   }
 }
