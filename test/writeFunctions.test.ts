@@ -1,10 +1,10 @@
 import "dotenv/config";
 
-import { HatsClient } from "@hatsprotocol/sdk-v1-core";
+import { hatIdIpToDecimal, hatIdToTreeId, HatsClient } from "@hatsprotocol/sdk-v1-core";
 import type { Anvil } from "@viem/anvil";
 import { createAnvil } from "@viem/anvil";
 import * as fs from "fs";
-import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import type { Address, HDAccount, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
@@ -26,23 +26,23 @@ describe("Write Functions Client Tests", () => {
   let walletClient: WalletClient;
   let hatsModulesClient: HatsModulesClient;
   let hatsClient: HatsClient;
-  let anvil: Anvil;
+  // let anvil: Anvil;
 
-  let account1: PrivateKeyAccount;
-  let account2: PrivateKeyAccount;
-  let hat1: bigint;
-  let hat1_1: bigint;
-  let hat1_1_1: bigint;
-  let hat1_1_2: bigint;
-  let hat1_2: bigint;
+  let account1: PrivateKeyAccount | HDAccount;
+  let account2: PrivateKeyAccount | HDAccount;
+  let hatX: bigint;
+  let hatX_1: bigint;
+  let hatX_1_1: bigint;
+  let hatX_1_2: bigint;
+  let hatX_2: bigint;
   let mchInstance: Address;
 
   beforeAll(async () => {
-    anvil = createAnvil({
-      forkUrl: process.env.SEPOLIA_RPC,
-      startTimeout: 20000,
-    });
-    await anvil.start();
+    // anvil = createAnvil({
+    //   forkUrl: process.env.SEPOLIA_RPC,
+    //   startTimeout: 20000,
+    // });
+    // await anvil.start();
 
     account1 = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
     account2 = privateKeyToAccount("0x59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d");
@@ -75,17 +75,20 @@ describe("Write Functions Client Tests", () => {
     });
 
     // create top hat
-    const resHat1 = await hatsClient.mintTopHat({
+    const resTopHat = await hatsClient.mintTopHat({
       target: account1.address,
       details: "Tophat SDK",
       imageURI: "Tophat URI",
       account: account1,
     });
-    hat1 = resHat1.hatId;
+    hatX = resTopHat.hatId;
+    const treeId = hatIdToTreeId(hatX);
+    console.log({ treeId });
 
-    // create 1.1 hat
-    const resHat1_1 = await hatsClient.createHat({
-      admin: hat1,
+    // create X.1 hat
+    hatX_1 = hatIdIpToDecimal(`${treeId}.1`);
+    await hatsClient.createHat({
+      admin: hatX,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
@@ -94,11 +97,11 @@ describe("Write Functions Client Tests", () => {
       imageURI: "1.1 URI",
       account: account1,
     });
-    hat1_1 = resHat1_1.hatId;
 
-    // create 1.1.1 hat
-    const resHat1_1_1 = await hatsClient.createHat({
-      admin: hat1_1,
+    // create X.1.1 hat
+    hatX_1_1 = hatIdIpToDecimal(`${treeId}.1.1`);
+    await hatsClient.createHat({
+      admin: hatX_1,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
@@ -107,12 +110,12 @@ describe("Write Functions Client Tests", () => {
       imageURI: "1.1.1 URI",
       account: account1,
     });
-    hat1_1_1 = resHat1_1_1.hatId;
 
-    // create 1.1.2 hat
-    const resHat1_1_2 = await hatsClient.createHat({
-      admin: hat1_1,
-      maxSupply: 1,
+    // create X.1.2 hat
+    hatX_1_2 = hatIdIpToDecimal(`${treeId}.1.2`);
+    await hatsClient.createHat({
+      admin: hatX_1,
+      maxSupply: 5,
       eligibility: account1.address,
       toggle: account1.address,
       mutable: true,
@@ -120,11 +123,11 @@ describe("Write Functions Client Tests", () => {
       imageURI: "1.1.2 URI",
       account: account1,
     });
-    hat1_1_2 = resHat1_1_2.hatId;
 
-    // create 1.2 hat
-    const resHat1_2 = await hatsClient.createHat({
-      admin: hat1_1,
+    // create X.2 hat
+    hatX_2 = hatIdIpToDecimal(`${treeId}.2`);
+    await hatsClient.createHat({
+      admin: hatX,
       maxSupply: 3,
       eligibility: account1.address,
       toggle: account1.address,
@@ -133,35 +136,28 @@ describe("Write Functions Client Tests", () => {
       imageURI: "1.2 URI",
       account: account1,
     });
-    hat1_2 = resHat1_2.hatId;
 
     // create MCH instance with initial claimable hat
     const resMchInstance = await hatsModulesClient.createNewInstance({
       account: account1,
       moduleId: MCH_MODULE_ID,
-      hatId: hat1,
+      hatId: hatX,
       immutableArgs: [],
-      mutableArgs: [
-        [hat1_1_1, hat1_1_2],
-        [2, 2],
-      ],
+      mutableArgs: [[hatX_1], [2]],
     });
     mchInstance = resMchInstance.newInstance;
 
-    // mint 1.1 hat to mch instance
-    await hatsClient.mintHat({
+    // mint 1.1 hat to mch instance and account2
+    await hatsClient.batchMintHats({
       account: account1,
-      hatId: hat1_1,
-      wearer: mchInstance,
-    });
-
-    // mint 1.1 hat to account2
-    await hatsClient.mintHat({
-      account: account1,
-      hatId: hat1_1,
-      wearer: account2.address,
+      hatIds: [hatX_1, hatX_1],
+      wearers: [mchInstance, account2.address],
     });
   }, 30000);
+
+  // afterAll(async () => {
+  //   await anvil.stop();
+  // }, 30000);
 
   describe("Allowlist Eligibility Write Functions", () => {
     let allowListInstance: Address;
@@ -174,8 +170,8 @@ describe("Write Functions Client Tests", () => {
       const resAllowListInstance = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: ALLOWLIST_MODULE_ID,
-        hatId: hat1_1_1,
-        immutableArgs: [hat1, hat1_1],
+        hatId: hatX_1_1,
+        immutableArgs: [hatX, hatX_1],
         mutableArgs: [[]],
       });
       allowListInstance = resAllowListInstance.newInstance;
@@ -183,7 +179,7 @@ describe("Write Functions Client Tests", () => {
       // update hat eligibility
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: allowListInstance,
       });
     }, 30000);
@@ -221,7 +217,7 @@ describe("Write Functions Client Tests", () => {
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account2.address, hat1_1_1],
+        args: [account2.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -241,7 +237,7 @@ describe("Write Functions Client Tests", () => {
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account2.address, hat1_1_1],
+        args: [account2.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -261,13 +257,13 @@ describe("Write Functions Client Tests", () => {
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account1.address, hat1_1_1],
+        args: [account1.address, hatX_1_1],
       })) as boolean[];
       const eligibilityRes2 = (await publicClient.readContract({
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account2.address, hat1_1_1],
+        args: [account2.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -288,13 +284,13 @@ describe("Write Functions Client Tests", () => {
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account1.address, hat1_1_1],
+        args: [account1.address, hatX_1_1],
       })) as boolean[];
       const eligibilityRes2 = (await publicClient.readContract({
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account2.address, hat1_1_1],
+        args: [account2.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -325,7 +321,7 @@ describe("Write Functions Client Tests", () => {
         address: allowListInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account2.address, hat1_1_1],
+        args: [account2.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -372,30 +368,30 @@ describe("Write Functions Client Tests", () => {
       const resAgreementInstance = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: AGREEMENT_MODULE_ID,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         immutableArgs: [],
-        mutableArgs: [hat1_1, hat1_1, "test agreement"], // should be an IPFS hash
+        mutableArgs: [hatX_1, hatX_1, "test agreement"], // should be an IPFS hash
       });
       agreementInstance = resAgreementInstance.newInstance;
 
       const resAgreementInstance2 = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: AGREEMENT_MODULE_ID,
-        hatId: hat1_1_2,
+        hatId: hatX_1_2,
         immutableArgs: [],
-        mutableArgs: [hat1_1, hat1_1, "test agreement"], // should be an IPFS hash
+        mutableArgs: [hatX_1, hatX_1, "test agreement"], // should be an IPFS hash
       });
       agreementInstance2 = resAgreementInstance2.newInstance;
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: agreementInstance,
       });
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_2,
+        hatId: hatX_1_2,
         newEligibility: agreementInstance2,
       });
     }, 30000);
@@ -482,7 +478,7 @@ describe("Write Functions Client Tests", () => {
           func,
           args: [mchInstance],
         }),
-      ).rejects.toThrow(`Error: attempting to mint ${hat1_1_2} but its maxSupply has been reached`);
+      ).rejects.toThrow(`Error: attempting to mint ${hatX_1_2} but its maxSupply has been reached`);
     });
   });
 
@@ -498,8 +494,8 @@ describe("Write Functions Client Tests", () => {
       const hatElectionsInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: ELECTIONS_MODULE_ID,
-        hatId: hat1_1_1,
-        immutableArgs: [hat1_1, hat1_2],
+        hatId: hatX_1_1,
+        immutableArgs: [hatX_1, hatX_2],
         mutableArgs: [electionsEndTime],
       });
       hatElectionsInstance = hatElectionsInstanceRes.newInstance;
@@ -508,7 +504,7 @@ describe("Write Functions Client Tests", () => {
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: hatElectionsInstance,
       });
     });
@@ -536,7 +532,7 @@ describe("Write Functions Client Tests", () => {
         address: hatElectionsInstance,
         abi: module.abi,
         functionName: "getWearerStatus",
-        args: [account1.address, hat1_1_1],
+        args: [account1.address, hatX_1_1],
       })) as boolean[];
 
       expect(res.status).toBe("success");
@@ -556,8 +552,8 @@ describe("Write Functions Client Tests", () => {
       const jokeraceInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: JOKERACE_MODULE_ID,
-        hatId: hat1_1_1,
-        immutableArgs: [hat1_1],
+        hatId: hatX_1_1,
+        immutableArgs: [hatX_1],
         mutableArgs: ["0xc5E226Caec417de53A38Fc63242291e474772274", electionsEndTime, 3n],
       });
       jokeraceInstance = jokeraceInstanceRes.newInstance;
@@ -566,7 +562,7 @@ describe("Write Functions Client Tests", () => {
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: jokeraceInstance,
       });
     });
@@ -604,15 +600,15 @@ describe("Write Functions Client Tests", () => {
       const passthroughInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: PASSTHROUGH_MODULE_ID,
-        hatId: hat1_1_1,
-        immutableArgs: [hat1_1],
+        hatId: hatX_1_1,
+        immutableArgs: [hatX_1],
         mutableArgs: [],
       });
       passthroughInstance = passthroughInstanceRes.newInstance;
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: passthroughInstance,
       });
     });
@@ -624,7 +620,7 @@ describe("Write Functions Client Tests", () => {
           moduleId: PASSTHROUGH_MODULE_ID,
           instance: passthroughInstance,
           func: module?.writeFunctions[0],
-          args: [hat1_1_1, account2.address, false, false],
+          args: [hatX_1_1, account2.address, false, false],
         }),
       ).rejects.toThrow("Error: caller is not wearing the eligibility/toggle passthrough hat");
 
@@ -634,7 +630,7 @@ describe("Write Functions Client Tests", () => {
           moduleId: PASSTHROUGH_MODULE_ID,
           instance: passthroughInstance,
           func: module?.writeFunctions[0],
-          args: [hat1_1_1, account2.address, false, false],
+          args: [hatX_1_1, account2.address, false, false],
         }),
       ).resolves.toBeUndefined();
     });
@@ -650,7 +646,7 @@ describe("Write Functions Client Tests", () => {
       const seasonInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: SEASON_TOGGLE_MODULE_ID,
-        hatId: hat1_2,
+        hatId: hatX_1_2,
         immutableArgs: [],
         mutableArgs: [2592000n, 5000n],
       });
@@ -658,7 +654,7 @@ describe("Write Functions Client Tests", () => {
 
       await hatsClient.changeHatToggle({
         account: account1,
-        hatId: hat1_2,
+        hatId: hatX_2,
         newToggle: seasonInstance,
       });
     });
@@ -687,15 +683,15 @@ describe("Write Functions Client Tests", () => {
       const stakingInstanceRes = await hatsModulesClient.createNewInstance({
         account: account1,
         moduleId: STAKING_MODULE_ID,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         immutableArgs: ["0x1d256A1154382921067d4B17CA52209f2d3bE106"],
-        mutableArgs: [100n, hat1_1, hat1_1, 86400n],
+        mutableArgs: [100n, hatX_1, hatX_1, 86400n],
       });
       stakingInstance = stakingInstanceRes.newInstance;
 
       await hatsClient.changeHatEligibility({
         account: account1,
-        hatId: hat1_1_1,
+        hatId: hatX_1_1,
         newEligibility: stakingInstance,
       });
     });
@@ -712,8 +708,4 @@ describe("Write Functions Client Tests", () => {
       ).rejects.toThrow("Error: caller is not wearing the Judge Hat");
     });
   });
-
-  afterAll(async () => {
-    await anvil.stop();
-  }, 30000);
 });

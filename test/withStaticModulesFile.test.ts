@@ -7,6 +7,7 @@ import {
   type Address,
   createPublicClient,
   createWalletClient,
+  type HDAccount,
   http,
   type PrivateKeyAccount,
   type PublicClient,
@@ -29,8 +30,8 @@ describe("Client Tests With a Static Modules File", () => {
   let publicClient: PublicClient;
   let walletClient: WalletClient;
   let hatsModulesClient: HatsModulesClient;
-  let anvil: Anvil;
-  let deployerAccount: PrivateKeyAccount;
+  // let anvil: Anvil;
+  let deployerAccount: PrivateKeyAccount | HDAccount;
   let registryModules: Registry;
 
   let erc20EligibilityInstance: Address;
@@ -38,11 +39,11 @@ describe("Client Tests With a Static Modules File", () => {
   let erc1155EligibilityInstance: Address;
 
   beforeAll(async () => {
-    anvil = createAnvil({
-      forkUrl: process.env.SEPOLIA_RPC,
-      startTimeout: 20000,
-    });
-    await anvil.start();
+    // anvil = createAnvil({
+    //   forkUrl: process.env.SEPOLIA_RPC,
+    //   startTimeout: 20000,
+    // });
+    // await anvil.start();
 
     deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
@@ -68,9 +69,9 @@ describe("Client Tests With a Static Modules File", () => {
     await hatsModulesClient.prepare(registryModules);
   }, 30000);
 
-  afterAll(async () => {
-    await anvil.stop();
-  }, 30000);
+  // afterAll(async () => {
+  //   await anvil.stop();
+  // }, 30000);
 
   test("Test get all active modules", () => {
     const filter = (module: Module) => {

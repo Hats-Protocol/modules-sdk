@@ -9,6 +9,7 @@ const config: JestConfigWithTsJest = {
     "^.+\\.(ts|tsx)?$": ["ts-jest", { useESM: true }],
   },
   testPathIgnorePatterns: ["./dist"],
+  forceExit: true,
 };
 
 export default config;

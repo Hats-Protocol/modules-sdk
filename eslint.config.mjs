@@ -6,10 +6,12 @@ import simpleImportSort from "eslint-plugin-simple-import-sort";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
+  {
+    ignores: ["node_modules/**", "dist/**", "test/modules.json"],
+  },
   eslint.configs.recommended,
   tseslint.configs.recommended,
   {
-    ignores: ["node_modules/**", "dist/**", "test/modules.json"],
     rules: {
       // Note: you must disable the base rule as it can report incorrect errors
       "no-unused-vars": "off",

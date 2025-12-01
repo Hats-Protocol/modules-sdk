@@ -3,7 +3,7 @@ import "dotenv/config";
 import type { Anvil } from "@viem/anvil";
 import { createAnvil } from "@viem/anvil";
 import * as fs from "fs";
-import type { Address, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
+import type { Address, HDAccount, PrivateKeyAccount, PublicClient, WalletClient } from "viem";
 import { createPublicClient, createWalletClient, http } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
@@ -28,8 +28,8 @@ describe("Batch Create Client Tests", () => {
   let publicClient: PublicClient;
   let walletClient: WalletClient;
   let hatsModulesClient: HatsModulesClient;
-  let anvil: Anvil;
-  let deployerAccount: PrivateKeyAccount;
+  // let anvil: Anvil;
+  let deployerAccount: PrivateKeyAccount | HDAccount;
 
   // let jokeraceInstance: Address;
   let stakingInstance: Address;
@@ -45,11 +45,11 @@ describe("Batch Create Client Tests", () => {
   let chains: { [key: string]: ModuleChain };
 
   beforeAll(async () => {
-    anvil = createAnvil({
-      forkUrl: process.env.SEPOLIA_RPC,
-      startTimeout: 20000,
-    });
-    await anvil.start();
+    // anvil = createAnvil({
+    //   forkUrl: process.env.SEPOLIA_RPC,
+    //   startTimeout: 20000,
+    // });
+    // await anvil.start();
 
     deployerAccount = privateKeyToAccount("0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80");
 
@@ -149,9 +149,9 @@ describe("Batch Create Client Tests", () => {
     };
   }, 35000);
 
-  afterAll(async () => {
-    await anvil.stop();
-  }, 30000);
+  // afterAll(async () => {
+  //   await anvil.stop();
+  // }, 30000);
 
   describe("Chain creation tests", () => {
     test("Scenario 1 - " + SCENARIO_1_DESC, async () => {
