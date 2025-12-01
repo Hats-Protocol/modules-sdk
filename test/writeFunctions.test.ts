@@ -394,6 +394,21 @@ describe("Write Functions Client Tests", () => {
         hatId: hatX_1_2,
         newEligibility: agreementInstance2,
       });
+
+      // set hats as claimable in MCH for signAgreementAndClaim tests
+      // ClaimType.ClaimableFor = 2
+      const mchModule = hatsModulesClient.getModuleById(MCH_MODULE_ID) as Module;
+      await walletClient.writeContract({
+        address: mchInstance,
+        abi: mchModule.abi,
+        functionName: "setHatsClaimability",
+        args: [
+          [hatX_1_1, hatX_1_2],
+          [2, 2],
+        ], // ClaimType.ClaimableFor = 2
+        account: account1,
+        chain: sepolia,
+      });
     }, 30000);
 
     test("Test setAgreement fails if caller is not owner", async () => {
@@ -408,7 +423,7 @@ describe("Write Functions Client Tests", () => {
           func,
           args: ["test agreement", gracePeriodEndTime],
         }),
-      ).rejects.toThrow("Do not know how to serialize a BigInt"); // ("Error: the caller does not wear the module's Owner Hat");
+      ).rejects.toThrow("AgreementEligibility_NotOwner");
     });
 
     test("Test setAgreement succeeds for owner", async () => {
@@ -456,7 +471,7 @@ describe("Write Functions Client Tests", () => {
       ).resolves.toHaveProperty("status", "success");
     });
 
-    test("Test signAgreementAndClaim fails with AllHatsWorn error", async () => {
+    test("Test signAgreementAndClaim fails with AlreadyWearingHat error", async () => {
       const func = module.writeFunctions.find((f) => f.functionName === "signAgreementAndClaimHat");
       if (!func) throw new Error("Error: signAgreementAndClaim write function not found");
 
@@ -478,7 +493,7 @@ describe("Write Functions Client Tests", () => {
           func,
           args: [mchInstance],
         }),
-      ).rejects.toThrow(`Error: attempting to mint ${hatX_1_2} but its maxSupply has been reached`);
+      ).rejects.toThrow("who is already wearing the hat");
     });
   });
 
