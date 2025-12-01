@@ -468,7 +468,7 @@ describe("Write Functions Client Tests", () => {
       ).resolves.toHaveProperty("status", "success");
     });
 
-    test("Test signAgreementAndClaim fails with AllHatsWorn error", async () => {
+    test("Test signAgreementAndClaim fails with AlreadyWearingHat error", async () => {
       const func = module.writeFunctions.find((f) => f.functionName === "signAgreementAndClaimHat");
       if (!func) throw new Error("Error: signAgreementAndClaim write function not found");
 
@@ -490,7 +490,7 @@ describe("Write Functions Client Tests", () => {
           func,
           args: [mchInstance],
         }),
-      ).rejects.toThrow(`Error: attempting to mint ${hatX_1_2} but its maxSupply has been reached`);
+      ).rejects.toThrow("who is already wearing the hat");
     });
   });
 
